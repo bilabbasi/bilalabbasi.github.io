@@ -1,0 +1,344 @@
+/* =========================================================================
+   WEBSITE STYLING SHEET (CSS)
+   =========================================================================
+   This file controls the colors, sizes, alignment, and fonts of the page.
+   Follow the comments below to easily customize the layout of your site. */
+
+/* Import Google Fonts (Lora for serif heading, Inter for clean body text) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+
+/* Define design colors and settings so they can be changed in one place */
+:root {
+    --bg-main: #ffffff;         /* Background color of the entire screen */
+    --text-title: #18181b;      /* Color of your name and main headers (charcoal/dark gray) */
+    --text-subtitle: #6b6687;   /* Color of the subtitle (soft slate purple) */
+    --text-body: #4b5563;       /* Color of your bio paragraphs (muted charcoal) */
+    --text-muted: #9ca3af;      /* Color for minor symbols and arrow indicators (light gray) */
+    --link-color: #18181b;      /* Default color of link text */
+    --link-hover: #6b6687;      /* Color of link text when hovered over */
+    --border-color: #e5e7eb;    /* Light gray borders (if used anywhere) */
+    
+    /* Font styles */
+    --font-serif: 'Lora', Georgia, serif;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    
+    /* Animation speed for links and transitions */
+    --transition-smooth: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Reset default browser margins and spacings to start with a clean slate */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Base styles for the document body */
+html, body {
+    height: 100%;
+    background-color: var(--bg-main);
+    color: var(--text-body);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden; /* Desktop layout: Lock height to prevent page scrolling */
+}
+
+/* Custom design for scrollbars (appears only when screen size is small) */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+}
+
+/* Wrapper container: Keeps content aligned and adds margins around the screen edge */
+.app-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 40px 80px;         /* Padding: 40px top/bottom, 80px left/right */
+    max-width: 1440px;          /* Maximum width to prevent content stretching on huge screens */
+    margin: 0 auto;             /* Centers the website block horizontally */
+}
+
+/* --- Navigation Bar (Top) --- */
+.navbar {
+    display: flex;
+    justify-content: flex-end; /* Align the navigation links to the right */
+    align-items: center;
+    height: 60px;
+    margin-bottom: auto; /* Automatically pushes body content to the screen center */
+}
+
+/* Logo styling */
+.logo {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-title);
+    letter-spacing: -0.5px;
+    text-transform: lowercase;  /* Renders the name in modern lowercase style */
+}
+
+/* List holding navigation links */
+.nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;           /* Removes default bullet points */
+}
+
+/* Navigation items link text */
+.nav-item a {
+    text-decoration: none;
+    font-size: 0.9rem;
+    color: var(--text-body);
+    transition: var(--transition-smooth);
+}
+
+.nav-item a:hover {
+    color: var(--text-title);
+}
+
+/* --- Main Layout: Columns split --- */
+.main-content {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr; /* Left column takes 1.2 shares of width, Right takes 1 share */
+    gap: 80px;                         /* Spacing space between the left and right columns */
+    align-items: center;
+    margin-bottom: auto;               /* Pushes the footer cleanly to the bottom */
+}
+
+/* --- Left Column: Info, Bio & Links --- */
+.info-column {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;                         /* Vertical spacing between title, paragraph, and links */
+    max-width: 580px;                  /* Prevents lines of text from becoming too wide to read */
+}
+
+/* Header layout block */
+.heading-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Main title: e.g. "Bilal Abbasi" */
+.main-title {
+    font-family: var(--font-serif);
+    font-size: 4rem;                   /* Large text size */
+    font-weight: 500;
+    line-height: 1.1;
+    color: var(--text-title);
+    letter-spacing: -1.5px;            /* Tightens letters closer together for clean design */
+}
+
+/* Subtitle: e.g. "Systems Engineering & Research" */
+.main-subtitle {
+    font-family: var(--font-serif);
+    font-size: 2.75rem;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--text-subtitle);
+    letter-spacing: -0.5px;
+}
+
+/* Bio Paragraph */
+.bio-paragraph {
+    font-size: 1.05rem;
+    line-height: 1.65;                 /* Increases line spacing for easy reading */
+    color: var(--text-body);
+}
+
+/* Outer wrapper block for the social links row */
+.external-links {
+    display: flex;
+    flex-wrap: wrap;                   /* Wraps links to a new line if screen is narrow */
+    gap: 24px;                         /* Spacing between links */
+    margin-top: 16px;
+}
+
+/* Individual link button styling */
+.external-link {
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--link-color);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;                          /* Spacing between link label and arrow icon */
+    position: relative;
+    padding-bottom: 2px;
+    transition: var(--transition-smooth);
+}
+
+/* Creates a custom line under links that vanishes on hover */
+.external-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: var(--text-title);
+    transform: scaleX(1);
+    transform-origin: bottom left;
+    transition: transform var(--transition-smooth);
+}
+
+.external-link:hover {
+    color: var(--link-hover);
+}
+
+/* Animate the underline to slide away on hover */
+.external-link:hover::after {
+    transform: scaleX(0);
+    transform-origin: bottom right;
+}
+
+/* Arrow SVG icon styling next to links */
+.external-link svg {
+    width: 14px;
+    height: 14px;
+    stroke-width: 2.5px;
+    color: var(--text-muted);
+    transition: var(--transition-smooth);
+}
+
+/* Animate the arrow icon to point further top-right on hover */
+.external-link:hover svg {
+    color: var(--link-hover);
+    transform: translate(2px, -2px);
+}
+
+/* --- Right Column: Image artwork --- */
+.visual-column {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sketch-container {
+    width: 100%;
+    max-width: 480px;                  /* Limit the width of the sketch container */
+    display: flex;
+    justify-content: center;
+}
+
+.sketch-img {
+    width: 100%;
+    height: auto;
+    max-height: 55vh;                  /* Prevents the image from taking more than 55% of window height */
+    object-fit: contain;               /* Preserves aspect ratio */
+    mix-blend-mode: multiply;          /* Blends illustration background cleanly with page background */
+    filter: contrast(1.02);
+    opacity: 0.9;
+    user-select: none;
+    pointer-events: none;              /* Prevents mouse dragging/saving issues on clicks */
+}
+
+/* --- Footer --- */
+.footer {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* =========================================================================
+   RESPONSIVE DESIGN RULES (Media Queries)
+   =========================================================================
+   These rules automatically tweak sizes and change column alignments on
+   tablets and mobile screens so the site looks good everywhere. */
+
+/* Tablet Screens (Slightly smaller desktop screens) */
+@media (max-width: 1024px) {
+    .app-wrapper {
+        padding: 40px;
+    }
+    
+    .main-content {
+        gap: 40px;
+    }
+    
+    .main-title {
+        font-size: 3.2rem;
+    }
+    
+    .main-subtitle {
+        font-size: 2.2rem;
+    }
+}
+
+/* Mobile Portrait & Narrow Viewports */
+@media (max-width: 900px) {
+    html, body {
+        overflow-y: auto;              /* Enable page scrolling on mobile screens */
+        height: auto;
+    }
+    
+    .app-wrapper {
+        height: auto;
+        min-height: 100vh;
+        padding: 32px 24px;
+    }
+    
+    .navbar {
+        margin-bottom: 60px;
+    }
+    
+    /* Stack the left text and right image vertically instead of side-by-side */
+    .main-content {
+        grid-template-columns: 1fr;
+        gap: 60px;
+        margin-bottom: 60px;
+    }
+    
+    .info-column {
+        max-width: 100%;
+    }
+    
+    .sketch-container {
+        max-width: 400px;
+    }
+    
+    .sketch-img {
+        max-height: 45vh;
+    }
+    
+    .footer {
+        margin-top: auto;
+    }
+}
+
+/* Small Smart Phones */
+@media (max-width: 480px) {
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        height: auto;
+    }
+    
+    .nav-links {
+        gap: 20px;
+    }
+    
+    .main-title {
+        font-size: 2.5rem;
+    }
+    
+    .main-subtitle {
+        font-size: 1.8rem;
+    }
+    
+    .external-links {
+        gap: 16px 20px;
+    }
+}

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio</title>
+
+    <!-- SEO Meta Tags - Helps Google find the site -->
+    <meta name="description" content="Personal space of Bilal Abbasi. Focused on systems engineering and research.">
+    <meta name="author" content="Bilal Abbasi">
+    <meta name="robots" content="index, follow">
+
+    <!-- Stylesheet: Controls how the website looks (colors, fonts, sizes) -->
+    <link rel="stylesheet" href="index.css">
+
+    <!-- Configuration Data: Where your text and links are defined -->
+    <script src="config.js"></script>
+
+    <!-- Loader Script: Automatically inserts the data from config.js into this page -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // 1. Update browser tab title
+            document.title = CONFIG.name;
+
+            // 2. Update main profile text headings & paragraphs
+            document.getElementById("main-title").textContent = CONFIG.name;
+            document.getElementById("main-subtitle").textContent = CONFIG.subtitle;
+            document.getElementById("bio-text").textContent = CONFIG.bio;
+
+            // 4. Generate the social/profile links dynamically
+            const linksList = document.getElementById("links-list");
+            linksList.innerHTML = CONFIG.links.map(link => `
+                <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="external-link">
+                    ${link.label}
+                    <!-- Inline SVG: Creates the small arrow icon pointing top-right (↗) next to links -->
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"></line>
+                        <polyline points="7 7 17 7 17 17"></polyline>
+                    </svg>
+                </a>
+            `).join("");
+        });
+    </script>
+</head>
+
+<body>
+
+    <!-- Main wrapper holding the header, main content, and footer -->
+    <div class="app-wrapper">
+
+        <!-- Header: Top bar containing navigation links -->
+        <header class="navbar">
+            <ul class="nav-links">
+                <li class="nav-item"><a href="#me">professional me</a></li>
+            </ul>
+        </header>
+
+        <!-- Main Content Area: Split into two columns -->
+        <main class="main-content" id="me">
+
+            <!-- Left Column: Biography headings and list of links -->
+            <div class="info-column">
+                <div class="heading-group">
+                    <!-- Headings are populated by the JavaScript loader at the top -->
+                    <h1 class="main-title" id="main-title">loading...</h1>
+                    <h2 class="main-subtitle" id="main-subtitle">loading...</h2>
+                </div>
+
+                <!-- Main bio paragraph text (populated by JavaScript loader) -->
+                <p class="bio-paragraph" id="bio-text">loading...</p>
+
+                <!-- Container where the social/professional links will be loaded -->
+                <div class="external-links" id="links-list">
+                    <!-- Links list will be injected here -->
+                </div>
+            </div>
+
+            <!-- Right Column: Visual Sketch illustration -->
+            <div class="visual-column">
+                <div class="sketch-container">
+                    <!-- You can swap assets/sketch.png with any other image in your directory -->
+                    <img src="assets/sketch.png" alt="Conceptual mechanical line illustration" class="sketch-img">
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Footer: Copyright line at the bottom -->
+        <footer class="footer">
+            <p>&copy; 2026 Bilal Abbasi. All rights reserved.</p>
+        </footer>
+
+    </div>
+
+</body>
+
+</html>
