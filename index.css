@@ -104,6 +104,13 @@ html, body {
     color: var(--text-title);
 }
 
+.nav-item a.active {
+    font-weight: 600;
+    color: var(--text-title);
+    border-bottom: 1.5px solid var(--text-title);
+    padding-bottom: 2px;
+}
+
 /* --- Main Layout: Columns split --- */
 .main-content {
     display: grid;

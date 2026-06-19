@@ -1,0 +1,22 @@
+/* =========================================================================
+   KITCHEN WEBSITE STYLING SHEET
+   =========================================================================
+   This file imports the main index.css styles and overrides specific color
+   variables to give the Kitchen page a warm, culinary aesthetic. */
+
+@import url('index.css');
+
+:root {
+    /* Override color accents with warm terracotta and amber tones */
+    --text-subtitle: #b45309;   /* Warm dark amber/terracotta */
+    --link-color: #7c2d12;      /* Rich terracotta brown for links */
+    --link-hover: #ea580c;      /* Bright orange-amber on hover */
+}
+
+/* Style the active navigation link for the kitchen theme */
+.nav-item a.active {
+    font-weight: 600;
+    color: var(--text-subtitle) !important;
+    border-bottom: 1.5px solid var(--text-subtitle);
+    padding-bottom: 2px;
+}
