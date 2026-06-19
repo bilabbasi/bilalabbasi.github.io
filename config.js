@@ -45,7 +45,7 @@ const KITCHEN_CONFIG = {
     subtitle: "Recipes from my childhood.",
 
     // Biography for your kitchen profile
-    bio: ""
+    bio: "All credit goes to ammi. Only the mistakes are mine."
     /* 
         // Links shown on your Kitchen page
         links: [
