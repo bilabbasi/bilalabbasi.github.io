@@ -107,7 +107,7 @@ html, body {
 /* --- Main Layout: Columns split --- */
 .main-content {
     display: grid;
-    grid-template-columns: 1.2fr 1fr; /* Left column takes 1.2 shares of width, Right takes 1 share */
+    grid-template-columns: 1fr 1fr;    /* Both columns share equal width for maximum image size */
     gap: 80px;                         /* Spacing space between the left and right columns */
     align-items: center;
     margin-bottom: auto;               /* Pushes the footer cleanly to the bottom */
@@ -225,7 +225,7 @@ html, body {
 
 .sketch-container {
     width: 100%;
-    max-width: 480px;                  /* Limit the width of the sketch container */
+    max-width: 100%;                   /* Allow the container to expand fully to fill its grid cell */
     display: flex;
     justify-content: center;
 }
@@ -233,7 +233,7 @@ html, body {
 .sketch-img {
     width: 100%;
     height: auto;
-    max-height: 55vh;                  /* Prevents the image from taking more than 55% of window height */
+    max-height: 80vh;                  /* Increased to 80vh for maximum scale within viewport bounds */
     object-fit: contain;               /* Preserves aspect ratio */
     mix-blend-mode: multiply;          /* Blends illustration background cleanly with page background */
     filter: contrast(1.02);

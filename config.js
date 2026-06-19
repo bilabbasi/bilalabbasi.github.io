@@ -28,7 +28,7 @@ const CONFIG = {
         },
         {
             label: "GitHub",
-            url: "https://github.com/bilalabbasi"
+            url: "https://github.com/bilabbasi"
         }
     ]
 };
