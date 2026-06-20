@@ -1,33 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="assets/logo.png">
+    <link rel="icon" type="image/png" href="assets/favicon_ba_urdu.png">
     <title>The Kitchen</title>
-    
+
     <!-- SEO Meta Tags -->
     <meta name="description" content="Bilal Abbasi's culinary corner. Sourdough baking, recipes, and food science.">
     <meta name="author" content="Bilal Abbasi">
     <meta name="robots" content="index, follow">
-    
+
     <!-- Stylesheet: Controls how the kitchen page looks (imports index.css + overrides colors) -->
     <link rel="stylesheet" href="kitchen.css">
-    
+
     <!-- Configuration Data: Shared config containing both professional and kitchen bio contents -->
     <script src="config.js"></script>
-    
+
     <!-- Loader Script: Automatically inserts the KITCHEN_CONFIG details when loaded -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             // 1. Update browser tab title
             document.title = KITCHEN_CONFIG.name;
-            
+
             // 2. Update main profile text headings & paragraphs
             document.getElementById("main-title").textContent = KITCHEN_CONFIG.name;
             document.getElementById("main-subtitle").textContent = KITCHEN_CONFIG.subtitle;
             document.getElementById("bio-text").textContent = KITCHEN_CONFIG.bio;
-            
+
             // 3. Generate the kitchen/recipe links dynamically
             const linksList = document.getElementById("links-list");
             linksList.innerHTML = KITCHEN_CONFIG.links.map(link => `
@@ -42,10 +43,11 @@
         });
     </script>
 </head>
+
 <body>
 
     <div class="app-wrapper">
-        
+
         <!-- Header: Top bar with navigation. "kitchen me" is marked active here -->
         <header class="navbar">
             <ul class="nav-links">
@@ -56,16 +58,16 @@
 
         <!-- Main Content Area: Split into two columns -->
         <main class="main-content" id="me">
-            
+
             <!-- Left Column: Biography headings and list of links -->
             <div class="info-column">
                 <div class="heading-group">
                     <h1 class="main-title" id="main-title">loading...</h1>
                     <h2 class="main-subtitle" id="main-subtitle">loading...</h2>
                 </div>
-                
+
                 <p class="bio-paragraph" id="bio-text">loading...</p>
-                
+
                 <div class="external-links" id="links-list">
                     <!-- Links list will be injected here -->
                 </div>
@@ -88,4 +90,5 @@
     </div>
 
 </body>
+
 </html>
