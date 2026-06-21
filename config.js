@@ -39,10 +39,10 @@ const PROFESSIONAL_CONFIG = {
 // -------------------------------------------------------------------------
 const KITCHEN_CONFIG = {
     // Page title/header name
-    name: "The Kitchen",
+    name: "the kitchen",
 
     // Culinary subtitle
-    subtitle: "Recipes from my childhood.",
+    subtitle: "recipes from my childhood",
 
     // Biography for your kitchen profile
     bio: "All credit goes to ammi. Only the mistakes are mine."
