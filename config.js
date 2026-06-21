@@ -46,20 +46,4 @@ const KITCHEN_CONFIG = {
 
     // Biography for your kitchen profile
     bio: "All credit goes to ammi. Only the mistakes are mine."
-    /* 
-        // Links shown on your Kitchen page
-        links: [
-            {
-                label: "Sourdough Notes",
-                url: "#" // You can replace '#' with link to notes or files later
-            },
-            {
-                label: "Pasta Ratios",
-                url: "#"
-            },
-            {
-                label: "GitHub",
-                url: "https://github.com/bilabbasi"
-            }
-        ] */
 };
