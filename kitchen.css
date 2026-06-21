@@ -270,3 +270,50 @@ body {
         margin-bottom: 20px;
     }
 }
+
+
+/* ABOUT */
+/* 2-column responsive grid layout */
+
+
+.about-title {
+    font-family: var(--font-serif);
+    font-size: 3rem;
+    font-weight: 500;
+    line-height: 1.1;
+    color: var(--text-title);
+    letter-spacing: -1px;
+    text-transform: lowercase;
+    margin-bottom: 48px;
+}
+
+.about-section {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    /* Ensures the section is tall enough to scroll fully into view on all screens */
+    padding-top: 80px;
+    padding-bottom: 120px;
+    /* Generous bottom spacing for footer and to guarantee smooth full scroll */
+    flex-shrink: 0;
+    /* Prevent flex shrinking to respect min-height */
+}
+
+.about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: start;
+    margin-bottom: auto;
+}
+
+.about-img {
+    width: 85%;
+    /* Forces the image to take up exactly the width of the column container */
+    height: auto;
+    /* Tells the browser to scale the height proportionally so it doesn't stretch */
+    display: block;
+    /* Removes any default inline margins or white space beneath the image */
+    border-radius: 8px;
+    /* Optional: adds nice rounded corners if you want it to look premium */
+}
