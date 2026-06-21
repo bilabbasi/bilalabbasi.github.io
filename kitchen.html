@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="assets/favicon_ba_urdu_orange.png">
-    <title>The Kitchen</title>
+    <title>the kitchen</title>
 
     <!-- SEO Meta Tags -->
     <meta name="description" content="Bilal Abbasi's culinary corner. Sourdough baking, recipes, and food science.">
@@ -31,7 +31,8 @@
 
             // 3. Generate the kitchen/recipe links dynamically
             const linksList = document.getElementById("links-list");
-            linksList.innerHTML = KITCHEN_CONFIG.links.map(link => `
+            const links = KITCHEN_CONFIG.links || [];
+            linksList.innerHTML = links.map(link => `
                 <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="external-link">
                     ${link.label}
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -48,44 +49,146 @@
 
     <div class="app-wrapper">
 
-        <!-- Header: Top bar with navigation. "kitchen me" is marked active here -->
-        <header class="navbar">
-            <ul class="nav-links">
-                <li class="nav-item"><a href="index.html">professional me</a></li>
-                <li class="nav-item"><a href="kitchen.html" class="active">kitchen me</a></li>
-            </ul>
-        </header>
+        <!-- Hero Section (First Page) -->
+        <section class="hero-section">
+            <!-- Header: Top bar with navigation. "kitchen me" is marked active here -->
+            <header class="navbar">
+                <ul class="nav-links">
+                    <li class="nav-item"><a href="index.html">professional me</a></li>
+                    <li class="nav-item"><a href="kitchen.html" class="active">kitchen me</a></li>
+                </ul>
+            </header>
 
-        <!-- Main Content Area: Split into two columns -->
-        <main class="main-content" id="me">
+            <!-- Main Content Area: Split into two columns -->
+            <main class="main-content" id="me">
 
-            <!-- Left Column: Biography headings and list of links -->
-            <div class="info-column">
-                <div class="heading-group">
-                    <h1 class="main-title" id="main-title">loading...</h1>
-                    <h2 class="main-subtitle" id="main-subtitle">loading...</h2>
+                <!-- Left Column: Biography headings and list of links -->
+                <div class="info-column">
+                    <div class="heading-group">
+                        <h1 class="main-title" id="main-title">loading...</h1>
+                        <h2 class="main-subtitle" id="main-subtitle">loading...</h2>
+                    </div>
+
+                    <p class="bio-paragraph" id="bio-text">loading...</p>
+
+                    <div class="external-links" id="links-list">
+                        <!-- Links list will be injected here -->
+                    </div>
                 </div>
 
-                <p class="bio-paragraph" id="bio-text">loading...</p>
-
-                <div class="external-links" id="links-list">
-                    <!-- Links list will be injected here -->
+                <!-- Right Column: Visual Sourdough Sketch -->
+                <div class="visual-column">
+                    <div class="sketch-container">
+                        <img src="assets/kitchen_sketch.png" alt="Sourdough bread blueprint drawing" class="sketch-img">
+                    </div>
                 </div>
+
+            </main>
+
+            <!-- Scroll indicator pointing to the menu below -->
+            <div class="scroll-indicator"
+                onclick="document.getElementById('menu').scrollIntoView({ behavior: 'smooth' })">
+                <span class="scroll-text">the menu</span>
+                <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </div>
+        </section>
+
+        <!-- Menu Section (Second Page) -->
+        <section class="menu-section" id="menu">
+            <h2 class="menu-title">the menu</h2>
+
+            <div class="menu-grid">
+
+                <!-- MEAT (ghosht) COLUMN -->
+                <div class="menu-column">
+                    <h3 class="column-title">meat <span class="urdu-title">گوشت</span></h3>
+                    <div class="menu-items">
+                        <!-- Template Item: Duplicate this block to add a new recipe -->
+                        <div class="menu-item">
+                            <a href="#" class="recipe-link">
+                                <span class="recipe-name">recipe name</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                    stroke-linecap="round" stroke-linejoin="round" class="link-arrow">
+                                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                                    <polyline points="7 7 17 7 17 17"></polyline>
+                                </svg>
+                            </a>
+                            <p class="recipe-description">A brief description of the recipe. Space beneath for details.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHICKEN (murgh) COLUMN -->
+                <div class="menu-column">
+                    <h3 class="column-title">chicken <span class="urdu-title">مرغ</span></h3>
+                    <div class="menu-items">
+                        <!-- Template Item: Duplicate this block to add a new recipe -->
+                        <div class="menu-item">
+                            <a href="#" class="recipe-link">
+                                <span class="recipe-name">recipe name</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                    stroke-linecap="round" stroke-linejoin="round" class="link-arrow">
+                                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                                    <polyline points="7 7 17 7 17 17"></polyline>
+                                </svg>
+                            </a>
+                            <p class="recipe-description">A brief description of the recipe. Space beneath for details.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VEG (sabzi) COLUMN -->
+                <div class="menu-column">
+                    <h3 class="column-title">veg <span class="urdu-title">سبزی</span></h3>
+                    <div class="menu-items">
+                        <!-- Template Item: Duplicate this block to add a new recipe -->
+                        <div class="menu-item">
+                            <a href="#" class="recipe-link">
+                                <span class="recipe-name">recipe name</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                    stroke-linecap="round" stroke-linejoin="round" class="link-arrow">
+                                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                                    <polyline points="7 7 17 7 17 17"></polyline>
+                                </svg>
+                            </a>
+                            <p class="recipe-description">A brief description of the recipe. Space beneath for details.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DESSERT (meetha) COLUMN -->
+                <div class="menu-column">
+                    <h3 class="column-title">dessert <span class="urdu-title">میٹھی</span></h3>
+                    <div class="menu-items">
+                        <!-- Template Item: Duplicate this block to add a new recipe -->
+                        <div class="menu-item">
+                            <a href="#" class="recipe-link">
+                                <span class="recipe-name">recipe name</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                    stroke-linecap="round" stroke-linejoin="round" class="link-arrow">
+                                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                                    <polyline points="7 7 17 7 17 17"></polyline>
+                                </svg>
+                            </a>
+                            <p class="recipe-description">A brief description of the recipe. Space beneath for details.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
-            <!-- Right Column: Visual Sourdough Sketch -->
-            <div class="visual-column">
-                <div class="sketch-container">
-                    <img src="assets/kitchen_sketch.png" alt="Sourdough bread blueprint drawing" class="sketch-img">
-                </div>
-            </div>
-
-        </main>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <p>&copy; 2026 Bilal Abbasi. All rights reserved.</p>
-        </footer>
+            <!-- Footer -->
+            <footer class="footer">
+                <p>&copy; 2026 Bilal Abbasi. All rights reserved.</p>
+            </footer>
+        </section>
 
     </div>
 
