@@ -45,5 +45,5 @@ const KITCHEN_CONFIG = {
     subtitle: "recipes from my childhood",
 
     // Biography for your kitchen profile
-    bio: "All credit goes to ammi. Only the mistakes are mine."
+    bio: "All credit goes to my mom. Only the mistakes are mine."
 };
