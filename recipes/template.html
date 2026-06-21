@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../assets/favicon_ba_urdu_orange.png">
+    <title>recipe</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Bilal Abbasi's culinary corner. Sourdough baking, recipes, and food science.">
+    <meta name="author" content="Bilal Abbasi">
+    <meta name="robots" content="index, follow">
+
+    <!-- Stylesheet: Controls how the kitchen page looks (imports index.css + overrides colors) -->
+    <link rel="stylesheet" href="recipe.css">
+
+
+    <!-- Loader Script: Automatically inserts the KITCHEN_CONFIG details when loaded -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // 3. Generate the kitchen/recipe links dynamically
+            const linksList = document.getElementById("links-list");
+            const links = KITCHEN_CONFIG.links || [];
+            linksList.innerHTML = links.map(link => `
+                <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="external-link">
+                    ${link.label}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"></line>
+                        <polyline points="7 7 17 7 17 17"></polyline>
+                    </svg>
+                </a>
+            `).join("");
+        });
+    </script>
+</head>
+
+<body>
+
+    <div class="app-wrapper">
+
+        <!-- Hero Section (First Page) -->
+        <section class="hero-section">
+            <!-- Header: Top bar with navigation. "kitchen me" is marked active here -->
+            <header class="navbar">
+                <ul class="nav-links">
+                    <li class="nav-item"><a href="../index.html">professional me</a></li>
+                    <li class="nav-item"><a href="../kitchen.html" class="active">kitchen me</a></li>
+                </ul>
+            </header>
+
+            <!-- Main Content Area: Split into two columns -->
+            <main class="main-content" id="me">
+
+                <!-- Left Column: Biography headings and list of links -->
+                <div class="info-column">
+                    <div class="heading-group">
+                        <h1 class="main-title" id="main-title">RECIPE NAME</h1>
+                        <h2 class="main-subtitle" id="main-subtitle">ترکیب کا نام</h2>
+                    </div>
+
+                    <p class="bio-paragraph" id="bio-text">RECIPE DESCRIPTION</p>
+
+                    <div class="external-links" id="links-list">
+                        <!-- Links list will be injected here -->
+                    </div>
+                </div>
+
+                <!-- Right Column: Visual Sourdough Sketch -->
+                <div class="visual-column">
+                    <div class="sketch-container">
+                        <img src="../assets/kitchen_sketch.png" alt="Sourdough bread blueprint drawing"
+                            class="sketch-img">
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Scroll indicator pointing to the menu below -->
+            <div class="scroll-indicator"
+                onclick="document.getElementById('menu').scrollIntoView({ behavior: 'smooth' })">
+                <span class="scroll-text">the recipe</span>
+                <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </div>
+        </section>
+
+        <!-- Menu Section (Second Page) -->
+        <section class="menu-section" id="menu">
+            <h2 class="menu-title">the recipe</h2>
+
+            <div class="menu-grid">
+
+                <!-- INGREDIENTS COLUMN -->
+                <div class="menu-column">
+                    <h3 class="column-title">ingredients</h3>
+                    <div class="menu-items">
+                        <!-- Template Item: Duplicate this block to add a new recipe -->
+                        <div class="menu-item">
+                            <p class="recipe-description">A brief description of the recipe. Space beneath for
+                                details.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- INGREDIENTS COLUMN -->
+                <div class="menu-column">
+                    <h3 class="column-title">steps</h3>
+                    <div class="menu-items">
+                        <!-- Template Item: Duplicate this block to add a new recipe -->
+                        <div class="menu-item">
+                            <p class="recipe-description">A brief description of the recipe. Space beneath for
+                                details.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <p>&copy; 2026 Bilal Abbasi. All rights reserved.</p>
+            </footer>
+
+    </div>
+
+</body>
+
+</html>
