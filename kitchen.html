@@ -185,9 +185,17 @@
                         </div>
                     </div>
                 </div>
-
             </div>
 
+            <!-- Scroll indicator pointing to the about section below -->
+            <div class="scroll-indicator"
+                onclick="document.getElementById('about').scrollIntoView({ behavior: 'smooth' })">
+                <span class="scroll-text">a little about me</span>
+                <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </div>
         </section>
 
         <!-- About Section (Third Page) -->
@@ -203,7 +211,8 @@
                         in until about 2 decades later. </p>
                 </div>
                 <div class="about-column">
-                    <img class="about-img" src="assets/photos/bilal_baby.png" alt="lol">
+                    <img class="about-img" src="assets/photos/bilal_baby.png"
+                        alt="Picture of Bilal's mom holding him in the kitchen sink.">
                 </div>
             </div>
         </section>
