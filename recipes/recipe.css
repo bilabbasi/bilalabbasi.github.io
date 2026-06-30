@@ -281,49 +281,60 @@ body {
     }
 }
 /* -------------------------------------------------------------------------
-   6. RECIPE VIEW INDICATORS & TOGGLES
-   ------------------------------------------------------------------------- */
+   6. RECIPE VIEW INDICATORS & TOGGLES (LAYOUT MODE BUTTONS)
+   ------------------------------------------------------------------------- 
+   These classes style the "side by side" and "step by step" layout select
+   buttons situated at the bottom of the Hero landing page. */
 
+/* Container wrapping both buttons horizontally */
 .recipe-indicators {
-    display: flex;
-    justify-content: center;
-    gap: 48px;
-    margin-top: auto;
+    display: flex;             /* Lines up indicators side-by-side */
+    justify-content: center;   /* Centers indicators horizontally */
+    gap: 48px;                 /* Spacing between indicators */
+    margin-top: auto;          /* Pushes container to the very bottom of screen */
     padding-top: 20px;
     width: 100%;
 }
 
+/* Individual layout selection indicator */
 .recipe-indicators .scroll-indicator {
     margin-top: 0;
     padding-top: 0;
+    /* transition: applies animation styles smoothly when hovering or active */
     transition: opacity var(--transition-smooth), transform var(--transition-smooth);
 }
 
+/* Slight lift effect on hover */
 .recipe-indicators .scroll-indicator:hover {
-    transform: translateY(-2px);
+    transform: translateY(-2px); /* Moves indicator up by 2px */
     opacity: 1;
 }
 
+/* Highlight style when this view mode is currently active */
 .recipe-indicators .scroll-indicator.active {
     opacity: 1;
 }
 
+/* Style active button text color and make it bold */
 .recipe-indicators .scroll-indicator.active .scroll-text {
     color: var(--text-subtitle);
     font-weight: 600;
 }
 
+/* Bounces the scroll arrow indicator when active to draw attention */
 .recipe-indicators .scroll-indicator.active .scroll-arrow {
     color: var(--text-subtitle);
-    animation: bounce-indicator 2s infinite;
+    animation: bounce-indicator 2s infinite; /* Starts bounce loop */
 }
 
+/* Fade down inactive buttons to keep visual focus on active indicator */
 .recipe-indicators .scroll-indicator:not(.active) {
     opacity: 0.5;
 }
 
+/* Stop bouncing arrows on inactive button indicators */
 .recipe-indicators .scroll-indicator:not(.active) .scroll-arrow {
-    animation: none; /* Disable bouncing for inactive modes */
+    animation: none; 
 }
 
 .recipe-indicators .scroll-indicator:not(.active):hover {
@@ -333,42 +344,56 @@ body {
 
 /* -------------------------------------------------------------------------
    7. HORIZONTAL STEPS SCROLLING (Side-by-Side View)
-   ------------------------------------------------------------------------- */
+   ------------------------------------------------------------------------- 
+   These classes style the step cards in side-by-side mode, turning them into 
+   paginated vertical decks that page scroll horizontally. */
 
+/* Outer wrapper: position relative is required so our floating arrow button 
+   can be absolutely positioned relative to this container's boundaries. */
 .steps-scroll-wrapper {
     position: relative;
     width: 100%;
 }
 
+/* Main horizontal scroll panel */
 .steps-scroll-container {
     display: flex;
-    flex-direction: row;
-    gap: 24px;
-    overflow-x: auto;
+    flex-direction: row;        /* Aligns column decks side-by-side horizontally */
+    gap: 24px;                  /* Horizontal gap between column decks */
+    overflow-x: auto;           /* Enable horizontal scrolling when decks overflow */
+    
+    /* scroll-snap-type: enables custom horizontal pagination snapping. 
+       "x mandatory" forces the browser to snap perfectly to card columns when scrolling. */
     scroll-snap-type: x mandatory;
-    scrollbar-width: none; /* Firefox */
-    padding-bottom: 8px; /* Allow slight bottom space for shadows/hover */
-    scroll-behavior: smooth;
+    scrollbar-width: none;      /* Hides standard scrollbar on Firefox for cleaner UI */
+    padding-bottom: 8px;        /* Spacing at bottom to avoid card shadow cuts */
+    scroll-behavior: smooth;    /* Smooth scroll slide transitions when clicking buttons */
     width: 100%;
 }
 
+/* Hide standard scrollbars on Chrome, Safari, and Edge browser engines */
 .steps-scroll-container::-webkit-scrollbar {
-    display: none; /* Safari and Chrome */
+    display: none; 
 }
 
-/* Steps Column Deck */
+/* Steps Column Deck: A vertical container holding a group of step cards.
+   We snap scroll at the deck level so columns switch fully. */
 .steps-column-deck {
     display: flex;
-    flex-direction: column;
-    gap: 16px;
-    width: 100%;
-    flex-shrink: 0;
-    scroll-snap-align: start;
-    box-sizing: border-box;
-    padding-right: 60px; /* Space for scroll button on desktop */
+    flex-direction: column;     /* Stacks step cards vertically inside this deck */
+    gap: 16px;                  /* Vertical gap between stacked step cards */
+    width: 100%;                /* Forces each column deck to occupy exactly 100% visible width */
+    flex-shrink: 0;             /* Prevents flexbox from squeezing column width below 100% */
+    
+    /* scroll-snap-align: aligns the deck boundary to start of viewport on scrolls */
+    scroll-snap-align: start;   
+    
+    /* border-box ensures padding is included within our 100% width limit */
+    box-sizing: border-box;     
+    padding-right: 60px;        /* Reserves space on the right so text doesn't slide under scroll button */
 }
 
-/* Step Card */
+/* Individual Step Card */
 .step-card {
     width: 100%;
     background: rgba(0, 0, 0, 0.02);
@@ -376,12 +401,13 @@ body {
     border-radius: 12px;
     padding: 24px;
     display: flex;
-    flex-direction: column;
+    flex-direction: column;     /* Stacks step number and text description vertically */
     gap: 16px;
     transition: transform var(--transition-smooth), border-color var(--transition-smooth), box-shadow var(--transition-smooth);
     box-sizing: border-box;
 }
 
+/* Border and shadow highlighting on card hover */
 .step-card:hover {
     border-color: var(--text-subtitle);
     transform: translateY(-2px);
