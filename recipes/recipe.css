@@ -156,6 +156,10 @@ body {
     /* Push the footer to the bottom of the section */
 }
 
+.menu-column {
+    min-width: 0;
+}
+
 .column-title {
     font-family: var(--font-serif);
     font-size: 1.6rem;
@@ -274,6 +278,398 @@ body {
     .scroll-indicator {
         padding-top: 10px;
         margin-bottom: 20px;
+    }
+}
+/* -------------------------------------------------------------------------
+   6. RECIPE VIEW INDICATORS & TOGGLES
+   ------------------------------------------------------------------------- */
+
+.recipe-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    margin-top: auto;
+    padding-top: 20px;
+    width: 100%;
+}
+
+.recipe-indicators .scroll-indicator {
+    margin-top: 0;
+    padding-top: 0;
+    transition: opacity var(--transition-smooth), transform var(--transition-smooth);
+}
+
+.recipe-indicators .scroll-indicator:hover {
+    transform: translateY(-2px);
+    opacity: 1;
+}
+
+.recipe-indicators .scroll-indicator.active {
+    opacity: 1;
+}
+
+.recipe-indicators .scroll-indicator.active .scroll-text {
+    color: var(--text-subtitle);
+    font-weight: 600;
+}
+
+.recipe-indicators .scroll-indicator.active .scroll-arrow {
+    color: var(--text-subtitle);
+    animation: bounce-indicator 2s infinite;
+}
+
+.recipe-indicators .scroll-indicator:not(.active) {
+    opacity: 0.5;
+}
+
+.recipe-indicators .scroll-indicator:not(.active) .scroll-arrow {
+    animation: none; /* Disable bouncing for inactive modes */
+}
+
+.recipe-indicators .scroll-indicator:not(.active):hover {
+    opacity: 0.8;
+}
+
+
+/* -------------------------------------------------------------------------
+   7. HORIZONTAL STEPS SCROLLING (Side-by-Side View)
+   ------------------------------------------------------------------------- */
+
+.steps-scroll-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.steps-scroll-container {
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none; /* Firefox */
+    padding-bottom: 8px; /* Allow slight bottom space for shadows/hover */
+    scroll-behavior: smooth;
+    width: 100%;
+}
+
+.steps-scroll-container::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+}
+
+/* Steps Column Deck */
+.steps-column-deck {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    box-sizing: border-box;
+    padding-right: 60px; /* Space for scroll button on desktop */
+}
+
+/* Step Card */
+.step-card {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transition: transform var(--transition-smooth), border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+    box-sizing: border-box;
+}
+
+.step-card:hover {
+    border-color: var(--text-subtitle);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
+}
+
+.step-card-num {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-subtitle);
+    letter-spacing: 1px;
+}
+
+.step-card .recipe-description {
+    margin-bottom: 0;
+}
+
+/* Scroll Right Button */
+.scroll-right-btn {
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--bg-main);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-subtitle);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform var(--transition-smooth), background-color var(--transition-smooth), border-color var(--transition-smooth);
+    z-index: 5;
+}
+
+.scroll-right-btn.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.scroll-right-btn:hover {
+    background-color: var(--border-color);
+    transform: translateY(-50%) scale(1.05);
+}
+
+.scroll-right-btn svg {
+    width: 18px;
+    height: 18px;
+    transition: transform var(--transition-smooth);
+}
+
+.scroll-right-btn.at-end svg {
+    transform: rotate(180deg); /* Points left to loop back */
+}
+
+
+/* -------------------------------------------------------------------------
+   8. STEP-BY-STEP SCROLL-DOWN LAYOUT
+   ------------------------------------------------------------------------- */
+
+.step-by-step-section {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    scroll-snap-align: start;
+    background-color: var(--bg-main);
+}
+
+/* Centered Ingredients Page */
+.ingredients-centered-page {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    scroll-snap-align: start;
+    padding: 40px;
+    text-align: center;
+    background-color: var(--bg-main);
+}
+
+.centered-ingredients-content {
+    max-width: 600px;
+    width: 100%;
+}
+
+.ingredients-centered-title {
+    font-family: var(--font-serif);
+    font-size: 3rem;
+    color: var(--text-title);
+    text-transform: lowercase;
+    margin-bottom: 40px;
+    letter-spacing: -1px;
+}
+
+.ingredients-centered-list {
+    font-family: var(--font-sans);
+    font-size: 1.15rem;
+    line-height: 2;
+    color: var(--text-body);
+}
+
+/* Split Steps Container */
+.split-steps-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    position: relative;
+    width: 100%;
+    margin-bottom: auto;
+}
+
+/* Sticky Visual Left Column */
+.visual-sticky-column {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.sticky-sketch-container {
+    width: 80%;
+    height: 70vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sketch-layers {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.sketch-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+    filter: contrast(1.02);
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    user-select: none;
+    pointer-events: none;
+}
+
+.sketch-layer.active {
+    opacity: 0.9;
+}
+
+/* Scrolling Right Steps Column */
+.steps-scrolling-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.step-slide {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 40px;
+    scroll-snap-align: start;
+    max-width: 500px;
+}
+
+.step-slide .step-number {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-subtitle);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+}
+
+.step-slide .step-text {
+    font-family: var(--font-sans);
+    font-size: 1.15rem;
+    line-height: 1.65;
+    color: var(--text-body);
+}
+
+/* -------------------------------------------------------------------------
+   9. RESPONSIVENESS OVERRIDES FOR NEW VIEWS
+   ------------------------------------------------------------------------- */
+
+@media (max-width: 1024px) {
+    .split-steps-container {
+        gap: 40px;
+    }
+    
+    .sticky-sketch-container {
+        width: 90%;
+    }
+}
+
+@media (max-width: 900px) {
+    /* Adjust Step-by-Step for Mobile: Stack sticky image on top, scroll steps below */
+    .split-steps-container {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+    
+    .visual-sticky-column {
+        position: sticky;
+        top: 0;
+        height: 40vh;
+        z-index: 10;
+        background-color: var(--bg-main);
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .sticky-sketch-container {
+        height: 35vh;
+        width: 100%;
+    }
+    
+    .steps-scrolling-column {
+        padding: 0 24px;
+        align-items: center;
+    }
+    
+    .step-slide {
+        height: 50vh;
+        max-width: 100%;
+        padding: 40px 0;
+        text-align: center;
+        justify-content: flex-start;
+    }
+    
+    .step-slide:first-child {
+        padding-top: 60px;
+    }
+    
+    /* Reset Side-by-Side vertical card wrapping for mobile/tablet */
+    .steps-scroll-container {
+        flex-direction: column;
+        flex-wrap: nowrap;
+        height: auto;
+        overflow-x: visible;
+        padding-right: 0;
+    }
+    
+    .steps-column-deck {
+        display: contents;
+    }
+    
+    .step-card {
+        width: 100% !important;
+        flex: none !important;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .recipe-indicators {
+        gap: 24px;
+    }
+    
+    .step-card {
+        padding: 16px;
+    }
+    
+    .ingredients-centered-title {
+        font-size: 2.2rem;
+        margin-bottom: 24px;
+    }
+    
+    .ingredients-centered-list {
+        font-size: 1rem;
+        line-height: 1.8;
+    }
+    
+    .step-slide .step-text {
+        font-size: 1rem;
     }
 }
 

@@ -76,18 +76,26 @@
 
             </main>
 
-            <!-- Scroll indicator pointing to the menu below -->
-            <div class="scroll-indicator"
-                onclick="document.getElementById('menu').scrollIntoView({ behavior: 'smooth' })">
-                <span class="scroll-text">the recipe</span>
-                <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
+            <!-- Scroll indicators pointing to the recipe layouts below -->
+            <div class="recipe-indicators">
+                <div class="scroll-indicator" id="indicator-side-by-side" onclick="selectRecipeMode('side-by-side')">
+                    <span class="scroll-text">side by side</span>
+                    <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                <div class="scroll-indicator" id="indicator-step-by-step" onclick="selectRecipeMode('step-by-step')">
+                    <span class="scroll-text">step by step</span>
+                    <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
             </div>
         </section>
 
-        <!-- Menu Section (Second Page) -->
+        <!-- Menu Section (Second Page / Side-by-Side View) -->
         <section class="menu-section" id="menu">
             <h2 class="menu-title">the recipe</h2>
 
@@ -97,7 +105,7 @@
                 <div class="menu-column">
                     <h3 class="column-title">ingredients</h3>
                     <div class="menu-items">
-                        <!-- Template Item: Duplicate this block to add a new recipe -->
+                        <!-- Template Item: Duplicate this block to add a new ingredient -->
                         <div class="menu-item">
                             <p class="recipe-description">A brief description of the recipe. Space beneath for
                                 details.
@@ -106,20 +114,51 @@
                     </div>
                 </div>
 
-
-                <!-- INGREDIENTS COLUMN -->
-                <div class="menu-column">
+                <!-- STEPS COLUMN -->
+                <div class="menu-column steps-column">
                     <h3 class="column-title">steps</h3>
-                    <div class="menu-items">
-                        <!-- Template Item: Duplicate this block to add a new recipe -->
-                        <div class="menu-item">
-                            <p class="recipe-description">A brief description of the recipe. Space beneath for
-                                details.
-                            </p>
+                    <div class="steps-scroll-wrapper">
+                        <div class="menu-items steps-scroll-container" id="steps-scroll-container">
+                            <!-- Column 1 -->
+                            <div class="steps-column-deck">
+                                <div class="menu-item step-card">
+                                    <span class="step-card-num">01</span>
+                                    <p class="recipe-description">Mix the flour and water together. Let it rest for 30 minutes.</p>
+                                </div>
+                                <div class="menu-item step-card">
+                                    <span class="step-card-num">02</span>
+                                    <p class="recipe-description">Add starter and salt. Knead until smooth.</p>
+                                </div>
+                                <div class="menu-item step-card">
+                                    <span class="step-card-num">03</span>
+                                    <p class="recipe-description">Perform bulk fermentation with stretch-and-folds.</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Column 2 -->
+                            <div class="steps-column-deck">
+                                <div class="menu-item step-card">
+                                    <span class="step-card-num">04</span>
+                                    <p class="recipe-description">Divide, pre-shape, and bench rest for 20 minutes.</p>
+                                </div>
+                                <div class="menu-item step-card">
+                                    <span class="step-card-num">05</span>
+                                    <p class="recipe-description">Final shape, transfer to baneton, and cold proof overnight.</p>
+                                </div>
+                                <div class="menu-item step-card">
+                                    <span class="step-card-num">06</span>
+                                    <p class="recipe-description">Bake in a preheated Dutch oven at 450°F (230°C).</p>
+                                </div>
+                            </div>
                         </div>
+                        <button class="scroll-right-btn" id="scroll-steps-btn" aria-label="Scroll steps right">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </button>
                     </div>
                 </div>
-
 
             </div>
 
@@ -127,8 +166,207 @@
             <footer class="footer">
                 <p>&copy; 2026 Bilal Abbasi. All rights reserved.</p>
             </footer>
+        </section>
+
+        <!-- Step-by-Step Section (Alternative View / Page-per-Step Scroll View) -->
+        <section class="step-by-step-section" id="step-by-step" style="display: none;">
+            <!-- Centered Ingredients Page -->
+            <div class="step-page ingredients-centered-page" id="step-page-ingredients">
+                <div class="centered-ingredients-content">
+                    <h2 class="ingredients-centered-title">ingredients</h2>
+                    <div class="ingredients-centered-list" id="ingredients-centered-list">
+                        <!-- Will be populated dynamically by JavaScript to match the main ingredients list -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Split steps layout (Sticky image on left, scrolling steps on right) -->
+            <div class="split-steps-container">
+                <!-- Sticky Visual Column -->
+                <div class="visual-sticky-column">
+                    <div class="sticky-sketch-container">
+                        <!-- These layers stack on top of each other and fade in as you scroll -->
+                        <div class="sketch-layers" id="sketch-layers">
+                            <!-- Template Image Layers: Duplicate/replace these image layers to match your steps.
+                                 Note: data-step matches the corresponding step number. 
+                                 For standard images, each layer represents the cumulative view at that step. -->
+                            <img src="../assets/kitchen_sketch.png" alt="Step 1 image" class="sketch-layer" data-step="1">
+                            <img src="../assets/kitchen_sketch.png" alt="Step 2 image" class="sketch-layer" data-step="2">
+                            <img src="../assets/kitchen_sketch.png" alt="Step 3 image" class="sketch-layer" data-step="3">
+                            <img src="../assets/kitchen_sketch.png" alt="Step 4 image" class="sketch-layer" data-step="4">
+                            <img src="../assets/kitchen_sketch.png" alt="Step 5 image" class="sketch-layer" data-step="5">
+                            <img src="../assets/kitchen_sketch.png" alt="Step 6 image" class="sketch-layer" data-step="6">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scrolling Steps Column -->
+                <div class="steps-scrolling-column" id="steps-scrolling-column">
+                    <!-- Template Step Card: Duplicate this block for each step. data-step is 1-indexed. -->
+                    <div class="step-slide" data-step="1">
+                        <span class="step-number">step 01</span>
+                        <p class="step-text">Mix the flour and water together. Let it rest for 30 minutes.</p>
+                    </div>
+                    <div class="step-slide" data-step="2">
+                        <span class="step-number">step 02</span>
+                        <p class="step-text">Add starter and salt. Knead until smooth.</p>
+                    </div>
+                    <div class="step-slide" data-step="3">
+                        <span class="step-number">step 03</span>
+                        <p class="step-text">Perform bulk fermentation with stretch-and-folds.</p>
+                    </div>
+                    <div class="step-slide" data-step="4">
+                        <span class="step-number">step 04</span>
+                        <p class="step-text">Divide, pre-shape, and bench rest for 20 minutes.</p>
+                    </div>
+                    <div class="step-slide" data-step="5">
+                        <span class="step-number">step 05</span>
+                        <p class="step-text">Final shape, transfer to baneton, and cold proof overnight.</p>
+                    </div>
+                    <div class="step-slide" data-step="6">
+                        <span class="step-number">step 06</span>
+                        <p class="step-text">Bake in a preheated Dutch oven at 450°F (230°C).</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer for Step-by-Step view -->
+            <footer class="footer">
+                <p>&copy; 2026 Bilal Abbasi. All rights reserved.</p>
+            </footer>
+        </section>
 
     </div>
+
+    <!-- Script logic for view toggling, horizontal steps scroll, and scroll-revealed image building -->
+    <script>
+        // --- Recipe Mode Toggle ---
+        function selectRecipeMode(mode) {
+            const sideBySideSection = document.getElementById('menu');
+            const stepByStepSection = document.getElementById('step-by-step');
+            const indSide = document.getElementById('indicator-side-by-side');
+            const indStep = document.getElementById('indicator-step-by-step');
+
+            if (mode === 'side-by-side') {
+                sideBySideSection.style.display = 'block';
+                stepByStepSection.style.display = 'none';
+                
+                // Update indicator styles
+                indSide.classList.add('active');
+                indStep.classList.remove('active');
+
+                // Scroll smoothly to side-by-side section
+                sideBySideSection.scrollIntoView({ behavior: 'smooth' });
+                
+                // Update horizontal scroll button visibility in case layout changed
+                setTimeout(updateScrollButtonVisibility, 300);
+            } else if (mode === 'step-by-step') {
+                sideBySideSection.style.display = 'none';
+                stepByStepSection.style.display = 'block';
+
+                // Update indicator styles
+                indSide.classList.remove('active');
+                indStep.classList.add('active');
+
+                // Clone ingredients list dynamically to centered page of step-by-step if not already done
+                populateCenteredIngredients();
+
+                // Scroll smoothly to step-by-step section
+                stepByStepSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Dynamically populate the step-by-step ingredients view from side-by-side view to ensure consistency
+        function populateCenteredIngredients() {
+            const sourceIngredients = document.querySelector('#menu .menu-column:first-child .menu-items');
+            const destIngredients = document.getElementById('ingredients-centered-list');
+            if (sourceIngredients && destIngredients && destIngredients.children.length === 0) {
+                destIngredients.innerHTML = sourceIngredients.innerHTML;
+            }
+        }
+
+        // --- Horizontal Steps Scroll Button (Side-by-Side) ---
+        const stepsContainer = document.getElementById('steps-scroll-container');
+        const scrollStepsBtn = document.getElementById('scroll-steps-btn');
+
+        function updateScrollButtonVisibility() {
+            if (stepsContainer && scrollStepsBtn) {
+                if (stepsContainer.scrollWidth > stepsContainer.clientWidth) {
+                    scrollStepsBtn.classList.add('visible');
+                } else {
+                    scrollStepsBtn.classList.remove('visible');
+                }
+            }
+        }
+
+        if (scrollStepsBtn && stepsContainer) {
+            scrollStepsBtn.addEventListener('click', () => {
+                const scrollAmount = stepsContainer.clientWidth;
+
+                // Loop back to start if we scrolled to the end
+                if (stepsContainer.scrollLeft + stepsContainer.clientWidth >= stepsContainer.scrollWidth - 10) {
+                    stepsContainer.scrollTo({ left: 0, behavior: 'smooth' });
+                } else {
+                    stepsContainer.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                }
+            });
+
+            // Update scroll button state when scrolling manually
+            stepsContainer.addEventListener('scroll', () => {
+                if (stepsContainer.scrollLeft + stepsContainer.clientWidth >= stepsContainer.scrollWidth - 10) {
+                    scrollStepsBtn.classList.add('at-end');
+                } else {
+                    scrollStepsBtn.classList.remove('at-end');
+                }
+            });
+        }
+
+        // --- Sticky Image Scroll IntersectionObserver (Step-by-Step View) ---
+        const stepObserverOptions = {
+            root: null,
+            rootMargin: '-40% 0px -40% 0px', // detect when slide is in active middle region
+            threshold: 0
+        };
+
+        const stepObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const stepNum = parseInt(entry.target.getAttribute('data-step'), 10);
+                    updateStickyLayers(stepNum);
+                }
+            });
+        }, stepObserverOptions);
+
+        function updateStickyLayers(stepNum) {
+            const layers = document.querySelectorAll('#sketch-layers .sketch-layer');
+            layers.forEach(layer => {
+                const layerStep = parseInt(layer.getAttribute('data-step'), 10);
+                if (layerStep <= stepNum) {
+                    layer.classList.add('active');
+                } else {
+                    layer.classList.remove('active');
+                }
+            });
+        }
+
+        // Attach observers to all step slides
+        document.querySelectorAll('#steps-scrolling-column .step-slide').forEach(slide => {
+            stepObserver.observe(slide);
+        });
+
+        // Handle initial load setup
+        window.addEventListener('load', () => {
+            updateScrollButtonVisibility();
+            // Check if URL hash points to step-by-step
+            if (window.location.hash === '#step-by-step') {
+                selectRecipeMode('step-by-step');
+            } else {
+                // Default active indicator
+                document.getElementById('indicator-side-by-side').classList.add('active');
+            }
+        });
+        window.addEventListener('resize', updateScrollButtonVisibility);
+    </script>
 
 </body>
 
