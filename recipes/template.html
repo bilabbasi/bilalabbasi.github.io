@@ -25,12 +25,12 @@
         // "DOMContentLoaded" triggers as soon as the HTML elements are ready in the browser.
         document.addEventListener("DOMContentLoaded", () => {
             const linksList = document.getElementById("links-list");
-            
+
             // Safety Check: If config.js fails to load, KITCHEN_CONFIG will be undefined.
             // We check its type first to prevent a browser console error from crashing our script.
             // If it is loaded, we retrieve "links". If not (or if links is empty), we use an empty array [].
             const links = (typeof KITCHEN_CONFIG !== 'undefined' && KITCHEN_CONFIG.links) || [];
-            
+
             // Loop through the list of links (using .map) to construct HTML anchor links dynamically,
             // and write them (.innerHTML) directly inside our links container.
             linksList.innerHTML = links.map(link => `
@@ -133,7 +133,8 @@
                             <!-- Step 1 -->
                             <div class="menu-item step-card">
                                 <span class="step-card-num">01</span>
-                                <p class="recipe-description">Mix the flour and water together. Let it rest for 30 minutes.</p>
+                                <p class="recipe-description">Mix the flour and water together. Let it rest for 30
+                                    minutes.</p>
                             </div>
                             <!-- Step 2 -->
                             <div class="menu-item step-card">
@@ -153,7 +154,8 @@
                             <!-- Step 5 -->
                             <div class="menu-item step-card">
                                 <span class="step-card-num">05</span>
-                                <p class="recipe-description">Final shape, transfer to baneton, and cold proof overnight.</p>
+                                <p class="recipe-description">Final shape, transfer to baneton, and cold proof
+                                    overnight.</p>
                             </div>
                             <!-- Step 6 -->
                             <div class="menu-item step-card">
@@ -162,7 +164,8 @@
                             </div>
                         </div>
                         <button class="scroll-down-btn" id="scroll-steps-btn" aria-label="Scroll steps down">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="12" y1="5" x2="12" y2="19"></line>
                                 <polyline points="19 12 12 19 5 12"></polyline>
                             </svg>
@@ -181,7 +184,7 @@
         <!-- Step-by-Step Section (Alternative View / Page-per-Step Scroll View) -->
         <section class="step-by-step-section" id="step-by-step" style="display: none;">
             <!-- Centered Ingredients Page -->
-            <div class="step-page ingredients-centered-page" id="step-page-ingredients">
+            <div class="step-page ingredients-centered-page" id="step-page-ingredients" data-step="0">
                 <div class="centered-ingredients-content">
                     <h2 class="ingredients-centered-title">ingredients</h2>
                     <div class="ingredients-centered-list" id="ingredients-centered-list">
@@ -195,17 +198,24 @@
                 <!-- Sticky Visual Column -->
                 <div class="visual-sticky-column">
                     <div class="sticky-sketch-container">
-                        <!-- These layers stack on top of each other and fade in as you scroll -->
+                        <!-- These image layers stack on top of each other and fade in/out as you scroll -->
                         <div class="sketch-layers" id="sketch-layers">
-                            <!-- Template Image Layers: Duplicate/replace these image layers to match your steps.
-                                 Note: data-step matches the corresponding step number. 
-                                 For standard images, each layer represents the cumulative view at that step. -->
-                            <img src="../assets/kitchen_sketch.png" alt="Step 1 image" class="sketch-layer" data-step="1">
-                            <img src="../assets/kitchen_sketch.png" alt="Step 2 image" class="sketch-layer" data-step="2">
-                            <img src="../assets/kitchen_sketch.png" alt="Step 3 image" class="sketch-layer" data-step="3">
-                            <img src="../assets/kitchen_sketch.png" alt="Step 4 image" class="sketch-layer" data-step="4">
-                            <img src="../assets/kitchen_sketch.png" alt="Step 5 image" class="sketch-layer" data-step="5">
-                            <img src="../assets/kitchen_sketch.png" alt="Step 6 image" class="sketch-layer" data-step="6">
+                            <!-- NEWBIE CUSTOMIZATION GUIDE:
+                                 1. Replace the placeholder paths below with your actual step images (e.g. "../assets/flour.png").
+                                 2. Make sure the 'data-step' numbers match the corresponding step cards in the scrolling list on the right.
+                                 3. Add or remove <img> elements depending on how many steps your recipe has. -->
+                            <img src="../assets/kitchen_sketch_1.png" alt="Step 1 image" class="sketch-layer"
+                                data-step="1">
+                            <img src="../assets/kitchen_sketch_2.png" alt="Step 2 image" class="sketch-layer"
+                                data-step="2">
+                            <img src="../assets/kitchen_sketch_3.png" alt="Step 3 image" class="sketch-layer"
+                                data-step="3">
+                            <img src="../assets/kitchen_sketch_4.png" alt="Step 4 image" class="sketch-layer"
+                                data-step="4">
+                            <img src="../assets/kitchen_sketch_5.png" alt="Step 5 image" class="sketch-layer"
+                                data-step="5">
+                            <img src="../assets/kitchen_sketch_6.png" alt="Step 6 image" class="sketch-layer"
+                                data-step="6">
                         </div>
                     </div>
                 </div>
@@ -270,7 +280,7 @@
             // Find our HTML page sections on the page using their unique IDs
             const sideBySideSection = document.getElementById('menu');
             const stepByStepSection = document.getElementById('step-by-step');
-            
+
             // Find the bottom mode indicators/buttons
             const indSide = document.getElementById('indicator-side-by-side');
             const indStep = document.getElementById('indicator-step-by-step');
@@ -279,19 +289,19 @@
                 // Show the side-by-side recipe layout, and hide the step-by-step layout
                 sideBySideSection.style.display = 'block';
                 stepByStepSection.style.display = 'none';
-                
+
                 // Add the "active" style class to the side-by-side button, and remove it from the other
                 indSide.classList.add('active');
                 indStep.classList.remove('active');
 
                 // Tell the browser to scroll smoothly down to the side-by-side section
                 sideBySideSection.scrollIntoView({ behavior: 'smooth' });
-                
+
                 // Check if the steps columns overflow. We wrap this in a setTimeout (delay of 300ms)
                 // because we need to wait for the browser to finish drawing the "display: block"
                 // changes on the screen before checking widths.
                 setTimeout(updateScrollButtonVisibility, 300);
-                
+
             } else if (mode === 'step-by-step') {
                 // Hide the side-by-side recipe layout, and show the step-by-step layout
                 sideBySideSection.style.display = 'none';
@@ -320,10 +330,10 @@
         function populateCenteredIngredients() {
             // Query the ingredients column items list from the first view
             const sourceIngredients = document.querySelector('#menu .menu-column:first-child .menu-items');
-            
+
             // Query the centered list element in the second view
             const destIngredients = document.getElementById('ingredients-centered-list');
-            
+
             // If the source list exists, the destination exists, and we haven't copied it yet (children count is 0)
             if (sourceIngredients && destIngredients && destIngredients.children.length === 0) {
                 // Copy the internal HTML content from the source to the destination
@@ -394,10 +404,10 @@
         // Configuration settings for the IntersectionObserver
         const stepObserverOptions = {
             root: null, // "null" defaults the root to the screen viewport
-            
+
             // "rootMargin" defines an invisible window check region.
             // '-40% 0px -40% 0px' creates a 20% active zone exactly in the vertical middle of the screen.
-            rootMargin: '-40% 0px -40% 0px', 
+            rootMargin: '-40% 0px -40% 0px',
             threshold: 0 // Fires as soon as 1 pixel of the card enters the middle active zone
         };
 
@@ -421,15 +431,32 @@
             layers.forEach(layer => {
                 // Retrieve the step number assigned to this image layer
                 const layerStep = parseInt(layer.getAttribute('data-step'), 10);
-                
-                // Cumulative reveal: Show layers that are less than or equal to the current step.
-                // Hide any future step layers.
-                if (layerStep <= stepNum) {
-                    layer.classList.add('active'); // active sets opacity to 0.9 in CSS
+
+                /* 
+                   NEWBIE CUSTOMIZATION TIP (How step images transition):
+                   
+                   - MODE 1: FADE-BETWEEN (Current Setting)
+                     Only shows the image corresponding EXACTLY to the current step (e.g. Step 2 shows ONLY Image 2).
+                     Perfect for individual illustrations showing step-by-step additions.
+                     Code: use "layerStep === stepNum"
+                     
+                   - MODE 2: CUMULATIVE REVEAL (Layer Stacking)
+                     Keeps previous step images visible underneath (e.g. Step 2 shows Image 1 + Image 2 stacking up).
+                     Perfect for transparent drawing layers that construct a single image over time.
+                     Code: change the check below to: "layerStep <= stepNum"
+                */
+                if (layerStep === stepNum) {
+                    layer.classList.add('active'); // active sets opacity to 1 in CSS
                 } else {
                     layer.classList.remove('active'); // inactive resets opacity to 0
                 }
             });
+        }
+
+        // Observe the centered ingredients page (data-step="0") to clear drawings at the top
+        const ingredientsPage = document.getElementById('step-page-ingredients');
+        if (ingredientsPage) {
+            stepObserver.observe(ingredientsPage);
         }
 
         // Register our observer to watch every step slide card in the scrolling list
@@ -450,7 +477,7 @@
         window.addEventListener('load', () => {
             // Check overflow right away
             updateScrollButtonVisibility();
-            
+
             // Check if URL ends with "#step-by-step" to load the guide view directly
             if (window.location.hash === '#step-by-step') {
                 selectRecipeMode('step-by-step');
@@ -459,7 +486,7 @@
                 document.getElementById('indicator-side-by-side').classList.add('active');
             }
         });
-        
+
         // Re-check scroll button overflow if the browser window changes dimensions (e.g. rotating a tablet)
         window.addEventListener('resize', updateScrollButtonVisibility);
     </script>
