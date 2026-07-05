@@ -130,42 +130,41 @@
                     <h3 class="column-title">steps</h3>
                     <div class="steps-scroll-wrapper">
                         <div class="menu-items steps-scroll-container" id="steps-scroll-container">
-                            <!-- Column 1 -->
-                            <div class="steps-column-deck">
-                                <div class="menu-item step-card">
-                                    <span class="step-card-num">01</span>
-                                    <p class="recipe-description">Mix the flour and water together. Let it rest for 30 minutes.</p>
-                                </div>
-                                <div class="menu-item step-card">
-                                    <span class="step-card-num">02</span>
-                                    <p class="recipe-description">Add starter and salt. Knead until smooth.</p>
-                                </div>
-                                <div class="menu-item step-card">
-                                    <span class="step-card-num">03</span>
-                                    <p class="recipe-description">Perform bulk fermentation with stretch-and-folds.</p>
-                                </div>
+                            <!-- Step 1 -->
+                            <div class="menu-item step-card">
+                                <span class="step-card-num">01</span>
+                                <p class="recipe-description">Mix the flour and water together. Let it rest for 30 minutes.</p>
                             </div>
-                            
-                            <!-- Column 2 -->
-                            <div class="steps-column-deck">
-                                <div class="menu-item step-card">
-                                    <span class="step-card-num">04</span>
-                                    <p class="recipe-description">Divide, pre-shape, and bench rest for 20 minutes.</p>
-                                </div>
-                                <div class="menu-item step-card">
-                                    <span class="step-card-num">05</span>
-                                    <p class="recipe-description">Final shape, transfer to baneton, and cold proof overnight.</p>
-                                </div>
-                                <div class="menu-item step-card">
-                                    <span class="step-card-num">06</span>
-                                    <p class="recipe-description">Bake in a preheated Dutch oven at 450°F (230°C).</p>
-                                </div>
+                            <!-- Step 2 -->
+                            <div class="menu-item step-card">
+                                <span class="step-card-num">02</span>
+                                <p class="recipe-description">Add starter and salt. Knead until smooth.</p>
+                            </div>
+                            <!-- Step 3 -->
+                            <div class="menu-item step-card">
+                                <span class="step-card-num">03</span>
+                                <p class="recipe-description">Perform bulk fermentation with stretch-and-folds.</p>
+                            </div>
+                            <!-- Step 4 -->
+                            <div class="menu-item step-card">
+                                <span class="step-card-num">04</span>
+                                <p class="recipe-description">Divide, pre-shape, and bench rest for 20 minutes.</p>
+                            </div>
+                            <!-- Step 5 -->
+                            <div class="menu-item step-card">
+                                <span class="step-card-num">05</span>
+                                <p class="recipe-description">Final shape, transfer to baneton, and cold proof overnight.</p>
+                            </div>
+                            <!-- Step 6 -->
+                            <div class="menu-item step-card">
+                                <span class="step-card-num">06</span>
+                                <p class="recipe-description">Bake in a preheated Dutch oven at 450°F (230°C).</p>
                             </div>
                         </div>
-                        <button class="scroll-right-btn" id="scroll-steps-btn" aria-label="Scroll steps right">
+                        <button class="scroll-down-btn" id="scroll-steps-btn" aria-label="Scroll steps down">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                                <polyline points="12 5 19 12 12 19"></polyline>
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <polyline points="19 12 12 19 5 12"></polyline>
                             </svg>
                         </button>
                     </div>
@@ -334,21 +333,21 @@
 
 
         /* =====================================================================
-           MODULE C: HORIZONTAL STEPS SCROLL CONTROL (Side-by-Side View)
+           MODULE C: VERTICAL STEPS SCROLL CONTROL (Side-by-Side View)
            =====================================================================
-           This module manages the scroll container for recipe step columns,
-           toggles the navigation button, and handles horizontal pagination. */
+           This module manages the scroll container for recipe steps,
+           toggles the navigation button, and handles vertical pagination. */
 
         const stepsContainer = document.getElementById('steps-scroll-container');
         const scrollStepsBtn = document.getElementById('scroll-steps-btn');
 
-        // This function checks if our steps list columns wrap and exceed the visible viewport width.
+        // This function checks if our steps list exceeds the visible container height.
         function updateScrollButtonVisibility() {
             if (stepsContainer && scrollStepsBtn) {
-                // scrollWidth = full width of the horizontal content (visible + hidden offscreen)
-                // clientWidth = width of the visible content area on the screen
-                // If scrollWidth is larger than clientWidth, there is hidden overflow content to scroll.
-                if (stepsContainer.scrollWidth > stepsContainer.clientWidth) {
+                // scrollHeight = full vertical height of the content (visible + hidden offscreen)
+                // clientHeight = height of the visible content area on the screen
+                // If scrollHeight is larger than clientHeight, there is hidden overflow content to scroll.
+                if (stepsContainer.scrollHeight > stepsContainer.clientHeight) {
                     scrollStepsBtn.classList.add('visible'); // Show the arrow button
                 } else {
                     scrollStepsBtn.classList.remove('visible'); // Hide the arrow button
@@ -359,24 +358,24 @@
         // Attach event listeners to make the scroll arrow interactive
         if (scrollStepsBtn && stepsContainer) {
             scrollStepsBtn.addEventListener('click', () => {
-                // The scroll amount matches exactly the visible width of the steps viewport (paging effect)
-                const scrollAmount = stepsContainer.clientWidth;
+                // The scroll amount matches exactly the visible height of the steps viewport (paging effect)
+                const scrollAmount = stepsContainer.clientHeight;
 
-                // Loop check: If current scroll position + visible width is close to the end, 
-                // scroll back to the beginning (scrollLeft = 0).
-                if (stepsContainer.scrollLeft + stepsContainer.clientWidth >= stepsContainer.scrollWidth - 10) {
-                    stepsContainer.scrollTo({ left: 0, behavior: 'smooth' });
+                // Loop check: If current scroll position + visible height is close to the end, 
+                // scroll back to the top (scrollTop = 0).
+                if (stepsContainer.scrollTop + stepsContainer.clientHeight >= stepsContainer.scrollHeight - 10) {
+                    stepsContainer.scrollTo({ top: 0, behavior: 'smooth' });
                 } else {
-                    // Otherwise, page right by scrollAmount
-                    stepsContainer.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                    // Otherwise, page down by scrollAmount
+                    stepsContainer.scrollBy({ top: scrollAmount, behavior: 'smooth' });
                 }
             });
 
             // Monitor user scrolls on the steps container to update the scroll button icon direction.
             stepsContainer.addEventListener('scroll', () => {
                 // If the user reaches the end of the scroll list, add the class "at-end" 
-                // which flips the arrow icon direction (to point left and signal looping back).
-                if (stepsContainer.scrollLeft + stepsContainer.clientWidth >= stepsContainer.scrollWidth - 10) {
+                // which flips the arrow icon direction (to point up and signal looping back).
+                if (stepsContainer.scrollTop + stepsContainer.clientHeight >= stepsContainer.scrollHeight - 10) {
                     scrollStepsBtn.classList.add('at-end');
                 } else {
                     scrollStepsBtn.classList.remove('at-end');

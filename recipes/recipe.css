@@ -355,42 +355,27 @@ body {
     width: 100%;
 }
 
-/* Main horizontal scroll panel */
+/* Main vertical scroll panel */
 .steps-scroll-container {
     display: flex;
-    flex-direction: row;        /* Aligns column decks side-by-side horizontally */
-    gap: 24px;                  /* Horizontal gap between column decks */
-    overflow-x: auto;           /* Enable horizontal scrolling when decks overflow */
+    flex-direction: column;     /* Aligns step cards vertically */
+    gap: 16px;                  /* Gap between step cards */
+    overflow-y: auto;           /* Enable vertical scrolling when cards overflow */
+    overflow-x: hidden;         /* Hide horizontal overflow */
     
-    /* scroll-snap-type: enables custom horizontal pagination snapping. 
-       "x mandatory" forces the browser to snap perfectly to card columns when scrolling. */
-    scroll-snap-type: x mandatory;
+    /* scroll-snap-type: enables custom vertical pagination snapping. 
+       "y mandatory" forces the browser to snap perfectly to step cards when scrolling. */
+    scroll-snap-type: y mandatory;
     scrollbar-width: none;      /* Hides standard scrollbar on Firefox for cleaner UI */
-    padding-bottom: 8px;        /* Spacing at bottom to avoid card shadow cuts */
+    padding-bottom: 24px;       /* Spacing at bottom to avoid card shadow cuts and button overlay */
     scroll-behavior: smooth;    /* Smooth scroll slide transitions when clicking buttons */
     width: 100%;
+    height: 420px;              /* Height constraint on desktop view */
 }
 
 /* Hide standard scrollbars on Chrome, Safari, and Edge browser engines */
 .steps-scroll-container::-webkit-scrollbar {
     display: none; 
-}
-
-/* Steps Column Deck: A vertical container holding a group of step cards.
-   We snap scroll at the deck level so columns switch fully. */
-.steps-column-deck {
-    display: flex;
-    flex-direction: column;     /* Stacks step cards vertically inside this deck */
-    gap: 16px;                  /* Vertical gap between stacked step cards */
-    width: 100%;                /* Forces each column deck to occupy exactly 100% visible width */
-    flex-shrink: 0;             /* Prevents flexbox from squeezing column width below 100% */
-    
-    /* scroll-snap-align: aligns the deck boundary to start of viewport on scrolls */
-    scroll-snap-align: start;   
-    
-    /* border-box ensures padding is included within our 100% width limit */
-    box-sizing: border-box;     
-    padding-right: 60px;        /* Reserves space on the right so text doesn't slide under scroll button */
 }
 
 /* Individual Step Card */
@@ -405,6 +390,7 @@ body {
     gap: 16px;
     transition: transform var(--transition-smooth), border-color var(--transition-smooth), box-shadow var(--transition-smooth);
     box-sizing: border-box;
+    scroll-snap-align: start;   /* Snaps the card to the top of the scroll viewport */
 }
 
 /* Border and shadow highlighting on card hover */
@@ -426,12 +412,12 @@ body {
     margin-bottom: 0;
 }
 
-/* Scroll Right Button */
-.scroll-right-btn {
+/* Scroll Down Button */
+.scroll-down-btn {
     position: absolute;
-    right: -10px;
-    top: 50%;
-    transform: translateY(-50%);
+    bottom: -22px;              /* Overlaps the bottom boundary */
+    left: 50%;
+    transform: translateX(-50%);
     width: 44px;
     height: 44px;
     border-radius: 50%;
@@ -449,24 +435,24 @@ body {
     z-index: 5;
 }
 
-.scroll-right-btn.visible {
+.scroll-down-btn.visible {
     opacity: 1;
     pointer-events: auto;
 }
 
-.scroll-right-btn:hover {
+.scroll-down-btn:hover {
     background-color: var(--border-color);
-    transform: translateY(-50%) scale(1.05);
+    transform: translateX(-50%) scale(1.05);
 }
 
-.scroll-right-btn svg {
+.scroll-down-btn svg {
     width: 18px;
     height: 18px;
     transition: transform var(--transition-smooth);
 }
 
-.scroll-right-btn.at-end svg {
-    transform: rotate(180deg); /* Points left to loop back */
+.scroll-down-btn.at-end svg {
+    transform: rotate(180deg); /* Points up to loop back */
 }
 
 
@@ -655,17 +641,16 @@ body {
         padding-top: 60px;
     }
     
-    /* Reset Side-by-Side vertical card wrapping for mobile/tablet */
+    /* Reset Side-by-Side vertical card scroll for mobile/tablet */
     .steps-scroll-container {
-        flex-direction: column;
-        flex-wrap: nowrap;
         height: auto;
-        overflow-x: visible;
-        padding-right: 0;
+        overflow-y: visible;
+        scroll-snap-type: none;
+        padding-bottom: 0;
     }
     
-    .steps-column-deck {
-        display: contents;
+    .scroll-down-btn {
+        display: none !important; /* Hide vertical scroll button on mobile */
     }
     
     .step-card {
