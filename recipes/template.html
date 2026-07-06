@@ -16,12 +16,23 @@
     <link rel="stylesheet" href="recipe.css">
 
 
-    <!-- Loader Script: Automatically inserts the KITCHEN_CONFIG details when loaded -->
+    <!-- 1. Import the configuration file (config.js) that defines professional and kitchen settings.
+         "../config.js" means go up one folder level (out of the "recipes" folder) to locate the config file. -->
+    <script src="../config.js"></script>
+
+    <!-- 2. Run a script once the browser finishes building the HTML page structure (DOM). -->
     <script>
+        // "DOMContentLoaded" triggers as soon as the HTML elements are ready in the browser.
         document.addEventListener("DOMContentLoaded", () => {
-            // 3. Generate the kitchen/recipe links dynamically
             const linksList = document.getElementById("links-list");
-            const links = KITCHEN_CONFIG.links || [];
+
+            // Safety Check: If config.js fails to load, KITCHEN_CONFIG will be undefined.
+            // We check its type first to prevent a browser console error from crashing our script.
+            // If it is loaded, we retrieve "links". If not (or if links is empty), we use an empty array [].
+            const links = (typeof KITCHEN_CONFIG !== 'undefined' && KITCHEN_CONFIG.links) || [];
+
+            // Loop through the list of links (using .map) to construct HTML anchor links dynamically,
+            // and write them (.innerHTML) directly inside our links container.
             linksList.innerHTML = links.map(link => `
                 <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="external-link">
                     ${link.label}
@@ -30,7 +41,7 @@
                         <polyline points="7 7 17 7 17 17"></polyline>
                     </svg>
                 </a>
-            `).join("");
+            `).join(""); // .join("") merges the array of HTML text strings into one single block of text
         });
     </script>
 </head>
@@ -76,18 +87,26 @@
 
             </main>
 
-            <!-- Scroll indicator pointing to the menu below -->
-            <div class="scroll-indicator"
-                onclick="document.getElementById('menu').scrollIntoView({ behavior: 'smooth' })">
-                <span class="scroll-text">the recipe</span>
-                <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
+            <!-- Scroll indicators pointing to the recipe layouts below -->
+            <div class="recipe-indicators">
+                <div class="scroll-indicator" id="indicator-side-by-side" onclick="selectRecipeMode('side-by-side')">
+                    <span class="scroll-text">side by side</span>
+                    <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                <div class="scroll-indicator" id="indicator-step-by-step" onclick="selectRecipeMode('step-by-step')">
+                    <span class="scroll-text">step by step</span>
+                    <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
             </div>
         </section>
 
-        <!-- Menu Section (Second Page) -->
+        <!-- Menu Section (Second Page / Side-by-Side View) -->
         <section class="menu-section" id="menu">
             <h2 class="menu-title">the recipe</h2>
 
@@ -97,7 +116,7 @@
                 <div class="menu-column">
                     <h3 class="column-title">ingredients</h3>
                     <div class="menu-items">
-                        <!-- Template Item: Duplicate this block to add a new recipe -->
+                        <!-- Template Item: Duplicate this block to add a new ingredient -->
                         <div class="menu-item">
                             <p class="recipe-description">A brief description of the recipe. Space beneath for
                                 details.
@@ -106,20 +125,42 @@
                     </div>
                 </div>
 
-
-                <!-- INGREDIENTS COLUMN -->
-                <div class="menu-column">
+                <!-- STEPS COLUMN -->
+                <div class="menu-column steps-column">
                     <h3 class="column-title">steps</h3>
-                    <div class="menu-items">
-                        <!-- Template Item: Duplicate this block to add a new recipe -->
-                        <div class="menu-item">
-                            <p class="recipe-description">A brief description of the recipe. Space beneath for
-                                details.
-                            </p>
+                    <div class="steps-scroll-wrapper">
+                        <div class="menu-items steps-scroll-container" id="steps-scroll-container">
+                            <!-- Step 1 -->
+                            <div class="menu-item step-card">
+                                <span class="step-card-num">01</span>
+                                <p class="recipe-description">Mix the flour and water together. Let it rest for 30
+                                    minutes.</p>
+                            </div>
+                            <!-- Step 2 -->
+                            <div class="menu-item step-card">
+                                <span class="step-card-num">02</span>
+                                <p class="recipe-description">Add starter and salt. Knead until smooth.</p>
+                            </div>
+                            <!-- Step 3 -->
+                            <div class="menu-item step-card">
+                                <span class="step-card-num">03</span>
+                                <p class="recipe-description">Perform bulk fermentation with stretch-and-folds.</p>
+                            </div>
+                            <!-- Step 4 -->
+                            <div class="menu-item step-card">
+                                <span class="step-card-num">04</span>
+                                <p class="recipe-description">Divide, pre-shape, and bench rest for 20 minutes.</p>
+                            </div>
                         </div>
+                        <button class="scroll-down-btn" id="scroll-steps-btn" aria-label="Scroll steps down">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <polyline points="19 12 12 19 5 12"></polyline>
+                            </svg>
+                        </button>
                     </div>
                 </div>
-
 
             </div>
 
@@ -127,8 +168,305 @@
             <footer class="footer">
                 <p>&copy; 2026 Bilal Abbasi. All rights reserved.</p>
             </footer>
+        </section>
+
+        <!-- Step-by-Step Section (Alternative View / Page-per-Step Scroll View) -->
+        <section class="step-by-step-section" id="step-by-step" style="display: none;">
+            <!-- Centered Ingredients Page -->
+            <div class="step-page ingredients-centered-page" id="step-page-ingredients" data-step="0">
+                <div class="centered-ingredients-content">
+                    <h2 class="ingredients-centered-title">ingredients</h2>
+                    <div class="ingredients-centered-list" id="ingredients-centered-list">
+                        <!-- Will be populated dynamically by JavaScript to match the main ingredients list -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Split steps layout (Sticky image on left, scrolling steps on right) -->
+            <div class="split-steps-container">
+                <!-- Sticky Visual Column -->
+                <div class="visual-sticky-column">
+                    <div class="sticky-sketch-container">
+                        <!-- These image layers stack on top of each other and fade in/out as you scroll -->
+                        <div class="sketch-layers" id="sketch-layers">
+                            <!-- NEWBIE CUSTOMIZATION GUIDE:
+                                 1. Replace the placeholder paths below with your actual step images (e.g. "../assets/flour.png").
+                                 2. Make sure the 'data-step' numbers match the corresponding step cards in the scrolling list on the right.
+                                 3. Add or remove <img> elements depending on how many steps your recipe has. -->
+                            <img src="../assets/kitchen_sketch_step1.png" alt="Step 1 image" class="sketch-layer"
+                                data-step="1">
+                            <img src="../assets/kitchen_sketch_step2.png" alt="Step 2 image" class="sketch-layer"
+                                data-step="2">
+                            <img src="../assets/kitchen_sketch_step3.png" alt="Step 3 image" class="sketch-layer"
+                                data-step="3">
+                            <img src="../assets/kitchen_sketch_step4.png" alt="Step 4 image" class="sketch-layer"
+                                data-step="4">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scrolling Steps Column -->
+                <div class="steps-scrolling-column" id="steps-scrolling-column">
+                    <!-- Template Step Card: Duplicate this block for each step. data-step is 1-indexed. -->
+                    <div class="step-slide" data-step="1">
+                        <span class="step-number">step 01</span>
+                        <p class="step-text">Mix the flour and water together. Let it rest for 30 minutes.</p>
+                    </div>
+                    <div class="step-slide" data-step="2">
+                        <span class="step-number">step 02</span>
+                        <p class="step-text">Add starter and salt. Knead until smooth.</p>
+                    </div>
+                    <div class="step-slide" data-step="3">
+                        <span class="step-number">step 03</span>
+                        <p class="step-text">Perform bulk fermentation with stretch-and-folds.</p>
+                    </div>
+                    <div class="step-slide" data-step="4">
+                        <span class="step-number">step 04</span>
+                        <p class="step-text">Divide, pre-shape, and bench rest for 20 minutes.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer for Step-by-Step view -->
+            <footer class="footer">
+                <p>&copy; 2026 Bilal Abbasi. All rights reserved.</p>
+            </footer>
+        </section>
 
     </div>
+
+    <!-- Script logic for view toggling, horizontal steps scroll, and scroll-revealed image building -->
+    <!-- 
+      =========================================================================
+      RECIPE INTERACTION LOGIC (JAVASCRIPT)
+      =========================================================================
+      This script handles three major interactive features on our recipe page:
+      1. Toggling between "Side-by-Side" and "Step-by-Step" view layouts.
+      2. Dynamically cloning the ingredients list so developers only write it once.
+      3. Horizontal column paging for steps in Side-by-Side mode.
+      4. Auto-revealing visual layers as you scroll in Step-by-Step mode.
+    -->
+    <script>
+        /* =====================================================================
+           MODULE A: VIEW MODE TOGGLING & SELECTION
+           =====================================================================
+           This module handles switching layouts when clicking "side by side" 
+           or "step by step" buttons at the bottom of the hero section. */
+
+        function selectRecipeMode(mode) {
+            // Find our HTML page sections on the page using their unique IDs
+            const sideBySideSection = document.getElementById('menu');
+            const stepByStepSection = document.getElementById('step-by-step');
+
+            // Find the bottom mode indicators/buttons
+            const indSide = document.getElementById('indicator-side-by-side');
+            const indStep = document.getElementById('indicator-step-by-step');
+
+            if (mode === 'side-by-side') {
+                // Show the side-by-side recipe layout, and hide the step-by-step layout
+                sideBySideSection.style.display = 'block';
+                stepByStepSection.style.display = 'none';
+
+                // Add the "active" style class to the side-by-side button, and remove it from the other
+                indSide.classList.add('active');
+                indStep.classList.remove('active');
+
+                // Tell the browser to scroll smoothly down to the side-by-side section
+                sideBySideSection.scrollIntoView({ behavior: 'smooth' });
+
+                // Check if the steps columns overflow. We wrap this in a setTimeout (delay of 300ms)
+                // because we need to wait for the browser to finish drawing the "display: block"
+                // changes on the screen before checking widths.
+                setTimeout(updateScrollButtonVisibility, 300);
+
+            } else if (mode === 'step-by-step') {
+                // Hide the side-by-side recipe layout, and show the step-by-step layout
+                sideBySideSection.style.display = 'none';
+                stepByStepSection.style.display = 'block';
+
+                // Add the "active" style class to the step-by-step button, and remove it from the other
+                indSide.classList.remove('active');
+                indStep.classList.add('active');
+
+                // Clone/copy the ingredients list dynamically (Module C)
+                populateCenteredIngredients();
+
+                // Tell the browser to scroll smoothly down to the step-by-step section
+                stepByStepSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+
+        /* =====================================================================
+           MODULE B: DYNAMIC INGREDIENTS CLONING (DRY Principle)
+           =====================================================================
+           To avoid duplicate code, this function copies the list of ingredients 
+           written in the Side-by-Side HTML list and inserts it into the 
+           Step-by-Stepcentered ingredients list on first load. */
+
+        function populateCenteredIngredients() {
+            // Query the ingredients column items list from the first view
+            const sourceIngredients = document.querySelector('#menu .menu-column:first-child .menu-items');
+
+            // Query the centered list element in the second view
+            const destIngredients = document.getElementById('ingredients-centered-list');
+
+            // If the source list exists, the destination exists, and we haven't copied it yet (children count is 0)
+            if (sourceIngredients && destIngredients && destIngredients.children.length === 0) {
+                // Copy the internal HTML content from the source to the destination
+                destIngredients.innerHTML = sourceIngredients.innerHTML;
+            }
+        }
+
+
+        /* =====================================================================
+           MODULE C: VERTICAL STEPS SCROLL CONTROL (Side-by-Side View)
+           =====================================================================
+           This module manages the scroll container for recipe steps,
+           toggles the navigation button, and handles vertical pagination. */
+
+        const stepsContainer = document.getElementById('steps-scroll-container');
+        const scrollStepsBtn = document.getElementById('scroll-steps-btn');
+
+        // This function checks if our steps list exceeds the visible container height.
+        function updateScrollButtonVisibility() {
+            if (stepsContainer && scrollStepsBtn) {
+                // scrollHeight = full vertical height of the content (visible + hidden offscreen)
+                // clientHeight = height of the visible content area on the screen
+                // If scrollHeight is larger than clientHeight, there is hidden overflow content to scroll.
+                if (stepsContainer.scrollHeight > stepsContainer.clientHeight) {
+                    scrollStepsBtn.classList.add('visible'); // Show the arrow button
+                } else {
+                    scrollStepsBtn.classList.remove('visible'); // Hide the arrow button
+                }
+            }
+        }
+
+        // Attach event listeners to make the scroll arrow interactive
+        if (scrollStepsBtn && stepsContainer) {
+            scrollStepsBtn.addEventListener('click', () => {
+                // The scroll amount matches exactly the visible height of the steps viewport (paging effect)
+                const scrollAmount = stepsContainer.clientHeight;
+
+                // Loop check: If current scroll position + visible height is close to the end, 
+                // scroll back to the top (scrollTop = 0).
+                if (stepsContainer.scrollTop + stepsContainer.clientHeight >= stepsContainer.scrollHeight - 10) {
+                    stepsContainer.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    // Otherwise, page down by scrollAmount
+                    stepsContainer.scrollBy({ top: scrollAmount, behavior: 'smooth' });
+                }
+            });
+
+            // Monitor user scrolls on the steps container to update the scroll button icon direction.
+            stepsContainer.addEventListener('scroll', () => {
+                // If the user reaches the end of the scroll list, add the class "at-end" 
+                // which flips the arrow icon direction (to point up and signal looping back).
+                if (stepsContainer.scrollTop + stepsContainer.clientHeight >= stepsContainer.scrollHeight - 10) {
+                    scrollStepsBtn.classList.add('at-end');
+                } else {
+                    scrollStepsBtn.classList.remove('at-end');
+                }
+            });
+        }
+
+
+        /* =====================================================================
+           MODULE D: DYNAMIC STICKY IMAGE REVEAL (Step-by-Step View)
+           =====================================================================
+           This module handles the scroll-driven image layered building. It uses 
+           an IntersectionObserver to watch when step cards enter the viewport, 
+           and activates corresponding image layers on the left side. */
+
+        // Configuration settings for the IntersectionObserver
+        const stepObserverOptions = {
+            root: null, // "null" defaults the root to the screen viewport
+
+            // "rootMargin" defines an invisible window check region.
+            // '-40% 0px -40% 0px' creates a 20% active zone exactly in the vertical middle of the screen.
+            rootMargin: '-40% 0px -40% 0px',
+            threshold: 0 // Fires as soon as 1 pixel of the card enters the middle active zone
+        };
+
+        // Create the observer: It runs a callback function whenever a card enters or leaves the middle region.
+        const stepObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                // If a step slide is currently centered in the middle region
+                if (entry.isIntersecting) {
+                    // Extract the step number from its "data-step" attribute (e.g. data-step="3" -> 3)
+                    const stepNum = parseInt(entry.target.getAttribute('data-step'), 10);
+                    // Update our drawing layers (Module D helper)
+                    updateStickyLayers(stepNum);
+                }
+            });
+        }, stepObserverOptions);
+
+        // Helper function that updates visible layers based on the current step number.
+        function updateStickyLayers(stepNum) {
+            // Find all image layers inside our sketch layers container
+            const layers = document.querySelectorAll('#sketch-layers .sketch-layer');
+            layers.forEach(layer => {
+                // Retrieve the step number assigned to this image layer
+                const layerStep = parseInt(layer.getAttribute('data-step'), 10);
+
+                /* 
+                   NEWBIE CUSTOMIZATION TIP (How step images transition):
+                   
+                   - MODE 1: FADE-BETWEEN (Current Setting)
+                     Only shows the image corresponding EXACTLY to the current step (e.g. Step 2 shows ONLY Image 2).
+                     Perfect for individual illustrations showing step-by-step additions.
+                     Code: use "layerStep === stepNum"
+                     
+                   - MODE 2: CUMULATIVE REVEAL (Layer Stacking)
+                     Keeps previous step images visible underneath (e.g. Step 2 shows Image 1 + Image 2 stacking up).
+                     Perfect for transparent drawing layers that construct a single image over time.
+                     Code: change the check below to: "layerStep <= stepNum"
+                */
+                if (layerStep === stepNum) {
+                    layer.classList.add('active'); // active sets opacity to 1 in CSS
+                } else {
+                    layer.classList.remove('active'); // inactive resets opacity to 0
+                }
+            });
+        }
+
+        // Observe the centered ingredients page (data-step="0") to clear drawings at the top
+        const ingredientsPage = document.getElementById('step-page-ingredients');
+        if (ingredientsPage) {
+            stepObserver.observe(ingredientsPage);
+        }
+
+        // Register our observer to watch every step slide card in the scrolling list
+        document.querySelectorAll('#steps-scrolling-column .step-slide').forEach(slide => {
+            stepObserver.observe(slide);
+        });
+
+
+        /* =====================================================================
+           INITIALIZATION & BROWSER EVENT BINDING
+           =====================================================================
+           Runs checks when the window loads or scales, ensuring the layout is 
+           displayed properly across screen dimensions. */
+
+        // "load" event runs after HTML, CSS, script files, and all assets (images) are loaded.
+        // We use "load" instead of "DOMContentLoaded" here because checking layout container 
+        // widths requires images to be loaded so dimensions are stable and calculated correctly.
+        window.addEventListener('load', () => {
+            // Check overflow right away
+            updateScrollButtonVisibility();
+
+            // Check if URL ends with "#step-by-step" to load the guide view directly
+            if (window.location.hash === '#step-by-step') {
+                selectRecipeMode('step-by-step');
+            } else {
+                // Otherwise, default indicator is side-by-side mode active
+                document.getElementById('indicator-side-by-side').classList.add('active');
+            }
+        });
+
+        // Re-check scroll button overflow if the browser window changes dimensions (e.g. rotating a tablet)
+        window.addEventListener('resize', updateScrollButtonVisibility);
+    </script>
 
 </body>
 

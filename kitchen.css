@@ -28,13 +28,16 @@
    1. LAYOUT & SMOOTH SCROLLING OVERRIDES
    ------------------------------------------------------------------------- */
 
-/* Override default overflow lock on html & body to allow seamless page scrolling */
-html,
-body {
+html {
     overflow-y: auto !important;
     height: auto !important;
     scroll-behavior: smooth;
     scroll-snap-type: y proximity; /* Snap to sections cleanly when scrolling near them */
+}
+
+body {
+    overflow: visible !important;
+    height: auto !important;
 }
 
 /* Extend wrapper height limit to accommodate the menu section */
