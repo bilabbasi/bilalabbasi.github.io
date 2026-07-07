@@ -378,28 +378,54 @@
            an IntersectionObserver to watch when step cards enter the viewport, 
            and activates corresponding image layers on the left side. */
 
-        // Configuration settings for the IntersectionObserver
-        const stepObserverOptions = {
-            root: null, // "null" defaults the root to the screen viewport
+        // Track which steps are currently in the viewport
+        const intersectingSteps = new Set();
 
-            // "rootMargin" defines an invisible window check region.
-            // '-40% 0px -40% 0px' creates a 20% active zone exactly in the vertical middle of the screen.
-            rootMargin: '-40% 0px -40% 0px',
-            threshold: 0 // Fires as soon as 1 pixel of the card enters the middle active zone
-        };
-
-        // Create the observer: It runs a callback function whenever a card enters or leaves the middle region.
+        // Create the observer: It runs a callback function whenever a card enters or leaves the viewport.
         const stepObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                // If a step slide is currently centered in the middle region
-                if (entry.isIntersecting) {
-                    // Extract the step number from its "data-step" attribute (e.g. data-step="3" -> 3)
-                    const stepNum = parseInt(entry.target.getAttribute('data-step'), 10);
-                    // Update our drawing layers (Module D helper)
-                    updateStickyLayers(stepNum);
+                const stepNum = parseInt(entry.target.getAttribute('data-step'), 10);
+                if (!isNaN(stepNum)) {
+                    if (entry.isIntersecting) {
+                        intersectingSteps.add(stepNum);
+                    } else {
+                        intersectingSteps.delete(stepNum);
+                    }
                 }
             });
-        }, stepObserverOptions);
+
+            // Find the step closest to the target line
+            if (intersectingSteps.size > 0) {
+                let activeStep = null;
+                let closestDistance = Infinity;
+                
+                // Active line is middle of screen (50% / 0.5) on desktop, middle of scrolling text area (70% / 0.7) on mobile
+                const targetY = window.innerHeight * (window.innerWidth <= 900 ? 0.7 : 0.5);
+
+                intersectingSteps.forEach(stepNum => {
+                    const slide = document.querySelector(`.step-slide[data-step="${stepNum}"]`) || document.getElementById('step-page-ingredients');
+                    if (slide) {
+                        const rect = slide.getBoundingClientRect();
+                        const slideCenter = rect.top + rect.height / 2;
+                        const distance = Math.abs(slideCenter - targetY);
+                        if (distance < closestDistance) {
+                            closestDistance = distance;
+                            activeStep = stepNum;
+                        }
+                    }
+                });
+
+                if (activeStep !== null) {
+                    updateStickyLayers(activeStep);
+                }
+            } else {
+                updateStickyLayers(0);
+            }
+        }, {
+            root: null,
+            rootMargin: '-10% 0px -10% 0px', // Wider active zone to capture adjacent slides on screen
+            threshold: 0
+        });
 
         // Helper function that updates visible layers based on the current step number.
         function updateStickyLayers(stepNum) {
