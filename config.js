@@ -2,7 +2,7 @@
 // WEBSITE CONFIGURATION FILE
 // =========================================================================
 // Change the text strings below to customize your website content.
-// You do not need to touch professional.html or index.css files to change text.
+// You do not need to touch the index.html or index.css files to change text.
 
 // -------------------------------------------------------------------------
 // 1. PROFESSIONAL ME CONFIGURATION

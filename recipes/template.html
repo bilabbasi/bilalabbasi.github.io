@@ -55,7 +55,7 @@
             <!-- Header: Top bar with navigation. "kitchen me" is marked active here -->
             <header class="navbar">
                 <ul class="nav-links">
-                    <li class="nav-item"><a href="../professional.html">professional me</a></li>
+                    <li class="nav-item"><a href="../index.html">professional me</a></li>
                     <li class="nav-item"><a href="../kitchen.html" class="active">kitchen me</a></li>
                 </ul>
             </header>
@@ -398,7 +398,7 @@
             if (intersectingSteps.size > 0) {
                 let activeStep = null;
                 let closestDistance = Infinity;
-
+                
                 // Active line is middle of screen (50% / 0.5) on desktop, middle of scrolling text area (70% / 0.7) on mobile
                 const targetY = window.innerHeight * (window.innerWidth <= 900 ? 0.7 : 0.5);
 
