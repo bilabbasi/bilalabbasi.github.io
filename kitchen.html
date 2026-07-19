@@ -29,6 +29,9 @@
             document.getElementById("main-subtitle").textContent = KITCHEN_CONFIG.subtitle;
             document.getElementById("bio-text").textContent = KITCHEN_CONFIG.bio;
 
+            document.getElementById("main-tab").textContent = PROFESSIONAL_CONFIG.tab;
+            document.getElementById("kitchen-tab").textContent = KITCHEN_CONFIG.tab;
+
             // 3. Generate the kitchen/recipe links dynamically
             const linksList = document.getElementById("links-list");
             const links = KITCHEN_CONFIG.links || [];
@@ -54,8 +57,8 @@
             <!-- Header: Top bar with navigation. "kitchen me" is marked active here -->
             <header class="navbar">
                 <ul class="nav-links">
-                    <li class="nav-item"><a href="index.html">professional me</a></li>
-                    <li class="nav-item"><a href="kitchen.html" class="active">(WIP) kitchen me</a></li>
+                    <li class="nav-item"><a href="index.html" id="main-tab">loading...</a></li>
+                    <li class="nav-item"><a href="kitchen.html" class="active" id="kitchen-tab">loading...</a></li>
                 </ul>
             </header>
 
