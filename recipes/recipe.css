@@ -4,7 +4,6 @@
    This file imports the main index.css styles and overrides specific color
    variables to give the Kitchen page a warm, culinary aesthetic. */
 
-@import url('../index.css');
 
 :root {
     /* Override color accents with warm terracotta and amber tones */

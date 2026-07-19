@@ -9,19 +9,27 @@
 
 /* Define design colors and settings so they can be changed in one place */
 :root {
-    --bg-main: #ffffff;         /* Background color of the entire screen */
-    --text-title: #18181b;      /* Color of your name and main headers (charcoal/dark gray) */
-    --text-subtitle: #6b6687;   /* Color of the subtitle (soft slate purple) */
-    --text-body: #4b5563;       /* Color of your bio paragraphs (muted charcoal) */
-    --text-muted: #9ca3af;      /* Color for minor symbols and arrow indicators (light gray) */
-    --link-color: #18181b;      /* Default color of link text */
-    --link-hover: #6b6687;      /* Color of link text when hovered over */
-    --border-color: #e5e7eb;    /* Light gray borders (if used anywhere) */
-    
+    --bg-main: #ffffff;
+    /* Background color of the entire screen */
+    --text-title: #18181b;
+    /* Color of your name and main headers (charcoal/dark gray) */
+    --text-subtitle: #6b6687;
+    /* Color of the subtitle (soft slate purple) */
+    --text-body: #4b5563;
+    /* Color of your bio paragraphs (muted charcoal) */
+    --text-muted: #9ca3af;
+    /* Color for minor symbols and arrow indicators (light gray) */
+    --link-color: #18181b;
+    /* Default color of link text */
+    --link-hover: #6b6687;
+    /* Color of link text when hovered over */
+    --border-color: #e5e7eb;
+    /* Light gray borders (if used anywhere) */
+
     /* Font styles */
     --font-serif: 'Lora', Georgia, serif;
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    
+
     /* Animation speed for links and transitions */
     --transition-smooth: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
@@ -38,13 +46,15 @@ html {
     scrollbar-gutter: stable;
 }
 
-html, body {
+html,
+body {
     height: 100%;
     background-color: var(--bg-main);
     color: var(--text-body);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
-    overflow: hidden; /* Desktop layout: Lock height to prevent page scrolling */
+    overflow: hidden;
+    /* Desktop layout: Lock height to prevent page scrolling */
 }
 
 /* Custom design for scrollbars (appears only when screen size is small) */
@@ -52,9 +62,11 @@ html, body {
     width: 6px;
     height: 6px;
 }
+
 ::-webkit-scrollbar-track {
     background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.1);
     border-radius: 3px;
@@ -65,18 +77,23 @@ html, body {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    padding: 40px 80px;         /* Padding: 40px top/bottom, 80px left/right */
-    max-width: 1440px;          /* Maximum width to prevent content stretching on huge screens */
-    margin: 0 auto;             /* Centers the website block horizontally */
+    padding: 40px 80px;
+    /* Padding: 40px top/bottom, 80px left/right */
+    max-width: 1440px;
+    /* Maximum width to prevent content stretching on huge screens */
+    margin: 0 auto;
+    /* Centers the website block horizontally */
 }
 
 /* --- Navigation Bar (Top) --- */
 .navbar {
     display: flex;
-    justify-content: flex-end; /* Align the navigation links to the right */
+    justify-content: flex-end;
+    /* Align the navigation links to the right */
     align-items: center;
     height: 60px;
-    flex-shrink: 0;            /* Prevent compressing the header height */
+    flex-shrink: 0;
+    /* Prevent compressing the header height */
 }
 
 /* Logo styling */
@@ -86,14 +103,16 @@ html, body {
     font-size: 1.1rem;
     color: var(--text-title);
     letter-spacing: -0.5px;
-    text-transform: lowercase;  /* Renders the name in modern lowercase style */
+    text-transform: lowercase;
+    /* Renders the name in modern lowercase style */
 }
 
 /* List holding navigation links */
 .nav-links {
     display: flex;
     gap: 32px;
-    list-style: none;           /* Removes default bullet points */
+    list-style: none;
+    /* Removes default bullet points */
 }
 
 /* Navigation items link text */
@@ -102,8 +121,10 @@ html, body {
     font-size: 0.9rem;
     color: var(--text-body);
     transition: var(--transition-smooth);
-    border-bottom: 1.5px solid transparent; /* Reserve space to prevent layout baseline shifts */
-    padding-bottom: 2px;                    /* Reserve space to prevent layout baseline shifts */
+    border-bottom: 1.5px solid transparent;
+    /* Reserve space to prevent layout baseline shifts */
+    padding-bottom: 2px;
+    /* Reserve space to prevent layout baseline shifts */
 }
 
 .nav-item a:hover {
@@ -119,19 +140,26 @@ html, body {
 /* --- Main Layout: Columns split --- */
 .main-content {
     display: grid;
-    grid-template-columns: 1fr 1fr;    /* Both columns share equal width for maximum image size */
-    gap: 80px;                         /* Spacing space between the left and right columns */
-    margin-top: 60px;                  /* Reduced gap to bring content closer to navbar */
-    margin-bottom: auto;               /* Pushes the footer cleanly to the bottom */
+    grid-template-columns: 1fr 1fr;
+    /* Both columns share equal width for maximum image size */
+    gap: 80px;
+    /* Spacing space between the left and right columns */
+    margin-top: 60px;
+    /* Reduced gap to bring content closer to navbar */
+    margin-bottom: auto;
+    /* Pushes the footer cleanly to the bottom */
 }
 
 /* --- Left Column: Info, Bio & Links --- */
 .info-column {
     display: flex;
     flex-direction: column;
-    gap: 32px;                         /* Vertical spacing between title, paragraph, and links */
-    max-width: 580px;                  /* Prevents lines of text from becoming too wide to read */
-    align-self: start;                 /* Keep the text column top-aligned at the exact same location across all pages */
+    gap: 10px;
+    /* Reduced spacing between title, bio paragraph, and links */
+    max-width: 580px;
+    /* Prevents lines of text from becoming too wide to read */
+    align-self: start;
+    /* Keep the text column top-aligned at the exact same location across all pages */
 }
 
 /* Header layout block */
@@ -144,11 +172,13 @@ html, body {
 /* Main title: e.g. "Bilal Abbasi" */
 .main-title {
     font-family: var(--font-serif);
-    font-size: 4rem;                   /* Large text size */
+    font-size: 4rem;
+    /* Large text size */
     font-weight: 500;
     line-height: 1.1;
     color: var(--text-title);
-    letter-spacing: -1.5px;            /* Tightens letters closer together for clean design */
+    letter-spacing: -1.5px;
+    /* Tightens letters closer together for clean design */
 }
 
 /* Subtitle: e.g. "Systems Engineering & Research" */
@@ -164,15 +194,22 @@ html, body {
 /* Bio Paragraph */
 .bio-paragraph {
     font-size: 1.05rem;
-    line-height: 1.65;                 /* Increases line spacing for easy reading */
+    line-height: 1.65;
+    /* Increases line spacing for easy reading */
     color: var(--text-body);
+    white-space: pre-line;
+    /* Renders standard newlines and line breaks from config.js */
+    text-align: justify;
+    /* Justify text to align cleanly with both left and right column boundaries */
 }
 
 /* Outer wrapper block for the social links row */
 .external-links {
     display: flex;
-    flex-wrap: wrap;                   /* Wraps links to a new line if screen is narrow */
-    gap: 24px;                         /* Spacing between links */
+    flex-wrap: wrap;
+    /* Wraps links to a new line if screen is narrow */
+    gap: 24px;
+    /* Spacing between links */
     margin-top: 16px;
 }
 
@@ -184,7 +221,8 @@ html, body {
     color: var(--link-color);
     display: inline-flex;
     align-items: center;
-    gap: 6px;                          /* Spacing between link label and arrow icon */
+    gap: 6px;
+    /* Spacing between link label and arrow icon */
     position: relative;
     padding-bottom: 2px;
     transition: var(--transition-smooth);
@@ -238,7 +276,8 @@ html, body {
 
 .sketch-container {
     width: 100%;
-    max-width: 100%;                   /* Allow the container to expand fully to fill its grid cell */
+    max-width: 100%;
+    /* Allow the container to expand fully to fill its grid cell */
     display: flex;
     justify-content: center;
 }
@@ -246,21 +285,28 @@ html, body {
 .sketch-img {
     width: 100%;
     height: auto;
-    max-height: calc(100vh - 200px);  /* Dynamically sized to stay entirely within viewport boundaries */
-    object-fit: contain;               /* Preserves aspect ratio */
-    object-position: top;              /* Align the visual drawing to the top of its box to remove empty space below navbar */
-    mix-blend-mode: multiply;          /* Blends illustration background cleanly with page background */
+    max-height: calc(100vh - 200px);
+    /* Dynamically sized to stay entirely within viewport boundaries */
+    object-fit: contain;
+    /* Preserves aspect ratio */
+    object-position: top;
+    /* Align the visual drawing to the top of its box to remove empty space below navbar */
+    mix-blend-mode: multiply;
+    /* Blends illustration background cleanly with page background */
     filter: contrast(1.02);
     opacity: 0.9;
     user-select: none;
-    pointer-events: none;              /* Prevents mouse dragging/saving issues on clicks */
+    pointer-events: none;
+    /* Prevents mouse dragging/saving issues on clicks */
 }
 
 /* --- Footer --- */
 .footer {
     height: 40px;
-    flex-shrink: 0;            /* Prevent compressing the footer height */
-    margin-top: auto;          /* Pushes footer to the bottom of the viewport */
+    flex-shrink: 0;
+    /* Prevent compressing the footer height */
+    margin-top: auto;
+    /* Pushes footer to the bottom of the viewport */
     display: flex;
     align-items: center;
     font-size: 0.8rem;
@@ -278,15 +324,15 @@ html, body {
     .app-wrapper {
         padding: 40px;
     }
-    
+
     .main-content {
         gap: 40px;
     }
-    
+
     .main-title {
         font-size: 3.2rem;
     }
-    
+
     .main-subtitle {
         font-size: 2.2rem;
     }
@@ -294,40 +340,43 @@ html, body {
 
 /* Mobile Portrait & Narrow Viewports */
 @media (max-width: 900px) {
-    html, body {
-        overflow-y: auto;              /* Enable page scrolling on mobile screens */
+
+    html,
+    body {
+        overflow-y: auto;
+        /* Enable page scrolling on mobile screens */
         height: auto;
     }
-    
+
     .app-wrapper {
         height: auto;
         min-height: 100vh;
         padding: 32px 24px;
     }
-    
+
     .navbar {
         margin-bottom: 60px;
     }
-    
+
     /* Stack the left text and right image vertically instead of side-by-side */
     .main-content {
         grid-template-columns: 1fr;
         gap: 60px;
         margin-bottom: 60px;
     }
-    
+
     .info-column {
         max-width: 100%;
     }
-    
+
     .sketch-container {
         max-width: 400px;
     }
-    
+
     .sketch-img {
         max-height: 45vh;
     }
-    
+
     .footer {
         margin-top: auto;
     }
@@ -341,19 +390,19 @@ html, body {
         gap: 16px;
         height: auto;
     }
-    
+
     .nav-links {
         gap: 20px;
     }
-    
+
     .main-title {
         font-size: 2.5rem;
     }
-    
+
     .main-subtitle {
         font-size: 1.8rem;
     }
-    
+
     .external-links {
         gap: 16px 20px;
     }
