@@ -12,12 +12,11 @@
     <meta name="author" content="Bilal Abbasi">
     <meta name="robots" content="index, follow">
 
-    <!-- Stylesheet: Controls how the kitchen page looks (imports index.css + overrides colors) -->
+    <!-- Stylesheets: Controls how the website and recipes look -->
+    <link rel="stylesheet" href="../index.css">
     <link rel="stylesheet" href="recipe.css">
 
-
-    <!-- 1. Import the configuration file (config.js) that defines professional and kitchen settings.
-         "../config.js" means go up one folder level (out of the "recipes" folder) to locate the config file. -->
+    <!-- Configuration Data: Where your text and links are defined -->
     <script src="../config.js"></script>
 
     <!-- 2. Run a script once the browser finishes building the HTML page structure (DOM). -->
@@ -25,6 +24,9 @@
         // "DOMContentLoaded" triggers as soon as the HTML elements are ready in the browser.
         document.addEventListener("DOMContentLoaded", () => {
             const linksList = document.getElementById("links-list");
+
+            document.getElementById("main-tab").textContent = PROFESSIONAL_CONFIG.tab;
+            document.getElementById("kitchen-tab").textContent = KITCHEN_CONFIG.tab;
 
             // Safety Check: If config.js fails to load, KITCHEN_CONFIG will be undefined.
             // We check its type first to prevent a browser console error from crashing our script.
@@ -50,15 +52,17 @@
 
     <div class="app-wrapper">
 
+        <!-- Header: Top bar containing navigation links -->
+        <header class="navbar">
+            <ul class="nav-links">
+                <li class="nav-item"><a href="../index.html" id="main-tab">professional me</a></li>
+                <li class="nav-item"><a href="../kitchen.html" class="active" id="kitchen-tab">(WIP) kitchen me</a>
+                </li>
+            </ul>
+        </header>
+
         <!-- Hero Section (First Page) -->
         <section class="hero-section">
-            <!-- Header: Top bar with navigation. "kitchen me" is marked active here -->
-            <header class="navbar">
-                <ul class="nav-links">
-                    <li class="nav-item"><a href="../index.html">professional me</a></li>
-                    <li class="nav-item"><a href="../kitchen.html" class="active">(WIP) kitchen me</a></li>
-                </ul>
-            </header>
 
             <!-- Main Content Area: Split into two columns -->
             <main class="main-content" id="me">

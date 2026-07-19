@@ -12,7 +12,8 @@
     <meta name="author" content="Bilal Abbasi">
     <meta name="robots" content="index, follow">
 
-    <!-- Stylesheet: Controls how the kitchen page looks (imports index.css + overrides colors) -->
+    <!-- Stylesheets: Controls how the website and kitchen look -->
+    <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="kitchen.css">
 
     <!-- Configuration Data: Shared config containing both professional and kitchen bio contents -->
@@ -28,6 +29,9 @@
             document.getElementById("main-title").textContent = KITCHEN_CONFIG.name;
             document.getElementById("main-subtitle").textContent = KITCHEN_CONFIG.subtitle;
             document.getElementById("bio-text").textContent = KITCHEN_CONFIG.bio;
+
+            document.getElementById("main-tab").textContent = PROFESSIONAL_CONFIG.tab;
+            document.getElementById("kitchen-tab").textContent = KITCHEN_CONFIG.tab;
 
             // 3. Generate the kitchen/recipe links dynamically
             const linksList = document.getElementById("links-list");
@@ -46,18 +50,18 @@
 </head>
 
 <body>
-
     <div class="app-wrapper">
+
+        <!-- Header: Top bar with navigation. "kitchen me" is marked active here -->
+        <header class="navbar">
+            <ul class="nav-links">
+                <li class="nav-item"><a href="index.html" id="main-tab">loading...</a></li>
+                <li class="nav-item"><a href="kitchen.html" class="active" id="kitchen-tab">loading...</a></li>
+            </ul>
+        </header>
 
         <!-- Hero Section (First Page) -->
         <section class="hero-section">
-            <!-- Header: Top bar with navigation. "kitchen me" is marked active here -->
-            <header class="navbar">
-                <ul class="nav-links">
-                    <li class="nav-item"><a href="index.html">professional me</a></li>
-                    <li class="nav-item"><a href="kitchen.html" class="active">(WIP) kitchen me</a></li>
-                </ul>
-            </header>
 
             <!-- Main Content Area: Split into two columns -->
             <main class="main-content" id="me">
