@@ -57,7 +57,7 @@ body {
     flex-direction: column;
     min-height: calc(100vh - 100px);
     /* Fills screen minus wrapper top padding (40px) and navbar height (60px) */
-    padding-bottom: 40px;
+    padding-bottom: 20px;
     /* Adds bottom padding to match professional wrapper bottom padding */
     justify-content: space-between;
     flex-shrink: 0;
@@ -67,6 +67,9 @@ body {
     scroll-margin-top: 100px; /* Offset the snap alignment to the top of the viewport */
 }
 
+.hero-section .sketch-img {
+    max-height: calc(100vh - 235px);  /* Dynamically constrained to fit perfectly within the initial viewport */
+}
 
 .hero-section .scroll-indicator {
     margin-top: 0;
@@ -80,7 +83,7 @@ body {
     align-items: center;
     gap: 8px;
     margin-top: auto;
-    padding-top: 20px;
+    padding-top: 10px;
     cursor: pointer;
     user-select: none;
     transition: opacity var(--transition-smooth);

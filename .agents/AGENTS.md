@@ -42,12 +42,16 @@ To maintain absolute visual stability, the elements on the professional landing 
 
 ### D. Image Containment
 *   Illustrations (`.sketch-img`) must remain in full view inside the viewport bounds.
-*   They are constrained by `max-height: calc(100vh - 200px);` and use `object-fit: contain;` to scale dynamically.
+*   They are constrained by `max-height: calc(100vh - 215px);` on the homepage, and `max-height: calc(100vh - 235px);` on scrollable sections to fit perfectly within the initial page boundaries. They use `object-fit: contain;` to scale dynamically.
 *   We use `object-position: top;` to align the topmost drawing pixels of the illustration with the top line of the biography headings, preventing visual gaps below the navbar.
 
 ### E. Scroll-Snapping offset
 *   The kitchen and recipe templates utilize CSS scroll snapping (`scroll-snap-type: y proximity`). 
 *   Always apply `scroll-margin-top: 100px;` to the `.hero-section` to offset the scroll alignment boundary by the navbar's layout footprint. This prevents the browser from automatically scrolling/jumping down on page load.
+
+### F. Grid Proportions & Column Spacing
+*   The content grid (`.main-content`) is split unequally into a `1fr 1.25fr` ratio (width of visual column is 25% larger than the text column) to make visual illustrations appear larger and occupy more space.
+*   We use a grid column `gap: 48px;` to keep column elements close and readable while maximizing layout space.
 
 ---
 

@@ -77,8 +77,8 @@ body {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    padding: 40px 80px;
-    /* Padding: 40px top/bottom, 80px left/right */
+    padding: 40px 80px 24px 80px;
+    /* Padding: 40px top, 80px left/right, 24px bottom */
     max-width: 1440px;
     /* Maximum width to prevent content stretching on huge screens */
     margin: 0 auto;
@@ -140,14 +140,10 @@ body {
 /* --- Main Layout: Columns split --- */
 .main-content {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    /* Both columns share equal width for maximum image size */
-    gap: 80px;
-    /* Spacing space between the left and right columns */
+    grid-template-columns: 1fr 1.25fr; /* Visual column is wider to let images occupy more space */
+    gap: 48px;                         /* Reduced gap to give more room to columns and visually tighten layout */
     margin-top: 60px;
-    /* Reduced gap to bring content closer to navbar */
-    margin-bottom: auto;
-    /* Pushes the footer cleanly to the bottom */
+    margin-bottom: auto;               /* Pushes the footer cleanly to the bottom */
 }
 
 /* --- Left Column: Info, Bio & Links --- */
@@ -194,8 +190,7 @@ body {
 /* Bio Paragraph */
 .bio-paragraph {
     font-size: 1.05rem;
-    line-height: 1.65;
-    /* Increases line spacing for easy reading */
+    line-height: 1.55;                 /* Slightly reduced line-height to ensure layout containment on standard viewports */
     color: var(--text-body);
     white-space: pre-line;
     /* Renders standard newlines and line breaks from config.js */
@@ -211,6 +206,11 @@ body {
     gap: 24px;
     /* Spacing between links */
     margin-top: 16px;
+}
+
+/* Hide empty link wrappers to reclaim vertical viewport space */
+.external-links:empty {
+    display: none;
 }
 
 /* Individual link button styling */
@@ -285,24 +285,19 @@ body {
 .sketch-img {
     width: 100%;
     height: auto;
-    max-height: calc(100vh - 200px);
-    /* Dynamically sized to stay entirely within viewport boundaries */
-    object-fit: contain;
-    /* Preserves aspect ratio */
-    object-position: top;
-    /* Align the visual drawing to the top of its box to remove empty space below navbar */
-    mix-blend-mode: multiply;
-    /* Blends illustration background cleanly with page background */
+    max-height: calc(100vh - 215px);  /* Dynamically sized to stay entirely within viewport boundaries */
+    object-fit: contain;               /* Preserves aspect ratio */
+    object-position: top;              /* Align the visual drawing to the top of its box to remove empty space below navbar */
+    mix-blend-mode: multiply;          /* Blends illustration background cleanly with page background */
     filter: contrast(1.02);
     opacity: 0.9;
     user-select: none;
-    pointer-events: none;
-    /* Prevents mouse dragging/saving issues on clicks */
+    pointer-events: none;              /* Prevents mouse dragging/saving issues on clicks */
 }
 
 /* --- Footer --- */
 .footer {
-    height: 40px;
+    height: 30px;
     flex-shrink: 0;
     /* Prevent compressing the footer height */
     margin-top: auto;
