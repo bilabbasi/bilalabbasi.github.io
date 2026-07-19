@@ -20,8 +20,7 @@
 .nav-item a.active {
     font-weight: 600;
     color: var(--text-subtitle) !important;
-    border-bottom: 1.5px solid var(--text-subtitle);
-    padding-bottom: 2px;
+    border-bottom-color: var(--text-subtitle);
 }
 
 /* -------------------------------------------------------------------------
@@ -56,12 +55,24 @@ body {
 .hero-section {
     display: flex;
     flex-direction: column;
-    min-height: calc(100vh - 80px);
-    /* Fills screen minus wrapper padding (40px top/bottom) */
+    min-height: calc(100vh - 100px);
+    /* Fills screen minus wrapper top padding (40px) and navbar height (60px) */
+    padding-bottom: 40px;
+    /* Adds bottom padding to match professional wrapper bottom padding */
     justify-content: space-between;
     flex-shrink: 0;
     /* Prevent flex shrinking to respect min-height */
     scroll-snap-align: start; /* Enable snap alignment */
+    scroll-margin-top: 100px; /* Offset the snap alignment to the top of the viewport */
+}
+
+.hero-section .main-content {
+    margin-top: auto;
+}
+
+.hero-section .scroll-indicator {
+    margin-top: 0;
+    padding-top: 0;
 }
 
 /* Elegant bouncing scroll guide */

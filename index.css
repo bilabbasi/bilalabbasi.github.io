@@ -34,6 +34,10 @@
 }
 
 /* Base styles for the document body */
+html {
+    scrollbar-gutter: stable;
+}
+
 html, body {
     height: 100%;
     background-color: var(--bg-main);
@@ -72,6 +76,7 @@ html, body {
     justify-content: flex-end; /* Align the navigation links to the right */
     align-items: center;
     height: 60px;
+    flex-shrink: 0;            /* Prevent compressing the header height */
     margin-bottom: auto; /* Automatically pushes body content to the screen center */
 }
 
@@ -98,6 +103,8 @@ html, body {
     font-size: 0.9rem;
     color: var(--text-body);
     transition: var(--transition-smooth);
+    border-bottom: 1.5px solid transparent; /* Reserve space to prevent layout baseline shifts */
+    padding-bottom: 2px;                    /* Reserve space to prevent layout baseline shifts */
 }
 
 .nav-item a:hover {
@@ -107,8 +114,7 @@ html, body {
 .nav-item a.active {
     font-weight: 600;
     color: var(--text-title);
-    border-bottom: 1.5px solid var(--text-title);
-    padding-bottom: 2px;
+    border-bottom-color: var(--text-title);
 }
 
 /* --- Main Layout: Columns split --- */
@@ -252,6 +258,7 @@ html, body {
 /* --- Footer --- */
 .footer {
     height: 40px;
+    flex-shrink: 0;            /* Prevent compressing the footer height */
     display: flex;
     align-items: center;
     font-size: 0.8rem;

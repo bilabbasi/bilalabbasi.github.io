@@ -18,10 +18,6 @@
     <!-- Configuration Data: Where your text and links are defined -->
     <script src="../config.js"></script>
 
-    <!-- 1. Import the configuration file (config.js) that defines professional and kitchen settings.
-         "../config.js" means go up one folder level (out of the "recipes" folder) to locate the config file. -->
-    <script src="../config.js"></script>
-
     <!-- 2. Run a script once the browser finishes building the HTML page structure (DOM). -->
     <script>
         // "DOMContentLoaded" triggers as soon as the HTML elements are ready in the browser.
@@ -55,16 +51,17 @@
 
     <div class="app-wrapper">
 
+        <!-- Header: Top bar containing navigation links -->
+        <header class="navbar">
+            <ul class="nav-links">
+                <li class="nav-item"><a href="../index.html" id="main-tab">professional me</a></li>
+                <li class="nav-item"><a href="../kitchen.html" class="active" id="kitchen-tab">(WIP) kitchen me</a>
+                </li>
+            </ul>
+        </header>
+
         <!-- Hero Section (First Page) -->
         <section class="hero-section">
-            <!-- Header: Top bar with navigation. "kitchen me" is marked active here -->
-            <header class="navbar">
-                <ul class="nav-links">
-                    <li class="nav-item"><a href="../index.html" id="main-tab">professional me</a></li>
-                    <li class="nav-item"><a href="../kitchen.html" class="active" id="kitchen-tab">(WIP) kitchen me</a>
-                    </li>
-                </ul>
-            </header>
 
             <!-- Main Content Area: Split into two columns -->
             <main class="main-content" id="me">
