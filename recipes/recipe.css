@@ -68,9 +68,6 @@ body {
     scroll-margin-top: 100px; /* Offset the snap alignment to the top of the viewport */
 }
 
-.hero-section .main-content {
-    margin-top: auto;
-}
 
 .hero-section .scroll-indicator {
     margin-top: 0;

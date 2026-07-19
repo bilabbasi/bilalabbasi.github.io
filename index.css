@@ -77,7 +77,6 @@ html, body {
     align-items: center;
     height: 60px;
     flex-shrink: 0;            /* Prevent compressing the header height */
-    margin-bottom: auto; /* Automatically pushes body content to the screen center */
 }
 
 /* Logo styling */
@@ -122,7 +121,7 @@ html, body {
     display: grid;
     grid-template-columns: 1fr 1fr;    /* Both columns share equal width for maximum image size */
     gap: 80px;                         /* Spacing space between the left and right columns */
-    align-items: center;
+    margin-top: 60px;                  /* Reduced gap to bring content closer to navbar */
     margin-bottom: auto;               /* Pushes the footer cleanly to the bottom */
 }
 
@@ -132,6 +131,7 @@ html, body {
     flex-direction: column;
     gap: 32px;                         /* Vertical spacing between title, paragraph, and links */
     max-width: 580px;                  /* Prevents lines of text from becoming too wide to read */
+    align-self: start;                 /* Keep the text column top-aligned at the exact same location across all pages */
 }
 
 /* Header layout block */
@@ -246,8 +246,9 @@ html, body {
 .sketch-img {
     width: 100%;
     height: auto;
-    max-height: 80vh;                  /* Increased to 80vh for maximum scale within viewport bounds */
+    max-height: calc(100vh - 200px);  /* Dynamically sized to stay entirely within viewport boundaries */
     object-fit: contain;               /* Preserves aspect ratio */
+    object-position: top;              /* Align the visual drawing to the top of its box to remove empty space below navbar */
     mix-blend-mode: multiply;          /* Blends illustration background cleanly with page background */
     filter: contrast(1.02);
     opacity: 0.9;
@@ -259,6 +260,7 @@ html, body {
 .footer {
     height: 40px;
     flex-shrink: 0;            /* Prevent compressing the footer height */
+    margin-top: auto;          /* Pushes footer to the bottom of the viewport */
     display: flex;
     align-items: center;
     font-size: 0.8rem;
