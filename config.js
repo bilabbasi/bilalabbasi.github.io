@@ -48,7 +48,14 @@ const KITCHEN_CONFIG = {
     subtitle: "recipes from my childhood",
 
     // Biography for your kitchen profile
-    bio: "All credit goes to my mom. Only the mistakes are mine.",
+    bio: `
+    A space to share some of my favourite recipes growing up in an Indian immigrant household. I scatter some Urdu language throughout, in a humble attempt to give a glimpse of the beauty of the language I spoke growing up.
+    
+    Food and language are among the primary pillars of the cultural inheritance of the diaspora. This is just a drop in the ocean.
+    
+    All credit goes to my mom. 
+    
+    Only the mistakes are mine.`,
 
     // Tab title
     tab: "kitchen me"
