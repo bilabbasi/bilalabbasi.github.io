@@ -15,7 +15,7 @@ const PROFESSIONAL_CONFIG = {
     subtitle: "Research Scientist, PhD",
 
     // Your biography paragraph
-    bio: "I am a research scientist at InterDigital, working on AI based video compression. Before that I was a researcher at Eidos-Montréal, working on deep learning for meshes. And, before that, I was doing a PhD at McGill University in Applied Mathematics.",
+    bio: "I am a research scientist at InterDigital, working on AI-based video compression. Previously, I was a researcher at Eidos-Montréal, working on deep learning for meshes. And, before that, I was doing a PhD at McGill University in Applied Mathematics.",
 
     // Tab title
     tab: "professional me",
@@ -49,13 +49,15 @@ const KITCHEN_CONFIG = {
 
     // Biography for your kitchen profile
     bio: `
-    A space to share some of my favourite recipes growing up in an Indian immigrant household. I scatter some Urdu language throughout, in a humble attempt to give a glimpse of the beauty of the language I spoke growing up.
+    a space to share some of my favourite recipes growing up in an Indian immigrant household
     
-    Food and language are among the primary pillars of the cultural inheritance of the diaspora. This is just a drop in the ocean.
+    there is urdu (اردو) scattered about, reflecting a humble attempt to give a glimpse of the beauty of the language I spoke growing up
     
-    All credit goes to my mom. 
+    food and language are among the primary pillars of the cultural inheritance of the diaspora; this is just a drop in the ocean
     
-    Only the mistakes are mine.`,
+    all credit goes to my mom 
+    
+    only the mistakes are mine`,
 
     // Tab title
     tab: "kitchen me"
