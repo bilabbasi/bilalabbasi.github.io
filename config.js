@@ -49,15 +49,12 @@ const KITCHEN_CONFIG = {
 
     // Biography for your kitchen profile
     bio: `
-    a space to share some of my favourite recipes growing up in an Indian immigrant household
+    a space to share some of my favourite recipes growing up in an Indian immigrant household.
+    there is urdu (اردو) scattered about, reflecting a humble attempt to give a glimpse of the beauty of the language I spoke growing up.
+    food and language are among the primary pillars of the cultural inheritance of the diaspora; this is just a drop in the ocean.
     
-    there is urdu (اردو) scattered about, reflecting a humble attempt to give a glimpse of the beauty of the language I spoke growing up
-    
-    food and language are among the primary pillars of the cultural inheritance of the diaspora; this is just a drop in the ocean
-    
-    all credit goes to my mom 
-    
-    only the mistakes are mine`,
+    all credit goes to my mom.
+    only the mistakes are mine.`,
 
     // Tab title
     tab: "kitchen me"
