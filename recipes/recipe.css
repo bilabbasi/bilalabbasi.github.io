@@ -391,6 +391,19 @@ body {
     display: none; 
 }
 
+/* Ingredients list container scrolling on desktop */
+#ingredients-list-container {
+    height: 420px;              /* Match steps column height */
+    overflow-y: auto;           /* Enable scroll */
+    overflow-x: hidden;
+    scrollbar-width: none;      /* Hide Firefox scrollbar */
+    padding-bottom: 24px;
+}
+
+#ingredients-list-container::-webkit-scrollbar {
+    display: none;              /* Hide Chrome/Safari scrollbar */
+}
+
 /* Individual Step Card */
 .step-card {
     width: 100%;
@@ -485,16 +498,18 @@ body {
 .ingredients-centered-page {
     height: 100vh;
     display: flex;
+    flex-direction: column;    /* Stack title and list vertically */
     align-items: center;
     justify-content: center;
     scroll-snap-align: start;
-    padding: 40px;
+    padding: 40px 60px;
     text-align: center;
     background-color: var(--bg-main);
+    box-sizing: border-box;
 }
 
 .centered-ingredients-content {
-    max-width: 600px;
+    max-width: 1100px;         /* Wide container to allow columns to span side-by-side */
     width: 100%;
 }
 
@@ -503,15 +518,58 @@ body {
     font-size: 3rem;
     color: var(--text-title);
     text-transform: lowercase;
-    margin-bottom: 40px;
+    margin-bottom: 32px;
     letter-spacing: -1px;
 }
 
 .ingredients-centered-list {
     font-family: var(--font-sans);
-    font-size: 1.15rem;
-    line-height: 2;
+    font-size: 1.1rem;
+    line-height: 1.8;
     color: var(--text-body);
+    display: flex;             /* Use flex layout to align section columns */
+    flex-direction: row;
+    flex-wrap: wrap;           /* Allow columns to wrap if screen is too narrow */
+    justify-content: center;   /* Center the columns horizontally under the title */
+    gap: 60px;                 /* Spacing between columns */
+    text-align: left;          /* Left align text inside the columns */
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Style columns inside the centered list */
+.ingredients-centered-list .recipe-section {
+    min-width: 260px;          /* Set ideal width range for columns */
+    max-width: 320px;
+    margin-bottom: 24px;
+}
+
+/* Override card styles inside the full-screen list for clean aesthetics */
+.ingredients-centered-list .menu-item {
+    border: none;
+    background: none;
+    box-shadow: none;
+    padding: 4px 0;
+    margin: 0;
+    width: auto;
+    transform: none !important;
+}
+
+.ingredients-centered-list .recipe-description {
+    margin-bottom: 0;
+    font-size: 1rem;
+}
+
+.ingredients-centered-list .recipe-section-title {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-subtitle);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px dashed var(--border-color);
+    padding-bottom: 6px;
 }
 
 /* Split Steps Container */
@@ -623,6 +681,28 @@ body {
         gap: 0;
     }
     
+    .ingredients-centered-page {
+        height: auto;
+        min-height: 100vh;
+        padding: 40px 24px;
+        justify-content: flex-start;
+    }
+    
+    .ingredients-centered-list {
+        flex-direction: column; /* Stack vertically on mobile */
+        align-items: center;    /* Center the flex columns */
+        text-align: center;
+    }
+    
+    .ingredients-centered-list .recipe-section {
+        min-width: 0;
+        max-width: 100%;
+    }
+    
+    .ingredients-centered-list .recipe-section-title {
+        text-align: center;
+    }
+    
     .visual-sticky-column {
         position: sticky;
         top: 0;
@@ -655,7 +735,8 @@ body {
     }
     
     /* Reset Side-by-Side vertical card scroll for mobile/tablet */
-    .steps-scroll-container {
+    .steps-scroll-container,
+    #ingredients-list-container {
         height: auto;
         overflow-y: visible;
         scroll-snap-type: none;
@@ -744,4 +825,23 @@ body {
     /* Removes any default inline margins or white space beneath the image */
     border-radius: 8px;
     /* Optional: adds nice rounded corners if you want it to look premium */
+}
+
+/* -------------------------------------------------------------------------
+   10. RECIPE SECTIONAL SEPARATOR (YAML-driven sections)
+   ------------------------------------------------------------------------- */
+.recipe-section {
+    margin-bottom: 32px;
+}
+
+.recipe-section-title {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-subtitle);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 16px;
+    border-bottom: 1px dashed var(--border-color);
+    padding-bottom: 8px;
 }
