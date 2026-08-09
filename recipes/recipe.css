@@ -660,6 +660,37 @@ body {
     color: var(--text-body);
 }
 
+.step-slide .step-section-heading {
+    font-family: var(--font-serif);
+    font-size: 2.2rem;
+    font-weight: 500;
+    color: var(--text-title);
+    margin-top: 0;
+    margin-bottom: 24px;
+    text-transform: lowercase;
+}
+
+.step-slide .step-section-list {
+    font-family: var(--font-sans);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--text-body);
+    padding-left: 20px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.step-slide .step-section-item {
+    margin-bottom: 0;
+}
+
+.step-slide .step-section-item::marker {
+    color: var(--text-subtitle);
+    font-weight: 600;
+}
+
 /* -------------------------------------------------------------------------
    9. RESPONSIVENESS OVERRIDES FOR NEW VIEWS
    ------------------------------------------------------------------------- */
@@ -775,6 +806,16 @@ body {
     
     .step-slide .step-text {
         font-size: 1rem;
+    }
+    
+    .step-slide .step-section-heading {
+        font-size: 1.8rem;
+        margin-bottom: 16px;
+    }
+    
+    .step-slide .step-section-list {
+        font-size: 0.95rem;
+        gap: 12px;
     }
 }
 

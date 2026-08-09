@@ -16,14 +16,20 @@ ingredients:
       - "10g Fine Sea Salt"
 
 steps:
-  - section: "Prepare the dough"
+  - section: "Autolyse & Mix"
+    image: "../assets/kitchen_sketch_step1.png"
     items:
-      - text: "Autolyse: Mix the flour and water together. Let it rest for 30 minutes."
-        image: "../assets/kitchen_sketch_step1.png"
-      - text: "Add starter and salt. Knead until smooth."
-        image: "../assets/kitchen_sketch_step2.png"
-      - text: "Perform bulk fermentation with stretch-and-folds."
-        image: "../assets/kitchen_sketch_step3.png"
-      - text: "Divide, pre-shape, and bench rest for 20 minutes."
-        image: "../assets/kitchen_sketch_step4.png"
+      - "Autolyse: Mix the flour and water together. Let it rest for 30 minutes."
+  - section: "Add Starter & Knead"
+    image: "../assets/kitchen_sketch_step2.png"
+    items:
+      - "Add starter and salt. Knead until smooth."
+  - section: "Bulk Fermentation"
+    image: "../assets/kitchen_sketch_step3.png"
+    items:
+      - "Perform bulk fermentation with stretch-and-folds."
+  - section: "Shape & Prove"
+    image: "../assets/kitchen_sketch_step4.png"
+    items:
+      - "Divide, pre-shape, and bench rest for 20 minutes."
 `;

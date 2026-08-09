@@ -95,7 +95,7 @@
                 ingredientsContainer.innerHTML = `<p class="recipe-description">No ingredients listed.</p>`;
             }
 
-            // 3. Render Steps Column (Side-by-Side View)
+            // 3. Render Steps Column (Side-by-Side View & Step-by-Step View)
             const stepsScrollContainer = document.getElementById("steps-scroll-container");
             const sketchLayers = document.getElementById("sketch-layers");
             const stepsScrollingColumn = document.getElementById("steps-scrolling-column");
@@ -104,41 +104,51 @@
             let stepsStepByStepHtml = "";
             let sketchLayersHtml = "";
             let globalStepCounter = 0;
+            let globalSectionCounter = 0;
 
             if (recipe.steps && recipe.steps.length > 0) {
                 recipe.steps.forEach(sec => {
-                    // Add Section Title to Side-by-Side View
-                    stepsSideBySideHtml += `<h4 class="recipe-section-title">${sec.section}</h4>`;
+                    globalSectionCounter++;
+                    const sectionTitle = sec.section || "";
+                    const sectionImage = sec.image || null;
+                    const formattedSectionNum = String(globalSectionCounter).padStart(2, '0');
 
+                    // Add Section Title to Side-by-Side View
+                    stepsSideBySideHtml += `<h4 class="recipe-section-title">${sectionTitle}</h4>`;
+
+                    // Generate Side-by-Side step cards for each item in the section
                     (sec.items || []).forEach(item => {
                         globalStepCounter++;
                         const stepText = typeof item === 'string' ? item : (item.text || "");
-                        const stepImage = typeof item === 'string' ? null : (item.image || null);
-                        const formattedNum = String(globalStepCounter).padStart(2, '0');
+                        const formattedStepNum = String(globalStepCounter).padStart(2, '0');
 
-                        // Add to Side-by-Side steps
                         stepsSideBySideHtml += `
                             <div class="menu-item step-card" data-step="${globalStepCounter}">
-                                <span class="step-card-num">${formattedNum}</span>
+                                <span class="step-card-num">${formattedStepNum}</span>
                                 <p class="recipe-description">${stepText}</p>
                             </div>
                         `;
-
-                        // Add to Step-by-Step slides
-                        stepsStepByStepHtml += `
-                            <div class="step-slide" data-step="${globalStepCounter}">
-                                <span class="step-number">step ${formattedNum}</span>
-                                <p class="step-text">${stepText}</p>
-                            </div>
-                        `;
-
-                        // Add to Step-by-Step visual sketch layers
-                        if (stepImage) {
-                            sketchLayersHtml += `
-                                <img src="${stepImage}" alt="Step ${globalStepCounter} image" class="sketch-layer" data-step="${globalStepCounter}">
-                            `;
-                        }
                     });
+
+                    // Generate a single slide for this section in the Step-by-Step View
+                    stepsStepByStepHtml += `
+                        <div class="step-slide" data-step="${globalSectionCounter}">
+                            <span class="step-number">section ${formattedSectionNum}</span>
+                            <h3 class="step-section-heading">${sectionTitle}</h3>
+                            <ol class="step-section-list">
+                                ${(sec.items || []).map(item => `
+                                    <li class="step-section-item">${typeof item === 'string' ? item : (item.text || "")}</li>
+                                `).join("")}
+                            </ol>
+                        </div>
+                    `;
+
+                    // Add Section-level Image to Step-by-Step visual sketch layers
+                    if (sectionImage) {
+                        sketchLayersHtml += `
+                            <img src="${sectionImage}" alt="Section ${globalSectionCounter} image" class="sketch-layer" data-step="${globalSectionCounter}">
+                        `;
+                    }
                 });
 
                 stepsScrollContainer.innerHTML = stepsSideBySideHtml;
