@@ -45,6 +45,46 @@
                     </svg>
                 </a>
             `).join("");
+
+            // 4. Generate the recipe columns & menu items dynamically from config.js
+            const menuGrid = document.getElementById("recipes-menu-grid");
+            const recipes = KITCHEN_CONFIG.recipes || [];
+
+            // Group recipes by category
+            const categories = {};
+            recipes.forEach(recipe => {
+                const cat = recipe.category || "other";
+                if (!categories[cat]) {
+                    categories[cat] = {
+                        title: cat,
+                        titleUrdu: recipe.categoryUrdu || "",
+                        items: []
+                    };
+                }
+                categories[cat].items.push(recipe);
+            });
+
+            // Render columns
+            menuGrid.innerHTML = Object.values(categories).map(cat => `
+                <div class="menu-column">
+                    <h3 class="column-title">${cat.title} ${cat.titleUrdu ? `<span class="urdu-title">${cat.titleUrdu}</span>` : ""}</h3>
+                    <div class="menu-items">
+                        ${cat.items.map(item => `
+                            <div class="menu-item">
+                                <a href="recipes/template.html?file=${item.file}" class="recipe-link">
+                                    <span class="recipe-name">${item.name}</span>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                        stroke-linecap="round" stroke-linejoin="round" class="link-arrow">
+                                        <line x1="7" y1="17" x2="17" y2="7"></line>
+                                        <polyline points="7 7 17 7 17 17"></polyline>
+                                    </svg>
+                                </a>
+                                <p class="recipe-description">${item.description}</p>
+                            </div>
+                        `).join("")}
+                    </div>
+                </div>
+            `).join("");
         });
     </script>
 </head>
@@ -104,88 +144,13 @@
         <section class="menu-section" id="menu">
             <h2 class="menu-title">the menu</h2>
 
-            <div class="menu-grid">
-
-                <!-- BREADS (roti) COLUMN -->
-                <div class="menu-column">
-                    <h3 class="column-title">breads <span class="urdu-title">روٹی</span></h3>
-                    <div class="menu-items">
-                        <div class="menu-item">
-                            <a href="recipes/template.html?file=examples/sourdough.js" class="recipe-link">
-                                <span class="recipe-name">sourdough bread</span>
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                                    stroke-linecap="round" stroke-linejoin="round" class="link-arrow">
-                                    <line x1="7" y1="17" x2="17" y2="7"></line>
-                                    <polyline points="7 7 17 7 17 17"></polyline>
-                                </svg>
-                            </a>
-                            <p class="recipe-description">Artisan country sourdough bread with a crispy crust and open
-                                crumb.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- CHICKEN (murgh) COLUMN -->
-                <div class="menu-column">
-                    <h3 class="column-title">chicken <span class="urdu-title">مرغ</span></h3>
-                    <div class="menu-items">
-                        <div class="menu-item">
-                            <a href="recipes/template.html?file=examples/murgh_cholay.js" class="recipe-link">
-                                <span class="recipe-name">murgh cholay</span>
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                                    stroke-linecap="round" stroke-linejoin="round" class="link-arrow">
-                                    <line x1="7" y1="17" x2="17" y2="7"></line>
-                                    <polyline points="7 7 17 7 17 17"></polyline>
-                                </svg>
-                            </a>
-                            <p class="recipe-description">A flavorful Punjabi chicken and chickpea curry slow-cooked
-                                with spices.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- VEG (sabzi) COLUMN -->
-                <div class="menu-column">
-                    <h3 class="column-title">veg <span class="urdu-title">سبزی</span></h3>
-                    <div class="menu-items">
-                        <div class="menu-item">
-                            <a href="recipes/template.html?file=examples/aloo_gobi.js" class="recipe-link">
-                                <span class="recipe-name">aloo gobi</span>
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                                    stroke-linecap="round" stroke-linejoin="round" class="link-arrow">
-                                    <line x1="7" y1="17" x2="17" y2="7"></line>
-                                    <polyline points="7 7 17 7 17 17"></polyline>
-                                </svg>
-                            </a>
-                            <p class="recipe-description">A dry potato and cauliflower dish cooked with cumin, turmeric,
-                                and ginger.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- DESSERT (meetha) COLUMN -->
-                <div class="menu-column">
-                    <h3 class="column-title">dessert <span class="urdu-title">میٹھی</span></h3>
-                    <div class="menu-items">
-                        <!-- Template Item: Duplicate this block to add a new recipe -->
-                        <div class="menu-item">
-                            <a href="recipes/template.html?file=examples/aloo_gobi.js" class="recipe-link">
-                                <span class="recipe-name">aloo gobi</span>
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                                    stroke-linecap="round" stroke-linejoin="round" class="link-arrow">
-                                    <line x1="7" y1="17" x2="17" y2="7"></line>
-                                    <polyline points="7 7 17 7 17 17"></polyline>
-                                </svg>
-                            </a>
-                            <p class="recipe-description">Aromatic spiced potato and cauliflower sautéed to perfection.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+            <div class="menu-grid" id="recipes-menu-grid">
+                <!-- Dynamically generated from config.js recipes configuration -->
             </div>
 
             <!-- Scroll indicator pointing to the about section below -->
-            <div class="scroll-indicator" onclick="document.getElementById('about').scrollIntoView({ behavior: 'smooth' })">
+            <div class="scroll-indicator"
+                onclick="document.getElementById('about').scrollIntoView({ behavior: 'smooth' })">
                 <span class="scroll-text">a little about me</span>
                 <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
@@ -194,29 +159,29 @@
             </div>
         </section>
 
-    <!-- About Section (Third Page) -->
-    <section class="about-section" id="about">
-        <h2 class="about-title">me</h2>
-        <div class="about-grid">
-            <!-- TODO: Add the about section content here -->
-            <div class="about-column">
-                <p class="about-text">That’s me, on the right, with ammi (امی). Despite what my face conveys, I'm
-                    not having a good time. Unfortunately, this informal baptism into the culinary life didn't
-                    really
-                    kick
-                    in until about 2 decades later. </p>
+        <!-- About Section (Third Page) -->
+        <section class="about-section" id="about">
+            <h2 class="about-title">me</h2>
+            <div class="about-grid">
+                <!-- TODO: Add the about section content here -->
+                <div class="about-column">
+                    <p class="about-text">That’s me, on the right, with ammi (امی). Despite what my face conveys, I'm
+                        not having a good time. Unfortunately, this informal baptism into the culinary life didn't
+                        really
+                        kick
+                        in until about 2 decades later. </p>
+                </div>
+                <div class="about-column">
+                    <img class="about-img" src="assets/photos/bilal_baby.png"
+                        alt="Picture of Bilal's mom holding him in the kitchen sink.">
+                </div>
             </div>
-            <div class="about-column">
-                <img class="about-img" src="assets/photos/bilal_baby.png"
-                    alt="Picture of Bilal's mom holding him in the kitchen sink.">
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <p>&copy; 2026 Bilal Abbasi. All rights reserved.</p>
-    </footer>
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2026 Bilal Abbasi. All rights reserved.</p>
+        </footer>
 
     </div>
 </body>
