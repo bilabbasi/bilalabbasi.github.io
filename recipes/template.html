@@ -73,7 +73,7 @@
             document.getElementById("main-title").textContent = recipe.title || "Recipe Name";
             document.getElementById("main-subtitle").textContent = recipe.subtitle || "";
             document.getElementById("bio-text").textContent = recipe.description || "";
-            
+
             if (recipe.image) {
                 document.querySelector(".sketch-img").src = recipe.image;
             }
@@ -99,7 +99,7 @@
             const stepsScrollContainer = document.getElementById("steps-scroll-container");
             const sketchLayers = document.getElementById("sketch-layers");
             const stepsScrollingColumn = document.getElementById("steps-scrolling-column");
-            
+
             let stepsSideBySideHtml = "";
             let stepsStepByStepHtml = "";
             let sketchLayersHtml = "";
@@ -133,7 +133,6 @@
                     // Generate a single slide for this section in the Step-by-Step View
                     stepsStepByStepHtml += `
                         <div class="step-slide" data-step="${globalSectionCounter}">
-                            <span class="step-number">section ${formattedSectionNum}</span>
                             <h3 class="step-section-heading">${sectionTitle}</h3>
                             <ol class="step-section-list">
                                 ${(sec.items || []).map(item => `
@@ -471,7 +470,7 @@
 
         function updateStickyLayers(stepNum) {
             const layers = document.querySelectorAll('#sketch-layers .sketch-layer');
-            
+
             // If there's only one layer (fallback mode), always keep it active
             if (layers.length === 1 && layers[0].getAttribute('data-step') === '1') {
                 layers[0].classList.add('active');
