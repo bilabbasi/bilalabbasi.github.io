@@ -81,6 +81,13 @@ const KITCHEN_CONFIG = {
             name: "aloo gobi",
             file: "examples/aloo_gobi.js",
             description: "A dry potato and cauliflower dish cooked with cumin, turmeric, and ginger."
+        },
+        {
+            category: "veg",
+            categoryUrdu: "سبزی",
+            name: "tarka daal",
+            file: "examples/chickenkitarkari.js",
+            description: "Ammi’s comforting yellow lentils tempered with ghee, cumin, onions, and golden fried garlic."
         }
     ]
 };
