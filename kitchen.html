@@ -51,7 +51,13 @@
             const recipes = KITCHEN_CONFIG.recipes || [];
 
             // Group recipes by category
-            const categories = {};
+            // Predefine default categories to ensure they always render even if empty
+            const categories = {
+                chicken: { title: "chicken", titleUrdu: "مرغ", items: [] },
+                meat: { title: "meat", titleUrdu: "گوشت", items: [] },
+                veg: { title: "veg", titleUrdu: "سبزی", items: [] },
+                dessert: { title: "dessert", titleUrdu: "میٹھی", items: [] }
+            };
             recipes.forEach(recipe => {
                 const cat = recipe.category || "other";
                 if (!categories[cat]) {
