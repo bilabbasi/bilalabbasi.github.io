@@ -57,5 +57,37 @@ const KITCHEN_CONFIG = {
     only the mistakes are mine.`,
 
     // Tab title
-    tab: "kitchen me"
+    tab: "kitchen me",
+
+    // Recipes metadata list for dynamic menu generation
+    recipes: [
+        // {
+        //     category: "breads",
+        //     categoryUrdu: "روٹی",
+        //     name: "sourdough bread",
+        //     file: "examples/sourdough.js",
+        //     description: "Artisan country sourdough bread with a crispy crust and open crumb."
+        // },
+        // {
+        //     category: "chicken",
+        //     categoryUrdu: "مرغ",
+        //     name: "murgh cholay",
+        //     file: "examples/murgh_cholay.js",
+        //     description: "A flavorful Punjabi chicken and chickpea curry slow-cooked with spices."
+        // },
+        // {
+        //     category: "veg",
+        //     categoryUrdu: "سبزی",
+        //     name: "aloo gobi",
+        //     file: "examples/aloo_gobi.js",
+        //     description: "A dry potato and cauliflower dish cooked with cumin, turmeric, and ginger."
+        // },
+        {
+            category: "veg",
+            categoryUrdu: "سبزی",
+            name: "tarka daal",
+            file: "recipes/yellowdaal.js",
+            description: "Ammi’s comforting yellow lentils tempered with ghee, cumin, onions, and golden fried garlic."
+        }
+    ]
 };
