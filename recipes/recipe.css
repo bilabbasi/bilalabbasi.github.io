@@ -937,3 +937,10 @@ body {
 .ingredients-centered-list .collapse-icon {
     display: none;
 }
+
+/* Ensure ingredients are always fully expanded in the step-by-step centered page */
+.ingredients-centered-list .recipe-section-content {
+    max-height: none !important;
+    opacity: 1 !important;
+    overflow: visible !important;
+}
