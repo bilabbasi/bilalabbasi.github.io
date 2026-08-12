@@ -875,6 +875,19 @@ body {
     margin-bottom: 32px;
 }
 
+#menu .recipe-section-title {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+    transition: color var(--transition-smooth);
+}
+
+#menu .recipe-section-title:hover {
+    color: var(--link-hover);
+}
+
 .recipe-section-title {
     font-family: var(--font-sans);
     font-size: 0.85rem;
@@ -885,4 +898,42 @@ body {
     margin-bottom: 16px;
     border-bottom: 1px dashed var(--border-color);
     padding-bottom: 8px;
+}
+
+/* Collapsible sections styles */
+.collapse-icon {
+    width: 14px;
+    height: 14px;
+    transition: transform var(--transition-smooth);
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+#menu .recipe-section-title:hover .collapse-icon {
+    color: var(--link-hover);
+}
+
+/* Rotation of icon when collapsed */
+.recipe-section.collapsed .collapse-icon {
+    transform: rotate(-90deg);
+}
+
+/* Collapsing animation for content */
+.recipe-section-content {
+    max-height: 1200px; /* Large enough to hold all items in a section */
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, margin-bottom 0.4s ease;
+    opacity: 1;
+}
+
+.recipe-section.collapsed .recipe-section-content {
+    max-height: 0;
+    opacity: 0;
+    margin-bottom: 0;
+    pointer-events: none;
+}
+
+/* Hide collapse icon in the step-by-step centered ingredients page */
+.ingredients-centered-list .collapse-icon {
+    display: none;
 }
