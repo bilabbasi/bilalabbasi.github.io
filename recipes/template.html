@@ -83,12 +83,19 @@
             if (recipe.ingredients && recipe.ingredients.length > 0) {
                 ingredientsContainer.innerHTML = recipe.ingredients.map(sec => `
                     <div class="recipe-section">
-                        <h4 class="recipe-section-title">${sec.section}</h4>
-                        ${(sec.items || []).map(item => `
-                            <div class="menu-item">
-                                <p class="recipe-description">${item}</p>
-                            </div>
-                        `).join("")}
+                        <h4 class="recipe-section-title">
+                            <span>${sec.section}</span>
+                            <svg class="collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </h4>
+                        <div class="recipe-section-content">
+                            ${(sec.items || []).map(item => `
+                                <div class="menu-item">
+                                    <p class="recipe-description">${item}</p>
+                                </div>
+                            `).join("")}
+                        </div>
                     </div>
                 `).join("");
             } else {
@@ -114,7 +121,16 @@
                     const formattedSectionNum = String(globalSectionCounter).padStart(2, '0');
 
                     // Add Section Title to Side-by-Side View
-                    stepsSideBySideHtml += `<h4 class="recipe-section-title">${sectionTitle}</h4>`;
+                    stepsSideBySideHtml += `
+                        <div class="recipe-section">
+                            <h4 class="recipe-section-title">
+                                <span>${sectionTitle}</span>
+                                <svg class="collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </h4>
+                            <div class="recipe-section-content">
+                    `;
 
                     // Generate Side-by-Side step cards for each item in the section
                     (sec.items || []).forEach(item => {
@@ -129,6 +145,11 @@
                             </div>
                         `;
                     });
+
+                    stepsSideBySideHtml += `
+                            </div>
+                        </div>
+                    `;
 
                     // Generate a single slide for this section in the Step-by-Step View
                     stepsStepByStepHtml += `
@@ -278,7 +299,7 @@
             <!-- Centered Ingredients Page -->
             <div class="step-page ingredients-centered-page" id="step-page-ingredients" data-step="0">
                 <div class="centered-ingredients-content">
-                    <h2 class="ingredients-centered-title">ingredients</h2>
+                    <h2 class="ingredients-centered-title">mise en place</h2>
                     <div class="ingredients-centered-list" id="ingredients-centered-list">
                         <!-- Will be populated dynamically by JavaScript to match the main ingredients list -->
                     </div>
@@ -407,6 +428,20 @@
             } else {
                 document.getElementById('indicator-side-by-side').classList.add('active');
             }
+
+            // Collapsible sections toggle logic for Side-by-Side view (Ingredients and Steps)
+            document.querySelectorAll('#menu .recipe-section-title').forEach(title => {
+                if (title.dataset.listenerAdded) return;
+                title.dataset.listenerAdded = "true";
+
+                title.addEventListener('click', () => {
+                    const section = title.closest('.recipe-section');
+                    if (section) {
+                        section.classList.toggle('collapsed');
+                        updateScrollButtonVisibility();
+                    }
+                });
+            });
 
             // Clean existing observer if any
             if (stepObserver) {
