@@ -37,12 +37,14 @@ ingredients:
 
 steps:
   - section: "Pressure Cooker Method"
+    image: "../assets/kitchen_sketch_step1.png"
     items:
       - "Put all of the ingredients for the daal into a pressure cooker and set to medium-high."
       - "Wait for 7-8 whistles and then reduce heat to low."
       - "Open the lid carefully. Use a hand blender to blend until about 80% is a puree (you still want some daal bits)."
       - "Season with salt to taste."
   - section: "Alternative Stovetop Method"
+    image: "../assets/kitchen_sketch_step2.png"
     items:
       - "Thoroughly rinse the daal."
       - "In a medium saucepan, bring the daal to a boil with 2 cups of water, skim off any foam."
@@ -50,6 +52,7 @@ steps:
       - "Add salt and continue to simmer covered for about 40 minutes until tender."
       - "Use a hand blender to lightly blend the daal mixture (do not turn into a smooth purée)."
   - section: "Prepare the Tarka"
+    image: "../assets/kitchen_sketch_step4.png"
     items:
       - "In a small saucepan, heat the ghee over medium heat."
       - "Once the ghee is glistening, add the cumin seeds, minced garlic, and chopped onions."

@@ -29,10 +29,10 @@
             document.getElementById("main-tab").textContent = PROFESSIONAL_CONFIG.tab || "professional me";
             document.getElementById("kitchen-tab").textContent = KITCHEN_CONFIG.tab || "kitchen me";
 
-            // Determine which recipe JS file to load using the URL parameter (e.g. ?file=sourdough.js)
-            // If no parameter is provided, it defaults to sourdough.js
+            // Determine which recipe JS file to load using the URL parameter (e.g. ?file=examples/sourdough.js)
+            // If no parameter is provided, it defaults to examples/sourdough.js
             const urlParams = new URLSearchParams(window.location.search);
-            let recipeFile = urlParams.get('file') || 'sourdough.js';
+            let recipeFile = urlParams.get('file') || 'examples/sourdough.js';
 
             // Backward-compatibility fallback: if they supplied .yaml, swap it to .js
             if (recipeFile.endsWith('.yaml')) {
@@ -66,6 +66,23 @@
             }
         });
 
+        // Helper function to normalize and resolve image paths
+        function resolveImagePath(imgPath) {
+            if (!imgPath) return '';
+            // Leave absolute URLs or domain-absolute paths as is
+            if (imgPath.startsWith('http://') || imgPath.startsWith('https://') || imgPath.startsWith('/') || imgPath.startsWith('data:')) {
+                return imgPath;
+            }
+            // Normalize paths relative to the project root
+            if (imgPath.startsWith('assets/')) {
+                return '../' + imgPath;
+            }
+            if (imgPath.startsWith('./assets/')) {
+                return '../' + imgPath.slice(2);
+            }
+            return imgPath;
+        }
+
         // Dynamic rendering function
         function renderRecipe(recipe) {
             // 1. Update Title and Headers
@@ -74,8 +91,10 @@
             document.getElementById("main-subtitle").textContent = recipe.subtitle || "";
             document.getElementById("bio-text").textContent = recipe.description || "";
 
-            if (recipe.image) {
-                document.querySelector(".sketch-img").src = recipe.image;
+            const defaultRecipeImg = resolveImagePath(recipe.image || '../assets/kitchen_sketch.png');
+            const mainImgEl = document.querySelector(".sketch-img");
+            if (mainImgEl) {
+                mainImgEl.src = defaultRecipeImg;
             }
 
             // 2. Render Ingredients Column (Side-by-Side View)
@@ -116,26 +135,45 @@
             if (recipe.steps && recipe.steps.length > 0) {
                 recipe.steps.forEach(sec => {
                     globalSectionCounter++;
-                    const sectionTitle = sec.section || "";
-                    const sectionImage = sec.image || null;
                     const formattedSectionNum = String(globalSectionCounter).padStart(2, '0');
 
-                    // Add Section Title to Side-by-Side View
-                    stepsSideBySideHtml += `
-                        <div class="recipe-section">
-                            <h4 class="recipe-section-title">
-                                <span>${sectionTitle}</span>
-                                <svg class="collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="6 9 12 15 18 9"></polyline>
-                                </svg>
-                            </h4>
-                            <div class="recipe-section-content">
-                    `;
+                    // Normalize section title, items, and image
+                    let sectionTitle = "";
+                    let sectionImage = null;
+                    let sectionItems = [];
 
-                    // Generate Side-by-Side step cards for each item in the section
-                    (sec.items || []).forEach(item => {
+                    if (typeof sec === 'string') {
+                        sectionItems = [sec];
+                    } else if (sec && typeof sec === 'object') {
+                        if (Array.isArray(sec.items)) {
+                            sectionTitle = sec.section || "";
+                            sectionImage = sec.image || (sec.items[0] && typeof sec.items[0] === 'object' && sec.items[0].image) || null;
+                            sectionItems = sec.items;
+                        } else {
+                            // Flat step object
+                            sectionTitle = sec.section || sec.title || "";
+                            sectionImage = sec.image || null;
+                            sectionItems = [sec.text || sec.step || sec.description || ""];
+                        }
+                    }
+
+                    // Side-by-Side View
+                    if (sectionTitle) {
+                        stepsSideBySideHtml += `
+                            <div class="recipe-section">
+                                <h4 class="recipe-section-title">
+                                    <span>${sectionTitle}</span>
+                                    <svg class="collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </h4>
+                                <div class="recipe-section-content">
+                        `;
+                    }
+
+                    sectionItems.forEach(item => {
                         globalStepCounter++;
-                        const stepText = typeof item === 'string' ? item : (item.text || "");
+                        const stepText = typeof item === 'string' ? item : (item.text || item.step || "");
                         const formattedStepNum = String(globalStepCounter).padStart(2, '0');
 
                         stepsSideBySideHtml += `
@@ -146,47 +184,49 @@
                         `;
                     });
 
-                    stepsSideBySideHtml += `
+                    if (sectionTitle) {
+                        stepsSideBySideHtml += `
+                                </div>
                             </div>
-                        </div>
-                    `;
-
-                    // Generate a single slide for this section in the Step-by-Step View
-                    stepsStepByStepHtml += `
-                        <div class="step-slide" data-step="${globalSectionCounter}">
-                            <h3 class="step-section-heading">${sectionTitle}</h3>
-                            <ol class="step-section-list">
-                                ${(sec.items || []).map(item => `
-                                    <li class="step-section-item">${typeof item === 'string' ? item : (item.text || "")}</li>
-                                `).join("")}
-                            </ol>
-                        </div>
-                    `;
-
-                    // Add Section-level Image to Step-by-Step visual sketch layers
-                    if (sectionImage) {
-                        sketchLayersHtml += `
-                            <img src="${sectionImage}" alt="Section ${globalSectionCounter} image" class="sketch-layer" data-step="${globalSectionCounter}">
                         `;
                     }
+
+                    // Step-by-Step View: Generate slide for this step/section
+                    if (sectionTitle) {
+                        stepsStepByStepHtml += `
+                            <div class="step-slide" data-step="${globalSectionCounter}">
+                                <h3 class="step-section-heading">${sectionTitle}</h3>
+                                <ol class="step-section-list">
+                                    ${sectionItems.map(item => `
+                                        <li class="step-section-item">${typeof item === 'string' ? item : (item.text || item.step || "")}</li>
+                                    `).join("")}
+                                </ol>
+                            </div>
+                        `;
+                    } else {
+                        const stepText = typeof sectionItems[0] === 'string' ? sectionItems[0] : (sectionItems[0].text || sectionItems[0].step || "");
+                        stepsStepByStepHtml += `
+                            <div class="step-slide" data-step="${globalSectionCounter}">
+                                <span class="step-number">step ${formattedSectionNum}</span>
+                                <p class="step-text">${stepText}</p>
+                            </div>
+                        `;
+                    }
+
+                    // Visual sketch layer for this step/section
+                    const stepVisualSrc = resolveImagePath(sectionImage || defaultRecipeImg);
+                    sketchLayersHtml += `
+                        <img src="${stepVisualSrc}" alt="Step ${globalSectionCounter} visual" class="sketch-layer" data-step="${globalSectionCounter}">
+                    `;
                 });
 
                 stepsScrollContainer.innerHTML = stepsSideBySideHtml;
                 stepsScrollingColumn.innerHTML = stepsStepByStepHtml;
-
-                // Handle visual layers fallback
-                if (sketchLayersHtml !== "") {
-                    sketchLayers.innerHTML = sketchLayersHtml;
-                } else {
-                    // Fallback to the main recipe image if no step-specific sketches are provided
-                    sketchLayers.innerHTML = `
-                        <img src="${recipe.image || '../assets/kitchen_sketch.png'}" alt="Recipe visual" class="sketch-layer active" data-step="1">
-                    `;
-                }
+                sketchLayers.innerHTML = sketchLayersHtml;
             } else {
                 stepsScrollContainer.innerHTML = `<p class="recipe-description">No steps listed.</p>`;
                 stepsScrollingColumn.innerHTML = `<p class="step-text">No steps listed.</p>`;
-                sketchLayers.innerHTML = `<img src="${recipe.image || '../assets/kitchen_sketch.png'}" alt="Recipe visual" class="sketch-layer active" data-step="1">`;
+                sketchLayers.innerHTML = `<img src="${defaultRecipeImg}" alt="Recipe visual" class="sketch-layer active" data-step="1">`;
             }
 
             // 4. Initialize observers and interactions for the dynamically created elements
