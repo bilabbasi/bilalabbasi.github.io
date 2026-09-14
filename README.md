@@ -23,6 +23,6 @@ The site is built with a focus on simplicity, responsiveness, and clean typograp
 * `index.html` / `index.css` — The entry page and core design system for the professional profile.
 * `kitchen.html` / `kitchen.css` — The dashboard and styles for "The Kitchen" recipes.
 * `config.js` — Central configuration file holding profile info, links, and titles.
-* `recipes/` — Contains CSS and HTML templates for individual recipe pages.
+* `recipes/` — Contains CSS, HTML templates, and recipes (see [recipes/README.md](recipes/README.md) for the recipe formatting guide).
 * `assets/` — Images, conceptual sketches, and favicons.
 * `.nojekyll` — Bypasses Jekyll processing on GitHub Pages to ensure fast, static asset delivery.
