@@ -88,6 +88,13 @@ const KITCHEN_CONFIG = {
             name: "tarka daal",
             file: "recipes/yellowdaal.js",
             description: "Ammi’s comforting yellow lentils tempered with ghee, cumin, onions, and golden fried garlic."
+        },
+        {
+            category: "meat",
+            categoryUrdu: "گوشت",
+            name: "keema",
+            file: "recipes/keema.js",
+            description: "One pot, super easy mattar keema dish."
         }
     ]
 };
