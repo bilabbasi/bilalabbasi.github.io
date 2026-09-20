@@ -26,8 +26,10 @@
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             // Update tabs from global config
-            document.getElementById("main-tab").textContent = PROFESSIONAL_CONFIG.tab || "professional me";
-            document.getElementById("kitchen-tab").textContent = KITCHEN_CONFIG.tab || "kitchen me";
+            const kitchenTab = document.getElementById("kitchen-tab");
+            if (kitchenTab) {
+                kitchenTab.textContent = "← " + (KITCHEN_CONFIG.name || "the kitchen");
+            }
 
             // Determine which recipe JS file to load using the URL parameter (e.g. ?file=examples/sourdough.js)
             // If no parameter is provided, it defaults to examples/sourdough.js
@@ -242,8 +244,7 @@
         <!-- Header: Top bar containing navigation links -->
         <header class="navbar">
             <ul class="nav-links">
-                <li class="nav-item"><a href="../index.html" id="main-tab">professional me</a></li>
-                <li class="nav-item"><a href="../kitchen.html" class="active" id="kitchen-tab">(WIP) kitchen me</a></li>
+                <li class="nav-item"><a href="../kitchen.html" class="active" id="kitchen-tab">← the kitchen</a></li>
             </ul>
         </header>
 

@@ -402,3 +402,90 @@ body {
         gap: 16px 20px;
     }
 }
+
+/* =========================================================================
+   GATEWAY / COVER PAGE STYLES
+   ========================================================================= */
+
+.gateway-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 40px 24px 24px 24px;
+    max-width: 1440px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.gateway-card {
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 24px;
+}
+
+.gateway-title {
+    font-family: var(--font-serif);
+    font-size: 3.75rem;
+    font-weight: 500;
+    line-height: 1.1;
+    color: var(--text-title);
+    letter-spacing: -1.5px;
+}
+
+.gateway-links {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    list-style: none;
+}
+
+.gateway-link {
+    font-family: var(--font-sans);
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--text-body);
+    text-decoration: none;
+    letter-spacing: 0.2px;
+    transition: var(--transition-smooth);
+    border-bottom: 1.5px solid transparent;
+    padding-bottom: 2px;
+}
+
+.gateway-link:hover {
+    color: var(--text-title);
+    border-bottom-color: var(--text-title);
+}
+
+.gateway-link.gateway-link-kitchen:hover {
+    color: #ea580c;
+    border-bottom-color: #ea580c;
+}
+
+.gateway-divider {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    user-select: none;
+}
+
+.gateway-footer {
+    margin-top: auto;
+    text-align: center;
+}
+
+@media (max-width: 480px) {
+    .gateway-title {
+        font-size: 2.75rem;
+    }
+
+    .gateway-links {
+        gap: 20px;
+    }
+
+    .gateway-link {
+        font-size: 1rem;
+    }
+}

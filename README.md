@@ -20,8 +20,9 @@ The site is built with a focus on simplicity, responsiveness, and clean typograp
 
 ## Repository structure
 
-* `index.html` / `index.css` — The entry page and core design system for the professional profile.
-* `kitchen.html` / `kitchen.css` — The dashboard and styles for "The Kitchen" recipes.
+* `index.html` — Minimalist gateway cover page at the root domain.
+* `professional.html` / `index.css` — Dedicated professional profile and core design system.
+* `kitchen.html` / `kitchen.css` — Dedicated dashboard and styles for "The Kitchen" recipes.
 * `config.js` — Central configuration file holding profile info, links, and titles.
 * `recipes/` — Contains CSS, HTML templates, and recipes (see [recipes/README.md](recipes/README.md) for the recipe formatting guide).
 * `assets/` — Images, conceptual sketches, and favicons.
