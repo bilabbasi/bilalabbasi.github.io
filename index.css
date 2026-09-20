@@ -137,6 +137,17 @@ body {
     border-bottom-color: var(--text-title);
 }
 
+.nav-item a.nav-home {
+    font-weight: 500;
+    color: var(--text-title);
+    border-bottom: 1.5px solid var(--text-title);
+}
+
+.nav-item a.nav-home:hover {
+    color: var(--link-hover);
+    border-bottom-color: var(--link-hover);
+}
+
 /* --- Main Layout: Columns split --- */
 .main-content {
     display: grid;

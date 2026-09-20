@@ -8,7 +8,7 @@
 // 0. GATEWAY (COVER PAGE) CONFIGURATION
 // -------------------------------------------------------------------------
 const GATEWAY_CONFIG = {
-    name: "Bilal Abbasi",
+    name: "bilal abbasi",
     links: [
         {
             label: "professional",

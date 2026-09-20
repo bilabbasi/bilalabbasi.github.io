@@ -5,10 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="assets/favicon_ba.png">
-    <title>Bilal Abbasi</title>
+    <title>bilal abbasi</title>
 
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Personal website and gateway for Bilal Abbasi. Systems engineering, research, and culinary explorations.">
+    <meta name="description"
+        content="Personal website and gateway for Bilal Abbasi. Systems engineering, research, and culinary explorations.">
     <meta name="author" content="Bilal Abbasi">
     <meta name="robots" content="index, follow">
 
@@ -40,8 +41,8 @@
                 linksContainer.innerHTML = config.links.map((link, index) => {
                     const extraClass = link.url.includes("kitchen") ? "gateway-link-kitchen" : "gateway-link-professional";
                     const linkHtml = `<a href="${link.url}" class="gateway-link ${extraClass}">${link.label}</a>`;
-                    return index < config.links.length - 1 
-                        ? `${linkHtml}<span class="gateway-divider">/</span>` 
+                    return index < config.links.length - 1
+                        ? `${linkHtml}<span class="gateway-divider">/</span>`
                         : linkHtml;
                 }).join("");
             }
@@ -54,7 +55,7 @@
     <div class="gateway-wrapper">
 
         <main class="gateway-card">
-            <h1 class="gateway-title" id="gateway-title">Bilal Abbasi</h1>
+            <h1 class="gateway-title" id="gateway-title">bilal abbasi</h1>
             <nav class="gateway-links" id="gateway-links">
                 <a href="professional.html" class="gateway-link gateway-link-professional">professional</a>
                 <span class="gateway-divider">/</span>
