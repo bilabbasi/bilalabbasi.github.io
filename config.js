@@ -85,9 +85,9 @@ const KITCHEN_CONFIG = {
         {
             category: "veg",
             categoryUrdu: "سبزی",
-            name: "tarka daal",
+            name: "yellow daal",
             file: "recipes/yellowdaal.js",
-            description: "Ammi’s comforting yellow lentils tempered with ghee, cumin, onions, and golden fried garlic."
+            description: "Quintessential tarka."
         },
         {
             category: "meat",

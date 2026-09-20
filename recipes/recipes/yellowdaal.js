@@ -1,7 +1,7 @@
 const RECIPE_DATA = `
 title: "Ammi’s Yellow Daal"
 subtitle: "تڑکا دال"
-description: "A comforting, traditional home-style tarka daal made with toor and chana lentils, tempered with ghee, cumin, onions, and golden garlic."
+description: "One of the quintessential dishes demonstrating the beauty of a tarka."
 image: "../assets/kitchen_sketch.png"
 
 ingredients:

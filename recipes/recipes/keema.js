@@ -1,7 +1,7 @@
 const RECIPE_DATA = `
 title: "Ammi’s Keema"
 subtitle: "قیمہ مٹر"
-description: "A deeply comforting home-style spiced minced beef curry cooked with onions, tomatoes, warm aromatics, and tender sweet green peas."
+description: "A simple classic. Serve this roti. Best setting for eating is probably cold with lukewarm roti, on a picnic at Niagara Falls."
 image: "../assets/kitchen_sketch.png"
 
 ingredients:
