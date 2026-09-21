@@ -445,6 +445,30 @@ body {
     line-height: 1.1;
     color: var(--text-title);
     letter-spacing: -1.5px;
+    min-height: 1.15em;
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: center;
+}
+
+.typewriter-cursor {
+    display: inline-block;
+    font-weight: 300;
+    font-size: 0.9em;
+    margin-left: 2px;
+    color: var(--text-subtitle);
+    animation: cursor-blink 0.85s infinite;
+    user-select: none;
+    transition: opacity 0.5s ease;
+}
+
+@keyframes cursor-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.typewriter-cursor.finished {
+    opacity: 0.4;
 }
 
 .gateway-links {
@@ -452,6 +476,14 @@ body {
     align-items: center;
     gap: 28px;
     list-style: none;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.6s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.gateway-links.visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .gateway-link {

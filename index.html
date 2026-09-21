@@ -19,11 +19,11 @@
     <!-- Configuration Data -->
     <script src="config.js"></script>
 
-    <!-- Loader Script -->
+    <!-- Loader & Typewriter Script -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const config = (typeof GATEWAY_CONFIG !== 'undefined') ? GATEWAY_CONFIG : {
-                name: "Bilal Abbasi",
+                name: "hi, i'm bilal",
                 links: [
                     { label: "professional", url: "professional.html" },
                     { label: "kitchen", url: "kitchen.html" }
@@ -31,10 +31,6 @@
             };
 
             document.title = config.name;
-            const titleEl = document.getElementById("gateway-title");
-            if (titleEl) {
-                titleEl.textContent = config.name;
-            }
 
             const linksContainer = document.getElementById("gateway-links");
             if (linksContainer && config.links && config.links.length > 0) {
@@ -46,6 +42,27 @@
                         : linkHtml;
                 }).join("");
             }
+
+            const textEl = document.getElementById("gateway-text");
+            const cursorEl = document.getElementById("gateway-cursor");
+            const textToType = config.name || "hi, i'm bilal";
+            let charIndex = 0;
+
+            function typeChar() {
+                if (charIndex < textToType.length) {
+                    const char = textToType.charAt(charIndex);
+                    textEl.textContent += char;
+                    charIndex++;
+                    let delay = 70 + Math.random() * 35;
+                    if (char === ',') delay += 220;
+                    setTimeout(typeChar, delay);
+                } else {
+                    if (cursorEl) cursorEl.classList.add("finished");
+                    if (linksContainer) linksContainer.classList.add("visible");
+                }
+            }
+
+            setTimeout(typeChar, 350);
         });
     </script>
 </head>
@@ -55,7 +72,7 @@
     <div class="gateway-wrapper">
 
         <main class="gateway-card">
-            <h1 class="gateway-title" id="gateway-title">bilal abbasi</h1>
+            <h1 class="gateway-title" id="gateway-title"><span id="gateway-text"></span><span class="typewriter-cursor" id="gateway-cursor">|</span></h1>
             <nav class="gateway-links" id="gateway-links">
                 <a href="professional.html" class="gateway-link gateway-link-professional">professional</a>
                 <span class="gateway-divider">/</span>
