@@ -30,8 +30,10 @@
             document.getElementById("main-subtitle").textContent = KITCHEN_CONFIG.subtitle;
             document.getElementById("bio-text").textContent = KITCHEN_CONFIG.bio;
 
-            document.getElementById("main-tab").textContent = PROFESSIONAL_CONFIG.tab;
-            document.getElementById("kitchen-tab").textContent = KITCHEN_CONFIG.tab;
+            const kitchenTab = document.getElementById("kitchen-tab");
+            if (kitchenTab) {
+                kitchenTab.textContent = KITCHEN_CONFIG.name;
+            }
 
             // 3. Generate the kitchen/recipe links dynamically
             const linksList = document.getElementById("links-list");
@@ -98,11 +100,10 @@
 <body>
     <div class="app-wrapper">
 
-        <!-- Header: Top bar with navigation. "kitchen me" is marked active here -->
+        <!-- Header: Top bar with navigation for kitchen sections -->
         <header class="navbar">
             <ul class="nav-links">
-                <li class="nav-item"><a href="index.html" id="main-tab">loading...</a></li>
-                <li class="nav-item"><a href="kitchen.html" class="active" id="kitchen-tab">loading...</a></li>
+                <li class="nav-item"><a href="index.html" class="nav-home">home</a></li>
             </ul>
         </header>
 

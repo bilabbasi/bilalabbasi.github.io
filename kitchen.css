@@ -22,6 +22,17 @@
     border-bottom-color: var(--text-subtitle);
 }
 
+.nav-item a.nav-home {
+    font-weight: 500;
+    color: var(--text-subtitle);
+    border-bottom: 1.5px solid var(--text-subtitle);
+}
+
+.nav-item a.nav-home:hover {
+    color: var(--link-hover);
+    border-bottom-color: var(--link-hover);
+}
+
 /* -------------------------------------------------------------------------
    1. LAYOUT & SMOOTH SCROLLING OVERRIDES
    ------------------------------------------------------------------------- */

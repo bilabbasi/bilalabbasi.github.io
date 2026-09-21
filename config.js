@@ -5,6 +5,23 @@
 // You do not need to touch the index.html or index.css files to change text.
 
 // -------------------------------------------------------------------------
+// 0. GATEWAY (COVER PAGE) CONFIGURATION
+// -------------------------------------------------------------------------
+const GATEWAY_CONFIG = {
+    name: "hi, i'm bilal",
+    links: [
+        {
+            label: "professional",
+            url: "professional.html"
+        },
+        {
+            label: "kitchen",
+            url: "kitchen.html"
+        }
+    ]
+};
+
+// -------------------------------------------------------------------------
 // 1. PROFESSIONAL ME CONFIGURATION
 // -------------------------------------------------------------------------
 const PROFESSIONAL_CONFIG = {
