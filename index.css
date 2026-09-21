@@ -186,6 +186,9 @@ body {
     color: var(--text-title);
     letter-spacing: -1.5px;
     /* Tightens letters closer together for clean design */
+    min-height: 1.15em;
+    display: inline-flex;
+    align-items: baseline;
 }
 
 /* Subtitle: e.g. "Systems Engineering & Research" */
@@ -196,6 +199,21 @@ body {
     line-height: 1.2;
     color: var(--text-subtitle);
     letter-spacing: -0.5px;
+    min-height: 1.2em;
+    display: inline-flex;
+    align-items: baseline;
+}
+
+/* Smooth fade-in for bio text and links after typing finishes */
+.profile-fade {
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.6s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.profile-fade.visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 /* Bio Paragraph */
