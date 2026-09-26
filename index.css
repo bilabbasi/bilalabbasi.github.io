@@ -476,6 +476,10 @@ body {
     justify-content: center;
 }
 
+.gateway-name-accent {
+    color: #7c2d12;
+}
+
 .typewriter-cursor {
     display: inline-block;
     font-weight: 300;

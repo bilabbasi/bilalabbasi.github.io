@@ -46,12 +46,32 @@
             const textEl = document.getElementById("gateway-text");
             const cursorEl = document.getElementById("gateway-cursor");
             const textToType = config.name || "hi, i'm bilal";
+
+            const matchIndex = textToType.toLowerCase().indexOf("bilal");
+            const matchLength = "bilal".length;
+
+            const prefixSpan = document.createElement("span");
+            const accentSpan = document.createElement("span");
+            accentSpan.className = "gateway-name-accent";
+            const suffixSpan = document.createElement("span");
+
+            textEl.appendChild(prefixSpan);
+            textEl.appendChild(accentSpan);
+            textEl.appendChild(suffixSpan);
+
             let charIndex = 0;
 
             function typeChar() {
                 if (charIndex < textToType.length) {
                     const char = textToType.charAt(charIndex);
-                    textEl.textContent += char;
+                    if (matchIndex !== -1 && charIndex >= matchIndex && charIndex < matchIndex + matchLength) {
+                        accentSpan.textContent += char;
+                    } else if (matchIndex !== -1 && charIndex >= matchIndex + matchLength) {
+                        suffixSpan.textContent += char;
+                    } else {
+                        prefixSpan.textContent += char;
+                    }
+
                     charIndex++;
                     let delay = 70 + Math.random() * 35;
                     if (char === ',') delay += 220;
