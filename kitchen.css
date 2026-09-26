@@ -41,7 +41,8 @@ html {
     overflow-y: auto !important;
     height: auto !important;
     scroll-behavior: smooth;
-    scroll-snap-type: y proximity; /* Snap to sections cleanly when scrolling near them */
+    scroll-snap-type: y proximity;
+    /* Snap to sections cleanly when scrolling near them */
 }
 
 body {
@@ -72,12 +73,15 @@ body {
     justify-content: space-between;
     flex-shrink: 0;
     /* Prevent flex shrinking to respect min-height */
-    scroll-snap-align: start; /* Enable snap alignment */
-    scroll-margin-top: 100px; /* Offset the snap alignment to the top of the viewport */
+    scroll-snap-align: start;
+    /* Enable snap alignment */
+    scroll-margin-top: 100px;
+    /* Offset the snap alignment to the top of the viewport */
 }
 
 .hero-section .sketch-img {
-    max-height: calc(100vh - 235px);  /* Dynamically constrained to fit perfectly within the initial viewport */
+    max-height: calc(100vh - 235px);
+    /* Dynamically constrained to fit perfectly within the initial viewport */
 }
 
 .hero-section .scroll-indicator {
@@ -153,7 +157,8 @@ body {
     justify-content: space-between;
     flex-shrink: 0;
     /* Prevent flex shrinking to respect min-height */
-    scroll-snap-align: start; /* Enable snap alignment */
+    scroll-snap-align: start;
+    /* Enable snap alignment */
 }
 
 .menu-title {
@@ -324,7 +329,6 @@ body {
     /* Generous bottom spacing for footer and to guarantee smooth full scroll */
     flex-shrink: 0;
     /* Prevent flex shrinking to respect min-height */
-    scroll-snap-align: start; /* Enable snap alignment */
 }
 
 .about-grid {

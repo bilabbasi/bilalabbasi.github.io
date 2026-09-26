@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="assets/favicon_ba_urdu_orange.png">
+    <title>the kitchen</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Bilal Abbasi's culinary corner. Sourdough baking, recipes, and food science.">
+    <meta name="author" content="Bilal Abbasi">
+    <meta name="robots" content="index, follow">
+
+    <!-- Stylesheets: Controls how the website and kitchen look -->
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="kitchen.css">
+
+    <!-- Configuration Data: Shared config containing both professional and kitchen bio contents -->
+    <script src="config.js"></script>
+
+    <!-- Loader Script: Automatically inserts the KITCHEN_CONFIG details when loaded -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // 1. Update browser tab title
+            document.title = KITCHEN_CONFIG.name;
+
+            // 2. Update main profile text headings & paragraphs
+            document.getElementById("main-title").textContent = KITCHEN_CONFIG.name;
+            document.getElementById("main-subtitle").textContent = KITCHEN_CONFIG.subtitle;
+            document.getElementById("bio-text").textContent = KITCHEN_CONFIG.bio;
+
+            const kitchenTab = document.getElementById("kitchen-tab");
+            if (kitchenTab) {
+                kitchenTab.textContent = KITCHEN_CONFIG.name;
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div class="app-wrapper">
+
+        <!-- Header: Top bar with navigation for kitchen sections -->
+        <header class="navbar">
+            <ul class="nav-links">
+                <li class="nav-item"><a href="index.html">home</a></li>
+                <li class="nav-item"><a href="kitchen.html" class="nav-home">the kitchen</a></li>
+            </ul>
+        </header>
+
+        <!-- About Section (Third Page) -->
+        <section class="about-section" id="about">
+            <h2 class="about-title">me</h2>
+            <div class="about-grid">
+                <!-- TODO: Add the about section content here -->
+                <div class="about-column">
+                    <p class="about-text">That’s me, on the right, with ammi (امی). Despite what my face conveys, I'm
+                        not having a good time. Unfortunately, this informal baptism into the culinary life didn't
+                        really
+                        kick
+                        in until about 2 decades later. </p>
+                </div>
+                <div class="about-column">
+                    <img class="about-img" src="assets/photos/bilal_baby.png"
+                        alt="Picture of Bilal's mom holding him in the kitchen sink.">
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2026 Bilal Abbasi. All rights reserved.</p>
+        </footer>
+
+    </div>
+</body>
+
+</html>
