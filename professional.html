@@ -77,7 +77,9 @@
                     setTimeout(typeSubtitle, delay);
                 } else {
                     if (titleCursor) titleCursor.classList.add("finished");
-                    fadeElements.forEach(el => el.classList.add("visible"));
+                    setTimeout(() => {
+                        fadeElements.forEach(el => el.classList.add("visible"));
+                    }, 250);
                 }
             }
 
@@ -92,7 +94,7 @@
     <div class="app-wrapper">
 
         <!-- Header: Fixed-height navbar preserving vertical alignment stability -->
-        <header class="navbar">
+        <header class="navbar profile-fade">
             <ul class="nav-links">
                 <li class="nav-item"><a href="index.html" class="nav-home">home</a></li>
             </ul>
@@ -118,7 +120,7 @@
             </div>
 
             <!-- Right Column: Visual Sketch illustration -->
-            <div class="visual-column">
+            <div class="visual-column profile-fade">
                 <div class="sketch-container">
                     <img src="assets/professional/sketch_colour.png" alt="Conceptual mechanical line illustration"
                         class="sketch-img">
@@ -128,7 +130,7 @@
         </main>
 
         <!-- Footer: Copyright line at the bottom -->
-        <footer class="footer">
+        <footer class="footer profile-fade">
             <p>&copy; 2026 Bilal Abbasi. All rights reserved.</p>
         </footer>
 
