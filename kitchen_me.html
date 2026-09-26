@@ -20,6 +20,7 @@
     <script src="config.js"></script>
 
     <!-- Loader Script: Automatically inserts the KITCHEN_CONFIG details when loaded -->
+    <!-- Loader Script: Automatically inserts the KITCHEN_CONFIG details when loaded -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             // 1. Update browser tab title
@@ -34,7 +35,20 @@
             if (kitchenTab) {
                 kitchenTab.textContent = KITCHEN_CONFIG.name;
             }
-        }
+
+            // 3. Generate the kitchen/recipe links dynamically
+            const linksList = document.getElementById("links-list");
+            const links = KITCHEN_CONFIG.links || [];
+            linksList.innerHTML = links.map(link => `
+                <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="external-link">
+                    ${link.label}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"></line>
+                        <polyline points="7 7 17 7 17 17"></polyline>
+                    </svg>
+                </a>
+            `).join("");
+        });
     </script>
 </head>
 
@@ -45,13 +59,33 @@
         <header class="navbar">
             <ul class="nav-links">
                 <li class="nav-item"><a href="index.html">home</a></li>
-                <li class="nav-item"><a href="kitchen.html" class="nav-home">the kitchen</a></li>
+                <li class="nav-item"><a href="kitchen.html">the kitchen</a></li>
+                <li class="nav-item"><a href="kitchen_me.html" class="nav-home">for the culture</a></li>
             </ul>
         </header>
 
-        <!-- About Section (Third Page) -->
+
         <section class="about-section" id="about">
-            <h2 class="about-title">me</h2>
+            <h2 class="about-title">this space</h2>
+
+            <div class="menu-grid">
+                hello
+            </div>
+            <!-- Scroll indicator pointing to the menu below -->
+            <div class="scroll-indicator"
+                onclick="document.getElementById('menu').scrollIntoView({ behavior: 'smooth' })">
+                <span class="scroll-text">a bit about me</span>
+                <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </div>
+        </section>
+
+        <!-- Menu Section (Second Page) -->
+        <section class="menu-section" id="menu">
+            <h2 class="menu-title">me</h2>
+
             <div class="about-grid">
                 <!-- TODO: Add the about section content here -->
                 <div class="about-column">
@@ -66,6 +100,7 @@
                         alt="Picture of Bilal's mom holding him in the kitchen sink.">
                 </div>
             </div>
+
         </section>
 
         <!-- Footer -->
