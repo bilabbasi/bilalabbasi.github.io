@@ -12,11 +12,11 @@ const GATEWAY_CONFIG = {
     links: [
         {
             label: "professional",
-            url: "professional.html"
+            url: "professional/"
         },
         {
             label: "kitchen",
-            url: "kitchen.html"
+            url: "kitchen/"
         }
     ]
 };

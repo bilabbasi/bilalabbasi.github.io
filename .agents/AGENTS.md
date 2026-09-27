@@ -24,7 +24,7 @@ The website is designed with a high-fidelity minimalist, typographic aesthetic i
 
 ## 📐 2. Layout & Spacing Stability Rules (CRITICAL)
 
-To maintain absolute visual stability, the elements on the professional landing page (`professional.html`), kitchen landing page (`kitchen.html`), and recipe page template (`recipes/template.html`) must not shift horizontally or vertically when navigating between pages.
+To maintain absolute visual stability, the elements on the professional landing page (`professional/index.html`), kitchen landing page (`kitchen/index.html`), and recipe page template (`recipes/template.html`) must not shift horizontally or vertically when navigating between pages.
 
 ### A. Navigation Tab Position & Height
 * The navigation header (`.navbar`) must remain in the **exact same location** across all pages.
