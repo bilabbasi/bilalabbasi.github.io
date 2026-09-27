@@ -25,8 +25,8 @@
             const config = (typeof GATEWAY_CONFIG !== 'undefined') ? GATEWAY_CONFIG : {
                 name: "hi, i'm bilal",
                 links: [
-                    { label: "professional", url: "professional.html" },
-                    { label: "kitchen", url: "kitchen.html" }
+                    { label: "professional", url: "professional/" },
+                    { label: "kitchen", url: "kitchen/" }
                 ]
             };
 
@@ -92,11 +92,12 @@
     <div class="gateway-wrapper">
 
         <main class="gateway-card">
-            <h1 class="gateway-title" id="gateway-title"><span id="gateway-text"></span><span class="typewriter-cursor" id="gateway-cursor">|</span></h1>
+            <h1 class="gateway-title" id="gateway-title"><span id="gateway-text"></span><span class="typewriter-cursor"
+                    id="gateway-cursor">|</span></h1>
             <nav class="gateway-links" id="gateway-links">
-                <a href="professional.html" class="gateway-link gateway-link-professional">professional</a>
+                <a href="professional/" class="gateway-link gateway-link-professional">professional</a>
                 <span class="gateway-divider">/</span>
-                <a href="kitchen.html" class="gateway-link gateway-link-kitchen">kitchen</a>
+                <a href="kitchen/" class="gateway-link gateway-link-kitchen">kitchen</a>
             </nav>
         </main>
 
