@@ -1,8 +1,8 @@
 const RECIPE_DATA = `
 title: "Ammi’s Keema"
 subtitle: "قیمہ مٹر"
-description: "A simple classic. Serve this roti. Best setting for eating is probably cold with lukewarm roti, on a picnic at Niagara Falls."
-image: "../assets/kitchen_sketch.png"
+description: "A simple classic. Serve this with roti. Best setting for eating is probably cold with lukewarm roti, on a picnic at Niagara Falls."
+image: "../../../assets/kitchen_sketch.png"
 
 ingredients:
   - section: "Keema Base (قیمہ)"
@@ -32,26 +32,26 @@ ingredients:
 
 steps:
   - section: "Initial Simmer"
-    image: "../assets/kitchen_sketch_step1.png"
+    image: "../../../assets/kitchen_sketch_step1.png"
     items:
       - "In a medium saucepan, add the ground beef, diced onions, diced tomato, coriander powder, turmeric, cumin seeds, black pepper powder, salt, garlic paste, and ginger paste along with 1 cup of water."
       - "Bring to a simmer over medium heat, cover with a lid, and cook for about 15 minutes."
 
   - section: "Bhunai (Sautéing)"
-    image: "../assets/kitchen_sketch_step2.png"
+    image: "../../../assets/kitchen_sketch_step2.png"
     items:
       - "Add the oil, increase the heat to medium, and sauté (bhunai) for about 10 minutes, stirring frequently to break down the mince."
       - "If the mixture gets too dry during cooking, splash in a little bit of water."
 
   - section: "Add Peas & Finish Cooking"
-    image: "../assets/kitchen_sketch_step3.png"
+    image: "../../../assets/kitchen_sketch_step3.png"
     items:
       - "Transfer everything to a nonstick pan set over medium heat."
       - "Add the frozen peas, Kashmiri chili powder, and sliced green chilies."
       - "Stir and reduce until the curry reaches your desired consistency and the peas are tender."
 
   - section: "Garnish & Serve"
-    image: "../assets/kitchen_sketch_step4.png"
+    image: "../../../assets/kitchen_sketch_step4.png"
     items:
       - "Garnish with a generous handful of fresh chopped coriander."
 `;

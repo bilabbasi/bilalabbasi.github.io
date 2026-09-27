@@ -82,14 +82,14 @@ const KITCHEN_CONFIG = {
             category: "veg",
             categoryUrdu: "سبزی",
             name: "yellow daal",
-            file: "recipes/yellowdaal.js",
+            url: "recipes/yellowdaal/",
             description: "Quintessential tarka."
         },
         {
             category: "meat",
             categoryUrdu: "گوشت",
             name: "keema",
-            file: "recipes/keema.js",
+            url: "recipes/keema/",
             description: "One pot, super easy mattar keema dish."
         }
     ]
