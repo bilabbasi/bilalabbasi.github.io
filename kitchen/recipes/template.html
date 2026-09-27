@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="../assets/favicon_ba_urdu_orange.png">
+    <link rel="icon" type="image/png" href="../../assets/favicon_ba_urdu_orange.png">
     <title>Recipe</title>
 
     <!-- SEO Meta Tags -->
@@ -13,14 +13,14 @@
     <meta name="robots" content="index, follow">
 
     <!-- Stylesheets: Controls how the website and recipes look -->
-    <link rel="stylesheet" href="../index.css">
+    <link rel="stylesheet" href="../../index.css">
     <link rel="stylesheet" href="recipe.css">
 
     <!-- YAML Parser Library: Loads js-yaml dynamically from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
 
     <!-- Configuration Data: Where your text and links are defined -->
-    <script src="../config.js"></script>
+    <script src="../../config.js"></script>
 
     <!-- Script to load the configuration data and fetch/parse the YAML recipe -->
     <script>
@@ -76,11 +76,17 @@
                 return imgPath;
             }
             // Normalize paths relative to the project root
-            if (imgPath.startsWith('assets/')) {
+            if (imgPath.startsWith('../../assets/')) {
+                return imgPath;
+            }
+            if (imgPath.startsWith('../assets/')) {
                 return '../' + imgPath;
             }
+            if (imgPath.startsWith('assets/')) {
+                return '../../' + imgPath;
+            }
             if (imgPath.startsWith('./assets/')) {
-                return '../' + imgPath.slice(2);
+                return '../../' + imgPath.slice(2);
             }
             return imgPath;
         }
@@ -243,7 +249,7 @@
 
         <header class="navbar">
             <ul class="nav-links">
-                <li class="nav-item"><a href="../kitchen/" class="active" id="kitchen-tab">← the kitchen</a></li>
+                <li class="nav-item"><a href="../" class="active" id="kitchen-tab">← the kitchen</a></li>
             </ul>
         </header>
 
@@ -270,7 +276,7 @@
                 <!-- Right Column: Visual Sourdough Sketch -->
                 <div class="visual-column">
                     <div class="sketch-container">
-                        <img src="../assets/kitchen_sketch.png" alt="Recipe illustration" class="sketch-img">
+                        <img src="../../assets/kitchen_sketch.png" alt="Recipe illustration" class="sketch-img">
                     </div>
                 </div>
 

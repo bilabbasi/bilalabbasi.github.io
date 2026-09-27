@@ -24,7 +24,7 @@ The website is designed with a high-fidelity minimalist, typographic aesthetic i
 
 ## 📐 2. Layout & Spacing Stability Rules (CRITICAL)
 
-To maintain absolute visual stability, the elements on the professional landing page (`professional/index.html`), kitchen landing page (`kitchen/index.html`), and recipe page template (`recipes/template.html`) must not shift horizontally or vertically when navigating between pages.
+To maintain absolute visual stability, the elements on the professional landing page (`professional/index.html`), kitchen landing page (`kitchen/index.html`), and recipe page template (`kitchen/recipes/template.html`) must not shift horizontally or vertically when navigating between pages.
 
 ### A. Navigation Tab Position & Height
 * The navigation header (`.navbar`) must remain in the **exact same location** across all pages.
@@ -59,7 +59,7 @@ To maintain absolute visual stability, the elements on the professional landing 
 ## 🍲 3. Recipe System Architecture
 
 ### A. Recipe File Format (`.js` as YAML container)
-* Recipes live in `recipes/recipes/<slug>.js` (or `recipes/examples/<slug>.js`).
+* Recipes live in `kitchen/recipes/recipes/<slug>.js` (or `kitchen/recipes/examples/<slug>.js`).
 * Each recipe is a JavaScript file exporting a template literal:
   ```javascript
   const RECIPE_DATA = `
@@ -83,7 +83,7 @@ To maintain absolute visual stability, the elements on the professional landing 
 * **Why `.js` instead of raw `.yaml`?**  
   Browsers block local `fetch()` requests on `file:///` URLs due to CORS. Loading the recipe as `<script src="..."></script>` parses without CORS issues both locally and on web servers.
 
-### B. Dual Recipe Views in `recipes/template.html`
+### B. Dual Recipe Views in `kitchen/recipes/template.html`
 1. **Side-by-Side View (`#menu`)**:
    - Two columns: Ingredients on left, Steps on right.
    - Sections are collapsible (`.recipe-section.collapsed`).
@@ -95,7 +95,7 @@ To maintain absolute visual stability, the elements on the professional landing 
    - **Image Fallback**: If a step section omits an `image`, it gracefully falls back to `recipe.image` so the visual container is never blank.
 
 ### C. Path Resolution
-* `template.html` uses `resolveImagePath()` to normalize paths. Both `"assets/..."` and `"../assets/..."` resolve correctly relative to the `/recipes/` directory.
+* `template.html` uses `resolveImagePath()` to normalize paths. Both `"assets/..."` and `"../assets/..."` resolve correctly relative to the `/kitchen/recipes/` directory.
 
 ### D. Registering Recipes (`config.js`)
 * Add new recipes to `KITCHEN_CONFIG.recipes` in `config.js`:
@@ -104,7 +104,7 @@ To maintain absolute visual stability, the elements on the professional landing 
       category: "veg",                     // "chicken", "meat", "veg", "dessert", or custom
       categoryUrdu: "سبزی",
       name: "tarka daal",
-      file: "recipes/yellowdaal.js",       // Path relative to recipes/template.html
+      file: "recipes/yellowdaal.js",       // Path relative to kitchen/recipes/template.html
       description: "Ammi’s comforting yellow lentils..."
   }
   ```
