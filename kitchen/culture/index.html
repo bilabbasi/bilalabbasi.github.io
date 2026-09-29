@@ -37,12 +37,12 @@
                         return res.text();
                     })
                     .then(text => {
-                        const paragraphs = text
+                        const content = text
                             .trim()
                             .split(/\n\s*\n/)
-                            .map(para => `<p>${para.trim().replace(/\n/g, "<br>")}</p>`)
-                            .join("");
-                        thisSpaceEl.innerHTML = paragraphs;
+                            .map(para => para.trim().replace(/\n/g, "<br>"))
+                            .join("<br><br>");
+                        thisSpaceEl.innerHTML = content;
                     })
                     .catch(err => {
                         console.warn("Using inline fallback content for this space:", err);
@@ -69,16 +69,25 @@
             <h2 class="about-title">this space</h2>
 
             <div class="about-text" id="this-space-content">
-                <p>this space is meant to be a tiny window into the life of someone who grew up at the nexus of two cultures.</p>
-                <p>my story is certainly not unique, but it is my own.</p>
-                <p>through recipes given by my mom, this space is hopefully a reminder that food is more then just a dictation of ingredients and steps.</p>
-                <p>it’s a collection of memories, heritage, and tradition.</p>
-                <p>this space is a tribute to the all of the kids who were made to feel like their food wasn’t normal.</p>
-                <p>it's a tribute to the kids who got excited seeing The Simpsons go to India.</p>
-                <p>it's a tribute to the kids who got excited hearing Chaiyya Chaiyya in Inside Man</p>
-                <p>it's a tribute to the kids who got excited seeing Akshay Kumar in Toronto</p>
-                <p>and, most of all, this space is a tribute to the parents who gave up their homeland, community, and the taste of their mom’s cooking, so that their kids could have access to a world they could only dream about.</p>
-                <p>this one's for them, and for us.</p>
+                this space is meant to be a tiny window into the life of someone who grew up at the nexus of two cultures.
+                <br><br>
+                my story is certainly not unique, but it is my own.
+                <br><br>
+                through recipes given by my mom, this space is hopefully a reminder that food is more then just a dictation of ingredients and steps.
+                <br><br>
+                it’s a collection of memories, heritage, and tradition.
+                <br><br>
+                this space is a tribute to the all of the kids who were made to feel like their food wasn’t normal.
+                <br><br>
+                it's a tribute to the kids who got excited seeing The Simpsons go to India.
+                <br><br>
+                it's a tribute to the kids who got excited hearing Chaiyya Chaiyya in Inside Man
+                <br><br>
+                it's a tribute to the kids who got excited seeing Akshay Kumar in Toronto
+                <br><br>
+                and, most of all, this space is a tribute to the parents who gave up their homeland, community, and the taste of their mom’s cooking, so that their kids could have access to a world they could only dream about.
+                <br><br>
+                this one's for them, and for us.
             </div>
             <!-- Scroll indicator pointing to the menu below -->
             <div class="scroll-indicator"
