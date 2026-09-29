@@ -316,7 +316,7 @@ body {
     color: var(--text-title);
     letter-spacing: -1px;
     text-transform: lowercase;
-    margin-bottom: 48px;
+    margin-bottom: 24px;
 }
 
 .about-section {
@@ -324,8 +324,8 @@ body {
     flex-direction: column;
     min-height: 100vh;
     /* Ensures the section is tall enough to scroll fully into view on all screens */
-    padding-top: 80px;
-    padding-bottom: 120px;
+    padding-top: 16px;
+    padding-bottom: 80px;
     /* Generous bottom spacing for footer and to guarantee smooth full scroll */
     flex-shrink: 0;
     /* Prevent flex shrinking to respect min-height */
