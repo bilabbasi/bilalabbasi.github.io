@@ -23,31 +23,31 @@
     <!-- Loader Script: Automatically inserts the KITCHEN_CONFIG details when loaded -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // 1. Update browser tab title
-            document.title = KITCHEN_CONFIG.name;
-
-            // 2. Update main profile text headings & paragraphs
-            document.getElementById("main-title").textContent = KITCHEN_CONFIG.name;
-            document.getElementById("main-subtitle").textContent = KITCHEN_CONFIG.subtitle;
-            document.getElementById("bio-text").textContent = KITCHEN_CONFIG.bio;
-
-            const kitchenTab = document.getElementById("kitchen-tab");
-            if (kitchenTab) {
-                kitchenTab.textContent = KITCHEN_CONFIG.name;
+            // Update browser tab title
+            if (typeof KITCHEN_CONFIG !== 'undefined') {
+                document.title = (KITCHEN_CONFIG.name || "the kitchen") + " — what for?";
             }
 
-            // 3. Generate the kitchen/recipe links dynamically
-            const linksList = document.getElementById("links-list");
-            const links = KITCHEN_CONFIG.links || [];
-            linksList.innerHTML = links.map(link => `
-                <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="external-link">
-                    ${link.label}
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="7" y1="17" x2="17" y2="7"></line>
-                        <polyline points="7 7 17 7 17 17"></polyline>
-                    </svg>
-                </a>
-            `).join("");
+            // Load "this space" content dynamically from this_space.txt
+            const thisSpaceEl = document.getElementById("this-space-content");
+            if (thisSpaceEl) {
+                fetch("this_space.txt")
+                    .then(res => {
+                        if (!res.ok) throw new Error("Could not fetch this_space.txt");
+                        return res.text();
+                    })
+                    .then(text => {
+                        const paragraphs = text
+                            .trim()
+                            .split(/\n\s*\n/)
+                            .map(para => `<p>${para.trim().replace(/\n/g, "<br>")}</p>`)
+                            .join("");
+                        thisSpaceEl.innerHTML = paragraphs;
+                    })
+                    .catch(err => {
+                        console.warn("Using inline fallback content for this space:", err);
+                    });
+            }
         });
     </script>
 </head>
@@ -68,37 +68,17 @@
         <section class="about-section" id="about">
             <h2 class="about-title">this space</h2>
 
-            <div class="about-text">
-                this space is meant to be a tiny window into the life of someone who grew up at the nexus of two
-                cultures.
-                <br><br>
-                my story is certainly not unique, but it is my own.
-                <br><br>
-                through recipes given by my mom, this space
-                is hopefully a reminder that food is more then just a dictation of ingredients and steps.
-                <br><br>
-                it’s a
-                collection of
-                memories, heritage, and tradition.
-                <br><br>
-                this space is a tribute to the all of the kids who were made to feel like their food wasn’t normal.
-                <br><br>
-                it's
-                a tribute to
-                the kids who got excited seeing The Simpsons go to India.
-                <br><br>
-                it's a tribute to the kids who got excited hearing Chaiyya Chaiyya in Inside Man
-                <br><br>
-                it's a tribute to the kids who got excited seeing Akshay Kumar in Toronto
-                <br><br>
-                and, most of
-                all, this space is a tribute to the parents who gave up their homeland, community, and the
-                taste
-                of their mom’s cooking, so that their kids could have access
-                to a
-                world they could only dream about.
-                <br><br>
-                this one's for them, and for us.
+            <div class="about-text" id="this-space-content">
+                <p>this space is meant to be a tiny window into the life of someone who grew up at the nexus of two cultures.</p>
+                <p>my story is certainly not unique, but it is my own.</p>
+                <p>through recipes given by my mom, this space is hopefully a reminder that food is more then just a dictation of ingredients and steps.</p>
+                <p>it’s a collection of memories, heritage, and tradition.</p>
+                <p>this space is a tribute to the all of the kids who were made to feel like their food wasn’t normal.</p>
+                <p>it's a tribute to the kids who got excited seeing The Simpsons go to India.</p>
+                <p>it's a tribute to the kids who got excited hearing Chaiyya Chaiyya in Inside Man</p>
+                <p>it's a tribute to the kids who got excited seeing Akshay Kumar in Toronto</p>
+                <p>and, most of all, this space is a tribute to the parents who gave up their homeland, community, and the taste of their mom’s cooking, so that their kids could have access to a world they could only dream about.</p>
+                <p>this one's for them, and for us.</p>
             </div>
             <!-- Scroll indicator pointing to the menu below -->
             <div class="scroll-indicator"

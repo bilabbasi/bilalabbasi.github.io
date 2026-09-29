@@ -331,6 +331,21 @@ body {
     /* Prevent flex shrinking to respect min-height */
 }
 
+.about-text {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--text-body);
+}
+
+.about-text p {
+    margin-bottom: 1.4rem;
+}
+
+.about-text p:last-child {
+    margin-bottom: 0;
+}
+
 .about-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
