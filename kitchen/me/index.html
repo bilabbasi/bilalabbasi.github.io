@@ -25,28 +25,7 @@
         document.addEventListener("DOMContentLoaded", () => {
             // Update browser tab title
             if (typeof KITCHEN_CONFIG !== 'undefined') {
-                document.title = (KITCHEN_CONFIG.name || "the kitchen") + " — for them";
-            }
-
-            // Load "this space" content dynamically from this_space.txt
-            const thisSpaceEl = document.getElementById("this-space-content");
-            if (thisSpaceEl) {
-                fetch("this_space.txt")
-                    .then(res => {
-                        if (!res.ok) throw new Error("Could not fetch this_space.txt");
-                        return res.text();
-                    })
-                    .then(text => {
-                        const content = text
-                            .trim()
-                            .split(/\n\s*\n/)
-                            .map(para => para.trim().replace(/\n/g, "<br>"))
-                            .join("<br><br>");
-                        thisSpaceEl.innerHTML = content;
-                    })
-                    .catch(err => {
-                        console.warn("Using inline fallback content for this space:", err);
-                    });
+                document.title = (KITCHEN_CONFIG.name || "the kitchen") + " — me";
             }
         });
     </script>
@@ -59,31 +38,15 @@
         <header class="navbar">
             <ul class="nav-links">
                 <li class="nav-item"><a href="../../">hi</a></li>
-                <li class="nav-item"><a href="./" class="nav-home">for them</a></li>
+                <li class="nav-item"><a href="../culture/">for them</a></li>
                 <li class="nav-item"><a href="../">the kitchen</a></li>
-                <li class="nav-item"><a href="../me/">me</a></li>
+                <li class="nav-item"><a href="./" class="nav-home">me</a></li>
             </ul>
         </header>
 
-
-        <section class="about-section" id="about">
-            <h2 class="about-title">this space</h2>
-
-            <div class="about-text" id="this-space-content"></div>
-            <!-- Scroll indicator pointing to the menu below -->
-            <div class="scroll-indicator"
-                onclick="document.getElementById('menu').scrollIntoView({ behavior: 'smooth' })">
-                <span class="scroll-text">a bit about me</span>
-                <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
-            </div>
-        </section>
-
-        <!-- Menu Section (Second Page) -->
-        <section class="menu-section" id="menu">
-            <h2 class="menu-title">me</h2>
+        <!-- About / Me Section -->
+        <section class="about-section" id="me">
+            <h2 class="about-title">me</h2>
 
             <div class="about-grid">
                 <!-- TODO: Add the about section content here -->
