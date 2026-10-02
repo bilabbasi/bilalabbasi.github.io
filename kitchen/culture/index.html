@@ -42,7 +42,19 @@
                             .split(/\n\s*\n/)
                             .map(para => para.trim().replace(/\n/g, "<br>"))
                             .join("<br><br>");
-                        thisSpaceEl.innerHTML = content;
+                        thisSpaceEl.innerHTML = content.replace(/\b(for them)\b/gi, '<a href="#for-them" class="culture-link">$1</a>');
+
+                        const forThemLink = thisSpaceEl.querySelector('a[href="#for-them"]');
+                        if (forThemLink) {
+                            forThemLink.addEventListener("click", (e) => {
+                                e.preventDefault();
+                                const target = document.getElementById("for-them");
+                                if (target) {
+                                    target.scrollIntoView({ behavior: "smooth" });
+                                    history.pushState(null, "", "#for-them");
+                                }
+                            });
+                        }
                     })
                     .catch(err => {
                         console.warn("Using inline fallback content for this space:", err);
@@ -65,12 +77,22 @@
             </ul>
         </header>
 
-
         <section class="about-section" id="about">
             <h2 class="about-title">this space</h2>
+
             <div class="about-text" id="this-space-content"></div>
         </section>
 
+        <!-- Photo Section -->
+        <section class="photo-section" id="for-them">
+            <figure class="photo-figure">
+                <img class="photo-img" src="../../assets/photos/ammi_and_abu_arrive_1.JPG"
+                    alt="Ammi and Abu arriving with luggage.">
+                <figcaption class="photo-caption">
+                    ammi and abu arriving to Toronto for the first time, with my brother in hand.
+                </figcaption>
+            </figure>
+        </section>
         <!-- Footer -->
         <footer class="footer">
             <p>&copy; 2026 Bilal Abbasi. All rights reserved.</p>
