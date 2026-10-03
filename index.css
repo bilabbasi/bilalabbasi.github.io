@@ -110,6 +110,7 @@ body {
 /* List holding navigation links */
 .nav-links {
     display: flex;
+    align-items: center;
     gap: 32px;
     list-style: none;
     /* Removes default bullet points */
@@ -146,6 +147,24 @@ body {
 .nav-item a.nav-home:hover {
     color: var(--link-hover);
     border-bottom-color: var(--link-hover);
+}
+
+/* Prominent emphasis for focal point section */
+.nav-item a.nav-focal {
+    font-weight: 600;
+    color: var(--text-title);
+    letter-spacing: -0.2px;
+}
+
+/* Elegant vertical separator */
+.nav-divider {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 300;
+    opacity: 0.45;
+    user-select: none;
+    line-height: 1;
+    margin: 0 -8px;
 }
 
 /* --- Main Layout: Columns split --- */

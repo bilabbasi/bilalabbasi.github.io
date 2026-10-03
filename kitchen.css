@@ -33,6 +33,23 @@
     border-bottom-color: var(--link-hover);
 }
 
+/* Focal brand link emphasis */
+.nav-item a.nav-focal {
+    font-weight: 600;
+    color: var(--text-title);
+    letter-spacing: -0.2px;
+}
+
+.nav-item a.nav-focal.nav-home {
+    font-weight: 600;
+    color: var(--text-subtitle);
+    border-bottom: 1.5px solid var(--text-subtitle);
+}
+
+.nav-item a.nav-focal:hover {
+    color: var(--link-hover);
+}
+
 /* -------------------------------------------------------------------------
    1. LAYOUT & SMOOTH SCROLLING OVERRIDES
    ------------------------------------------------------------------------- */
