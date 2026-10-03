@@ -20,12 +20,32 @@
     <script src="../../config.js"></script>
 
     <!-- Loader Script: Automatically inserts the KITCHEN_CONFIG details when loaded -->
-    <!-- Loader Script: Automatically inserts the KITCHEN_CONFIG details when loaded -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             // Update browser tab title
             if (typeof KITCHEN_CONFIG !== 'undefined') {
                 document.title = (KITCHEN_CONFIG.name || "the kitchen") + " — us";
+            }
+
+            // Load "us" content dynamically from us.txt
+            const usSpaceEl = document.getElementById("us-content");
+            if (usSpaceEl) {
+                fetch("us.txt")
+                    .then(res => {
+                        if (!res.ok) throw new Error("Could not fetch us.txt");
+                        return res.text();
+                    })
+                    .then(text => {
+                        const content = text
+                            .trim()
+                            .split(/\n\s*\n/)
+                            .map(para => para.trim().replace(/\n/g, "<br>"))
+                            .join("<br><br>");
+                        usSpaceEl.innerHTML = content;
+                    })
+                    .catch(err => {
+                        console.warn("Using inline fallback content for this space:", err);
+                    });
             }
         });
     </script>
@@ -49,13 +69,8 @@
             <h2 class="about-title">us</h2>
 
             <div class="about-grid">
-                <!-- TODO: Add the about section content here -->
                 <div class="about-column">
-                    <p class="about-text">That’s us, on the right, me and ammi (امی). Despite what my face conveys, I'm
-                        not having a good time. Unfortunately, this informal baptism into the culinary life didn't
-                        really
-                        kick
-                        in until about 2 decades later. </p>
+                    <p class="about-text" id="us-content"></p>
                 </div>
                 <div class="about-column">
                     <img class="about-img" src="../../assets/photos/bilal_baby.png"
