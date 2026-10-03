@@ -16,6 +16,9 @@
     <link rel="stylesheet" href="../../index.css">
     <link rel="stylesheet" href="../../kitchen.css">
 
+    <!-- Markdown Parser Library: Vendored locally -->
+    <script src="../../assets/marked.min.js"></script>
+
     <!-- Configuration Data: Shared config containing both professional and kitchen bio contents -->
     <script src="../../config.js"></script>
 
@@ -27,25 +30,30 @@
                 document.title = (KITCHEN_CONFIG.name || "the kitchen") + " — for them";
             }
 
-            // Load "this space" content dynamically from this_space.txt
+            // Load "this space" content dynamically from this_space.md
             const thisSpaceEl = document.getElementById("this-space-content");
             if (thisSpaceEl) {
-                fetch("this_space.txt")
+                fetch("this_space.md")
                     .then(res => {
-                        if (!res.ok) throw new Error("Could not fetch this_space.txt");
+                        if (!res.ok) throw new Error("Could not fetch this_space.md");
                         return res.text();
                     })
-                    .then(text => {
-                        const content = text
-                            .trim()
-                            .split(/\n\s*\n/)
-                            .map(para => para.trim().replace(/\n/g, "<br>"))
-                            .join("<br><br>");
-                        thisSpaceEl.innerHTML = content.replace(/\b(for them)\b/gi, '<a href="#for-them" class="culture-link">$1</a>');
+                    .then(markdown => {
+                        let html = (typeof marked !== "undefined" && marked.parse)
+                            ? marked.parse(markdown)
+                            : markdown.trim().split(/\n\s*\n/).map(p => `<p>${p.trim().replace(/\n/g, "<br>")}</p>`).join("");
 
-                        const forThemLink = thisSpaceEl.querySelector('a[href="#for-them"]');
-                        if (forThemLink) {
-                            forThemLink.addEventListener("click", (e) => {
+                        // Automatically link "for them" to #for-them if not already formatted as a link
+                        if (!html.includes('href="#for-them"')) {
+                            html = html.replace(/\b(for them)\b/gi, '<a href="#for-them" class="culture-link">$1</a>');
+                        }
+
+                        thisSpaceEl.innerHTML = html;
+
+                        // Ensure any links to #for-them scroll smoothly
+                        thisSpaceEl.querySelectorAll('a[href="#for-them"]').forEach(link => {
+                            link.classList.add("culture-link");
+                            link.addEventListener("click", (e) => {
                                 e.preventDefault();
                                 const target = document.getElementById("for-them");
                                 if (target) {
@@ -53,7 +61,7 @@
                                     history.pushState(null, "", "#for-them");
                                 }
                             });
-                        }
+                        });
                     })
                     .catch(err => {
                         console.warn("Using inline fallback content for this space:", err);
