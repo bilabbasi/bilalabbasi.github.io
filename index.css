@@ -350,6 +350,13 @@ body {
     pointer-events: none;              /* Prevents mouse dragging/saving issues on clicks */
 }
 
+/* Optical alignment for the professional page functions illustration */
+@media (min-width: 901px) {
+    .professional-sketch {
+        margin-top: -35px;
+    }
+}
+
 /* --- Footer --- */
 .footer {
     height: 30px;
