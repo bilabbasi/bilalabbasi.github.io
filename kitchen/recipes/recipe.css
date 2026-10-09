@@ -383,7 +383,8 @@ body {
     padding-bottom: 24px;       /* Spacing at bottom to avoid card shadow cuts and button overlay */
     scroll-behavior: smooth;    /* Smooth scroll slide transitions when clicking buttons */
     width: 100%;
-    height: 420px;              /* Height constraint on desktop view */
+    max-height: max(420px, calc(100vh - 340px));
+    height: auto;
 }
 
 /* Hide standard scrollbars on Chrome, Safari, and Edge browser engines */
@@ -393,7 +394,8 @@ body {
 
 /* Ingredients list container scrolling on desktop */
 #ingredients-list-container {
-    height: 420px;              /* Match steps column height */
+    max-height: max(420px, calc(100vh - 340px));
+    height: auto;
     overflow-y: auto;           /* Enable scroll */
     overflow-x: hidden;
     scrollbar-width: none;      /* Hide Firefox scrollbar */
