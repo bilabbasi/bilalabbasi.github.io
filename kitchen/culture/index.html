@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="assets/favicon_ba_urdu_orange.png">
+    <title>the kitchen</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Bilal Abbasi's culinary corner. Sourdough baking, recipes, and food science.">
+    <meta name="author" content="Bilal Abbasi">
+    <meta name="robots" content="index, follow">
+
+    <!-- Stylesheets: Controls how the website and kitchen look -->
+    <link rel="stylesheet" href="../../index.css">
+    <link rel="stylesheet" href="../../kitchen.css">
+
+    <!-- Markdown Parser Library: Vendored locally -->
+    <script src="../../assets/marked.min.js"></script>
+
+    <!-- Configuration Data: Shared config containing both professional and kitchen bio contents -->
+    <script src="../../config.js"></script>
+
+    <!-- Loader Script: Automatically inserts the KITCHEN_CONFIG details when loaded -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Update browser tab title
+            if (typeof KITCHEN_CONFIG !== 'undefined') {
+                document.title = (KITCHEN_CONFIG.name || "the kitchen") + " — for them";
+            }
+
+            // Load "this space" content dynamically from this_space.md
+            const thisSpaceEl = document.getElementById("this-space-content");
+            if (thisSpaceEl) {
+                fetch("this_space.md")
+                    .then(res => {
+                        if (!res.ok) throw new Error("Could not fetch this_space.md");
+                        return res.text();
+                    })
+                    .then(markdown => {
+                        let html = (typeof marked !== "undefined" && marked.parse)
+                            ? marked.parse(markdown)
+                            : markdown.trim().split(/\n\s*\n/).map(p => `<p>${p.trim().replace(/\n/g, "<br>")}</p>`).join("");
+
+                        // Automatically link "for them" to #for-them if not already formatted as a link
+                        if (!html.includes('href="#for-them"')) {
+                            html = html.replace(/\b(for them)\b/gi, '<a href="#for-them" class="culture-link">$1</a>');
+                        }
+
+                        thisSpaceEl.innerHTML = html;
+
+                        // Ensure any links to #for-them scroll smoothly
+                        thisSpaceEl.querySelectorAll('a[href="#for-them"]').forEach(link => {
+                            link.classList.add("culture-link");
+                            link.addEventListener("click", (e) => {
+                                e.preventDefault();
+                                const target = document.getElementById("for-them");
+                                if (target) {
+                                    target.scrollIntoView({ behavior: "smooth" });
+                                    history.pushState(null, "", "#for-them");
+                                }
+                            });
+                        });
+                    })
+                    .catch(err => {
+                        console.warn("Using inline fallback content for this space:", err);
+                    });
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <div class="app-wrapper">
+
+        <!-- Header: Top bar with navigation for kitchen sections -->
+        <header class="navbar">
+            <ul class="nav-links">
+                <li class="nav-item"><a href="../" class="nav-focal">the kitchen</a></li>
+                <li class="nav-divider" aria-hidden="true">|</li>
+                <li class="nav-item"><a href="./" class="nav-home">for them</a></li>
+                <li class="nav-item"><a href="../me/">us</a></li>
+            </ul>
+        </header>
+
+        <section class="about-section" id="about">
+            <h2 class="about-title">this space</h2>
+
+            <div class="about-text" id="this-space-content"></div>
+        </section>
+
+        <!-- Photo Section -->
+        <section class="photo-section" id="for-them">
+            <figure class="photo-figure">
+                <img class="photo-img" src="../../assets/photos/ammi_and_abu_arrive_1.JPG"
+                    alt="Ammi and Abu arriving with luggage.">
+                <figcaption class="photo-caption">
+                    Ammi and abu arriving to Toronto for the first time, with my brother in hand.<br><br>
+                    July 17, 1987
+                </figcaption>
+            </figure>
+        </section>
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2026 Bilal Abbasi. All rights reserved.</p>
+        </footer>
+
+    </div>
+</body>
+
+</html>

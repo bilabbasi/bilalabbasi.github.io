@@ -5,6 +5,23 @@
 // You do not need to touch the index.html or index.css files to change text.
 
 // -------------------------------------------------------------------------
+// 0. GATEWAY (COVER PAGE) CONFIGURATION
+// -------------------------------------------------------------------------
+const GATEWAY_CONFIG = {
+    name: "hi, i'm bilal",
+    links: [
+        {
+            label: "professional",
+            url: "professional/"
+        },
+        {
+            label: "kitchen",
+            url: "kitchen/"
+        }
+    ]
+};
+
+// -------------------------------------------------------------------------
 // 1. PROFESSIONAL ME CONFIGURATION
 // -------------------------------------------------------------------------
 const PROFESSIONAL_CONFIG = {
@@ -15,7 +32,7 @@ const PROFESSIONAL_CONFIG = {
     subtitle: "Research Scientist, PhD",
 
     // Your biography paragraph
-    bio: "I am a research scientist at InterDigital, working on AI based video compression. Before that I was a researcher at Eidos-Montréal, working on deep learning for meshes. And, before that, I was doing a PhD at McGill University in Applied Mathematics.",
+    bio: "I am a research scientist at InterDigital, working on AI-based video compression. Previously, I was a researcher at Eidos-Montréal, working on deep learning for meshes. And, before that, I was doing a PhD at McGill University in Applied Mathematics.",
 
     // Tab title
     tab: "professional me",
@@ -49,14 +66,38 @@ const KITCHEN_CONFIG = {
 
     // Biography for your kitchen profile
     bio: `
-    A space to share some of my favourite recipes growing up in an Indian immigrant household. I scatter some Urdu language throughout, in a humble attempt to give a glimpse of the beauty of the language I spoke growing up.
+    a space to share some of my favourite recipes growing up in an Indian immigrant household.
+    there is urdu (اردو) scattered about, reflecting a humble attempt to give a glimpse of the beauty of the language I spoke growing up.
+    food and language are among the primary pillars of the cultural inheritance of the diaspora; this is just my drop in the ocean.
     
-    Food and language are among the primary pillars of the cultural inheritance of the diaspora. This is just a drop in the ocean.
-    
-    All credit goes to my mom. 
-    
-    Only the mistakes are mine.`,
+    all credit goes to my mom.
+    only the mistakes are mine.`,
 
     // Tab title
-    tab: "kitchen me"
+    tab: "kitchen me",
+
+    // Recipes metadata list for dynamic menu generation
+    recipes: [
+        {
+            category: "veg",
+            categoryUrdu: "سبزی",
+            name: "yellow daal",
+            url: "recipes/yellowdaal/",
+            description: "Quintessential tarka."
+        },
+        {
+            category: "veg",
+            categoryUrdu: "سبزی",
+            name: "dahi ka bhagar",
+            url: "recipes/dahi_bhagar/",
+            description: "Yogurt, rice, daal. What else?"
+        },
+        {
+            category: "meat",
+            categoryUrdu: "گوشت",
+            name: "keema",
+            url: "recipes/keema/",
+            description: "One pot, super easy mattar keema dish."
+        }
+    ]
 };

@@ -110,6 +110,7 @@ body {
 /* List holding navigation links */
 .nav-links {
     display: flex;
+    align-items: center;
     gap: 32px;
     list-style: none;
     /* Removes default bullet points */
@@ -135,6 +136,35 @@ body {
     font-weight: 600;
     color: var(--text-title);
     border-bottom-color: var(--text-title);
+}
+
+.nav-item a.nav-home {
+    font-weight: 500;
+    color: var(--text-title);
+    border-bottom: 1.5px solid var(--text-title);
+}
+
+.nav-item a.nav-home:hover {
+    color: var(--link-hover);
+    border-bottom-color: var(--link-hover);
+}
+
+/* Prominent emphasis for focal point section */
+.nav-item a.nav-focal {
+    font-weight: 600;
+    color: var(--text-title);
+    letter-spacing: -0.2px;
+}
+
+/* Elegant vertical separator */
+.nav-divider {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 300;
+    opacity: 0.45;
+    user-select: none;
+    line-height: 1;
+    margin: 0 -8px;
 }
 
 /* --- Main Layout: Columns split --- */
@@ -175,6 +205,9 @@ body {
     color: var(--text-title);
     letter-spacing: -1.5px;
     /* Tightens letters closer together for clean design */
+    min-height: 1.15em;
+    display: inline-flex;
+    align-items: baseline;
 }
 
 /* Subtitle: e.g. "Systems Engineering & Research" */
@@ -185,6 +218,28 @@ body {
     line-height: 1.2;
     color: var(--text-subtitle);
     letter-spacing: -0.5px;
+    min-height: 1.2em;
+    display: inline-flex;
+    align-items: baseline;
+}
+
+/* Smooth fade-in for page elements after typing finishes */
+.profile-fade {
+    opacity: 0;
+    transition: opacity 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.profile-fade.visible {
+    opacity: 1;
+}
+
+.info-column .profile-fade {
+    transform: translateY(6px);
+    transition: opacity 0.8s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.info-column .profile-fade.visible {
+    transform: translateY(0);
 }
 
 /* Bio Paragraph */
@@ -295,6 +350,13 @@ body {
     pointer-events: none;              /* Prevents mouse dragging/saving issues on clicks */
 }
 
+/* Optical alignment for the professional page functions illustration */
+@media (min-width: 901px) {
+    .professional-sketch {
+        margin-top: -35px;
+    }
+}
+
 /* --- Footer --- */
 .footer {
     height: 30px;
@@ -400,5 +462,128 @@ body {
 
     .external-links {
         gap: 16px 20px;
+    }
+}
+
+/* =========================================================================
+   GATEWAY / COVER PAGE STYLES
+   ========================================================================= */
+
+.gateway-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 40px 24px 24px 24px;
+    max-width: 1440px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.gateway-card {
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 24px;
+}
+
+.gateway-title {
+    font-family: var(--font-serif);
+    font-size: 3.75rem;
+    font-weight: 500;
+    line-height: 1.1;
+    color: var(--text-title);
+    letter-spacing: -1.5px;
+    min-height: 1.15em;
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: center;
+}
+
+.gateway-name-accent {
+    color: #7c2d12;
+}
+
+.typewriter-cursor {
+    display: inline-block;
+    font-weight: 300;
+    font-size: 0.9em;
+    margin-left: 2px;
+    color: var(--text-subtitle);
+    animation: cursor-blink 0.85s infinite;
+    user-select: none;
+    transition: opacity 0.5s ease;
+}
+
+@keyframes cursor-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.typewriter-cursor.finished {
+    opacity: 0.4;
+}
+
+.gateway-links {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    list-style: none;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.6s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.gateway-links.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.gateway-link {
+    font-family: var(--font-sans);
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--text-body);
+    text-decoration: none;
+    letter-spacing: 0.2px;
+    transition: var(--transition-smooth);
+    border-bottom: 1.5px solid transparent;
+    padding-bottom: 2px;
+}
+
+.gateway-link:hover {
+    color: var(--text-title);
+    border-bottom-color: var(--text-title);
+}
+
+.gateway-link.gateway-link-kitchen:hover {
+    color: #ea580c;
+    border-bottom-color: #ea580c;
+}
+
+.gateway-divider {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    user-select: none;
+}
+
+.gateway-footer {
+    margin-top: auto;
+    text-align: center;
+}
+
+@media (max-width: 480px) {
+    .gateway-title {
+        font-size: 2.75rem;
+    }
+
+    .gateway-links {
+        gap: 20px;
+    }
+
+    .gateway-link {
+        font-size: 1rem;
     }
 }

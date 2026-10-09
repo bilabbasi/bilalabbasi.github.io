@@ -1,0 +1,1 @@
+That’s us, on the right, me and ammi (امی). Despite what my face conveys, I'm not having a good time. Unfortunately, this informal baptism into the culinary life didn't really kick in until about 2 decades later.

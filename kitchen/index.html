@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../assets/favicon_ba_urdu_orange.png">
+    <title>the kitchen</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Bilal Abbasi's culinary corner. Sourdough baking, recipes, and food science.">
+    <meta name="author" content="Bilal Abbasi">
+    <meta name="robots" content="index, follow">
+
+    <!-- Stylesheets: Controls how the website and kitchen look -->
+    <link rel="stylesheet" href="../index.css">
+    <link rel="stylesheet" href="../kitchen.css">
+
+    <!-- Configuration Data: Shared config containing both professional and kitchen bio contents -->
+    <script src="../config.js"></script>
+
+    <!-- Loader Script: Automatically inserts the KITCHEN_CONFIG details when loaded -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // 1. Update browser tab title
+            document.title = KITCHEN_CONFIG.name;
+
+            // 2. Update main profile text headings & paragraphs
+            document.getElementById("main-title").textContent = KITCHEN_CONFIG.name;
+            document.getElementById("main-subtitle").textContent = KITCHEN_CONFIG.subtitle;
+            document.getElementById("bio-text").textContent = KITCHEN_CONFIG.bio;
+
+            const kitchenTab = document.getElementById("kitchen-tab");
+            if (kitchenTab) {
+                kitchenTab.textContent = KITCHEN_CONFIG.name;
+            }
+
+            // 3. Generate the kitchen/recipe links dynamically
+            const linksList = document.getElementById("links-list");
+            const links = KITCHEN_CONFIG.links || [];
+            linksList.innerHTML = links.map(link => `
+                <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="external-link">
+                    ${link.label}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"></line>
+                        <polyline points="7 7 17 7 17 17"></polyline>
+                    </svg>
+                </a>
+            `).join("");
+
+            // 4. Generate the recipe columns & menu items dynamically from config.js
+            const menuGrid = document.getElementById("recipes-menu-grid");
+            const recipes = KITCHEN_CONFIG.recipes || [];
+
+            // Group recipes by category
+            // Predefine default categories to ensure they always render even if empty
+            const categories = {
+                chicken: { title: "chicken", titleUrdu: "مرغ", items: [] },
+                meat: { title: "meat", titleUrdu: "گوشت", items: [] },
+                veg: { title: "veg", titleUrdu: "سبزی", items: [] },
+                dessert: { title: "dessert", titleUrdu: "میٹھی", items: [] }
+            };
+            recipes.forEach(recipe => {
+                const cat = recipe.category || "other";
+                if (!categories[cat]) {
+                    categories[cat] = {
+                        title: cat,
+                        titleUrdu: recipe.categoryUrdu || "",
+                        items: []
+                    };
+                }
+                categories[cat].items.push(recipe);
+            });
+
+            // Render columns
+            menuGrid.innerHTML = Object.values(categories).map(cat => `
+                <div class="menu-column">
+                    <h3 class="column-title">${cat.title} ${cat.titleUrdu ? `<span class="urdu-title">${cat.titleUrdu}</span>` : ""}</h3>
+                    <div class="menu-items">
+                        ${cat.items.map(item => `
+                            <div class="menu-item">
+                                <a href="${item.url || `recipes/template.html?file=${item.file}`}" class="recipe-link">
+                                    <span class="recipe-name">${item.name}</span>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                        stroke-linecap="round" stroke-linejoin="round" class="link-arrow">
+                                        <line x1="7" y1="17" x2="17" y2="7"></line>
+                                        <polyline points="7 7 17 7 17 17"></polyline>
+                                    </svg>
+                                </a>
+                                <p class="recipe-description">${item.description}</p>
+                            </div>
+                        `).join("")}
+                    </div>
+                </div>
+            `).join("");
+        });
+    </script>
+</head>
+
+<body>
+    <div class="app-wrapper">
+
+        <!-- Header: Top bar with navigation for kitchen sections -->
+        <header class="navbar">
+            <ul class="nav-links">
+                <li class="nav-item"><a href="./" class="nav-home nav-focal" id="kitchen-tab">the kitchen</a></li>
+                <li class="nav-divider" aria-hidden="true">|</li>
+                <li class="nav-item"><a href="culture/">for them</a></li>
+                <li class="nav-item"><a href="me/">us</a></li>
+            </ul>
+        </header>
+
+        <!-- Hero Section (First Page) -->
+        <section class="hero-section">
+
+            <!-- Main Content Area: Split into two columns -->
+            <main class="main-content" id="me">
+
+                <!-- Left Column: Biography headings and list of links -->
+                <div class="info-column">
+                    <div class="heading-group">
+                        <h1 class="main-title" id="main-title">loading...</h1>
+                        <h2 class="main-subtitle" id="main-subtitle">loading...</h2>
+                    </div>
+
+                    <p class="bio-paragraph" id="bio-text">loading...</p>
+
+                    <div class="external-links" id="links-list">
+                        <!-- Links list will be injected here -->
+                    </div>
+                </div>
+
+                <!-- Right Column: Visual Sourdough Sketch -->
+                <div class="visual-column">
+                    <div class="sketch-container">
+                        <img src="../assets/kitchen_sketch.png" alt="Sourdough bread blueprint drawing"
+                            class="sketch-img">
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Scroll indicator pointing to the menu below -->
+            <div class="scroll-indicator"
+                onclick="document.getElementById('menu').scrollIntoView({ behavior: 'smooth' })">
+                <span class="scroll-text">the menu</span>
+                <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </div>
+        </section>
+
+        <!-- Menu Section (Second Page) -->
+        <section class="menu-section" id="menu">
+            <h2 class="menu-title">the menu</h2>
+
+            <div class="menu-grid" id="recipes-menu-grid">
+                <!-- Dynamically generated from config.js recipes configuration -->
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2026 Bilal Abbasi. All rights reserved.</p>
+        </footer>
+
+    </div>
+</body>
+
+</html>

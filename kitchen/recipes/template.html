@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../../assets/favicon_ba_urdu_orange.png">
+    <title>Recipe</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Bilal Abbasi's culinary corner. Sourdough baking, recipes, and food science.">
+    <meta name="author" content="Bilal Abbasi">
+    <meta name="robots" content="index, follow">
+
+    <!-- Stylesheets: Controls how the website and recipes look -->
+    <link rel="stylesheet" href="../../index.css">
+    <link rel="stylesheet" href="recipe.css">
+
+    <!-- YAML Parser Library: Loads js-yaml dynamically from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+
+    <!-- Configuration Data: Where your text and links are defined -->
+    <script src="../../config.js"></script>
+
+    <!-- Script to load the configuration data and fetch/parse the YAML recipe -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Update tabs from global config
+            const kitchenTab = document.getElementById("kitchen-tab");
+            if (kitchenTab) {
+                kitchenTab.textContent = "← " + (KITCHEN_CONFIG.name || "the kitchen");
+            }
+
+            // Determine which recipe JS file to load using the URL parameter (e.g. ?file=examples/sourdough.js)
+            // If no parameter is provided, it defaults to examples/sourdough.js
+            const urlParams = new URLSearchParams(window.location.search);
+            let recipeFile = urlParams.get('file') || 'examples/sourdough.js';
+
+            // Backward-compatibility fallback: if they supplied .yaml, swap it to .js
+            if (recipeFile.endsWith('.yaml')) {
+                recipeFile = recipeFile.replace('.yaml', '.js');
+            }
+
+            // Dynamically load the recipe JS file using a script tag (bypasses local file:/// CORS restrictions)
+            const script = document.createElement('script');
+            script.src = recipeFile;
+            script.onload = () => {
+                try {
+                    // RECIPE_DATA variable is defined inside the loaded recipe script
+                    if (typeof RECIPE_DATA === 'undefined') {
+                        throw new Error("RECIPE_DATA variable is not defined in the recipe file.");
+                    }
+                    const recipe = jsyaml.load(RECIPE_DATA);
+                    renderRecipe(recipe);
+                } catch (err) {
+                    showError(err);
+                }
+            };
+            script.onerror = () => {
+                showError(new Error(`Failed to load script: ${recipeFile}`));
+            };
+            document.head.appendChild(script);
+
+            function showError(err) {
+                console.error("Error loading recipe:", err);
+                document.getElementById("main-title").textContent = "Recipe Not Found";
+                document.getElementById("bio-text").textContent = `Could not load the recipe file: "${recipeFile}". Please check if the file exists and is formatted correctly.`;
+            }
+        });
+
+        // Helper function to normalize and resolve image paths
+        function resolveImagePath(imgPath) {
+            if (!imgPath) return '';
+            // Leave absolute URLs or domain-absolute paths as is
+            if (imgPath.startsWith('http://') || imgPath.startsWith('https://') || imgPath.startsWith('/') || imgPath.startsWith('data:')) {
+                return imgPath;
+            }
+            // Normalize paths relative to the project root
+            if (imgPath.startsWith('../../assets/')) {
+                return imgPath;
+            }
+            if (imgPath.startsWith('../assets/')) {
+                return '../' + imgPath;
+            }
+            if (imgPath.startsWith('assets/')) {
+                return '../../' + imgPath;
+            }
+            if (imgPath.startsWith('./assets/')) {
+                return '../../' + imgPath.slice(2);
+            }
+            return imgPath;
+        }
+
+        // Dynamic rendering function
+        function renderRecipe(recipe) {
+            // 1. Update Title and Headers
+            document.title = recipe.title || "Recipe";
+            document.getElementById("main-title").textContent = recipe.title || "Recipe Name";
+            document.getElementById("main-subtitle").textContent = recipe.subtitle || "";
+            document.getElementById("bio-text").textContent = recipe.description || "";
+
+            const defaultRecipeImg = resolveImagePath(recipe.image || '../assets/kitchen_sketch.png');
+            const mainImgEl = document.querySelector(".sketch-img");
+            if (mainImgEl) {
+                mainImgEl.src = defaultRecipeImg;
+            }
+
+            // 2. Render Ingredients Column (Side-by-Side View)
+            const ingredientsContainer = document.getElementById("ingredients-list-container");
+            if (recipe.ingredients && recipe.ingredients.length > 0) {
+                ingredientsContainer.innerHTML = recipe.ingredients.map(sec => `
+                    <div class="recipe-section">
+                        <h4 class="recipe-section-title">
+                            <span>${sec.section}</span>
+                            <svg class="collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </h4>
+                        <div class="recipe-section-content">
+                            ${(sec.items || []).map(item => `
+                                <div class="menu-item">
+                                    <p class="recipe-description">${item}</p>
+                                </div>
+                            `).join("")}
+                        </div>
+                    </div>
+                `).join("");
+            } else {
+                ingredientsContainer.innerHTML = `<p class="recipe-description">No ingredients listed.</p>`;
+            }
+
+            // 3. Render Steps Column (Side-by-Side View & Step-by-Step View)
+            const stepsScrollContainer = document.getElementById("steps-scroll-container");
+            const sketchLayers = document.getElementById("sketch-layers");
+            const stepsScrollingColumn = document.getElementById("steps-scrolling-column");
+
+            let stepsSideBySideHtml = "";
+            let stepsStepByStepHtml = "";
+            let sketchLayersHtml = "";
+            let globalStepCounter = 0;
+            let globalSectionCounter = 0;
+
+            if (recipe.steps && recipe.steps.length > 0) {
+                recipe.steps.forEach(sec => {
+                    globalSectionCounter++;
+                    const formattedSectionNum = String(globalSectionCounter).padStart(2, '0');
+
+                    // Normalize section title, items, and image
+                    let sectionTitle = "";
+                    let sectionImage = null;
+                    let sectionItems = [];
+
+                    if (typeof sec === 'string') {
+                        sectionItems = [sec];
+                    } else if (sec && typeof sec === 'object') {
+                        if (Array.isArray(sec.items)) {
+                            sectionTitle = sec.section || "";
+                            sectionImage = sec.image || (sec.items[0] && typeof sec.items[0] === 'object' && sec.items[0].image) || null;
+                            sectionItems = sec.items;
+                        } else {
+                            // Flat step object
+                            sectionTitle = sec.section || sec.title || "";
+                            sectionImage = sec.image || null;
+                            sectionItems = [sec.text || sec.step || sec.description || ""];
+                        }
+                    }
+
+                    // Side-by-Side View
+                    if (sectionTitle) {
+                        stepsSideBySideHtml += `
+                            <div class="recipe-section">
+                                <h4 class="recipe-section-title">
+                                    <span>${sectionTitle}</span>
+                                    <svg class="collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </h4>
+                                <div class="recipe-section-content">
+                        `;
+                    }
+
+                    sectionItems.forEach(item => {
+                        globalStepCounter++;
+                        const stepText = typeof item === 'string' ? item : (item.text || item.step || "");
+                        const formattedStepNum = String(globalStepCounter).padStart(2, '0');
+
+                        stepsSideBySideHtml += `
+                            <div class="menu-item step-card" data-step="${globalStepCounter}">
+                                <span class="step-card-num">${formattedStepNum}</span>
+                                <p class="recipe-description">${stepText}</p>
+                            </div>
+                        `;
+                    });
+
+                    if (sectionTitle) {
+                        stepsSideBySideHtml += `
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    // Step-by-Step View: Generate slide for this step/section
+                    if (sectionTitle) {
+                        stepsStepByStepHtml += `
+                            <div class="step-slide" data-step="${globalSectionCounter}">
+                                <h3 class="step-section-heading">${sectionTitle}</h3>
+                                <ol class="step-section-list">
+                                    ${sectionItems.map(item => `
+                                        <li class="step-section-item">${typeof item === 'string' ? item : (item.text || item.step || "")}</li>
+                                    `).join("")}
+                                </ol>
+                            </div>
+                        `;
+                    } else {
+                        const stepText = typeof sectionItems[0] === 'string' ? sectionItems[0] : (sectionItems[0].text || sectionItems[0].step || "");
+                        stepsStepByStepHtml += `
+                            <div class="step-slide" data-step="${globalSectionCounter}">
+                                <span class="step-number">step ${formattedSectionNum}</span>
+                                <p class="step-text">${stepText}</p>
+                            </div>
+                        `;
+                    }
+
+                    // Visual sketch layer for this step/section
+                    const stepVisualSrc = resolveImagePath(sectionImage || defaultRecipeImg);
+                    sketchLayersHtml += `
+                        <img src="${stepVisualSrc}" alt="Step ${globalSectionCounter} visual" class="sketch-layer" data-step="${globalSectionCounter}">
+                    `;
+                });
+
+                stepsScrollContainer.innerHTML = stepsSideBySideHtml;
+                stepsScrollingColumn.innerHTML = stepsStepByStepHtml;
+                sketchLayers.innerHTML = sketchLayersHtml;
+            } else {
+                stepsScrollContainer.innerHTML = `<p class="recipe-description">No steps listed.</p>`;
+                stepsScrollingColumn.innerHTML = `<p class="step-text">No steps listed.</p>`;
+                sketchLayers.innerHTML = `<img src="${defaultRecipeImg}" alt="Recipe visual" class="sketch-layer active" data-step="1">`;
+            }
+
+            // 4. Initialize observers and interactions for the dynamically created elements
+            initObserversAndInteractions();
+        }
+    </script>
+</head>
+
+<body>
+
+    <div class="app-wrapper">
+
+        <header class="navbar">
+            <ul class="nav-links">
+                <li class="nav-item"><a href="../" class="active" id="kitchen-tab">← the kitchen</a></li>
+            </ul>
+        </header>
+
+        <!-- Hero Section (First Page) -->
+        <section class="hero-section">
+
+            <!-- Main Content Area: Split into two columns -->
+            <main class="main-content" id="me">
+
+                <!-- Left Column: Biography headings and list of links -->
+                <div class="info-column">
+                    <div class="heading-group">
+                        <h1 class="main-title" id="main-title">loading...</h1>
+                        <h2 class="main-subtitle" id="main-subtitle"></h2>
+                    </div>
+
+                    <p class="bio-paragraph" id="bio-text">loading...</p>
+
+                    <div class="external-links" id="links-list">
+                        <!-- Links list will be injected here -->
+                    </div>
+                </div>
+
+                <!-- Right Column: Visual Sourdough Sketch -->
+                <div class="visual-column">
+                    <div class="sketch-container">
+                        <img src="../../assets/kitchen_sketch.png" alt="Recipe illustration" class="sketch-img">
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Scroll indicators pointing to the recipe layouts below -->
+            <div class="recipe-indicators">
+                <div class="scroll-indicator" id="indicator-side-by-side" onclick="selectRecipeMode('side-by-side')">
+                    <span class="scroll-text">side by side</span>
+                    <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                <div class="scroll-indicator" id="indicator-step-by-step" onclick="selectRecipeMode('step-by-step')">
+                    <span class="scroll-text">step by step</span>
+                    <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- Menu Section (Second Page / Side-by-Side View) -->
+        <section class="menu-section" id="menu">
+            <h2 class="menu-title">the recipe</h2>
+
+            <div class="menu-grid">
+
+                <!-- INGREDIENTS COLUMN -->
+                <div class="menu-column">
+                    <h3 class="column-title">ingredients</h3>
+                    <div class="menu-items" id="ingredients-list-container">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- STEPS COLUMN -->
+                <div class="menu-column steps-column">
+                    <h3 class="column-title">steps</h3>
+                    <div class="steps-scroll-wrapper">
+                        <div class="menu-items steps-scroll-container" id="steps-scroll-container">
+                            <!-- Populated dynamically -->
+                        </div>
+                        <button class="scroll-down-btn" id="scroll-steps-btn" aria-label="Scroll steps down">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <polyline points="19 12 12 19 5 12"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <p>&copy; 2026 Bilal Abbasi. All rights reserved.</p>
+            </footer>
+        </section>
+
+        <!-- Step-by-Step Section (Alternative View / Page-per-Step Scroll View) -->
+        <section class="step-by-step-section" id="step-by-step" style="display: none;">
+            <!-- Centered Ingredients Page -->
+            <div class="step-page ingredients-centered-page" id="step-page-ingredients" data-step="0">
+                <div class="centered-ingredients-content">
+                    <h2 class="ingredients-centered-title">mise en place</h2>
+                    <div class="ingredients-centered-list" id="ingredients-centered-list">
+                        <!-- Will be populated dynamically by JavaScript to match the main ingredients list -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Split steps layout (Sticky image on left, scrolling steps on right) -->
+            <div class="split-steps-container">
+                <!-- Sticky Visual Column -->
+                <div class="visual-sticky-column">
+                    <div class="sticky-sketch-container">
+                        <div class="sketch-layers" id="sketch-layers">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scrolling Steps Column -->
+                <div class="steps-scrolling-column" id="steps-scrolling-column">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Footer for Step-by-Step view -->
+            <footer class="footer">
+                <p>&copy; 2026 Bilal Abbasi. All rights reserved.</p>
+            </footer>
+        </section>
+
+    </div>
+
+    <!-- Script logic for view toggling, horizontal steps scroll, and scroll-revealed image building -->
+    <script>
+        /* =====================================================================
+           MODULE A: VIEW MODE TOGGLING & SELECTION
+           ===================================================================== */
+        function selectRecipeMode(mode) {
+            const sideBySideSection = document.getElementById('menu');
+            const stepByStepSection = document.getElementById('step-by-step');
+
+            const indSide = document.getElementById('indicator-side-by-side');
+            const indStep = document.getElementById('indicator-step-by-step');
+
+            if (mode === 'side-by-side') {
+                sideBySideSection.style.display = 'block';
+                stepByStepSection.style.display = 'none';
+
+                indSide.classList.add('active');
+                indStep.classList.remove('active');
+
+                sideBySideSection.scrollIntoView({ behavior: 'smooth' });
+                setTimeout(updateScrollButtonVisibility, 300);
+
+            } else if (mode === 'step-by-step') {
+                sideBySideSection.style.display = 'none';
+                stepByStepSection.style.display = 'block';
+
+                indSide.classList.remove('active');
+                indStep.classList.add('active');
+
+                populateCenteredIngredients();
+                stepByStepSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        /* =====================================================================
+           MODULE B: DYNAMIC INGREDIENTS CLONING (DRY Principle)
+           ===================================================================== */
+        function populateCenteredIngredients() {
+            const sourceIngredients = document.getElementById('ingredients-list-container');
+            const destIngredients = document.getElementById('ingredients-centered-list');
+
+            if (sourceIngredients && destIngredients && destIngredients.children.length === 0) {
+                destIngredients.innerHTML = sourceIngredients.innerHTML;
+            }
+        }
+
+        /* =====================================================================
+           MODULE C: VERTICAL STEPS SCROLL CONTROL (Side-by-Side View)
+           ===================================================================== */
+        const stepsContainer = document.getElementById('steps-scroll-container');
+        const scrollStepsBtn = document.getElementById('scroll-steps-btn');
+
+        function updateScrollButtonVisibility() {
+            if (stepsContainer && scrollStepsBtn) {
+                if (stepsContainer.scrollHeight > stepsContainer.clientHeight) {
+                    scrollStepsBtn.classList.add('visible');
+                } else {
+                    scrollStepsBtn.classList.remove('visible');
+                }
+            }
+        }
+
+        if (scrollStepsBtn && stepsContainer) {
+            scrollStepsBtn.addEventListener('click', () => {
+                const scrollAmount = stepsContainer.clientHeight;
+                if (stepsContainer.scrollTop + stepsContainer.clientHeight >= stepsContainer.scrollHeight - 10) {
+                    stepsContainer.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    stepsContainer.scrollBy({ top: scrollAmount, behavior: 'smooth' });
+                }
+            });
+
+            stepsContainer.addEventListener('scroll', () => {
+                if (stepsContainer.scrollTop + stepsContainer.clientHeight >= stepsContainer.scrollHeight - 10) {
+                    scrollStepsBtn.classList.add('at-end');
+                } else {
+                    scrollStepsBtn.classList.remove('at-end');
+                }
+            });
+        }
+
+        /* =====================================================================
+           MODULE D: DYNAMIC STICKY IMAGE REVEAL (Step-by-Step View)
+           ===================================================================== */
+        const intersectingSteps = new Set();
+        let stepObserver = null;
+
+        function initObserversAndInteractions() {
+            // Check scroll button overflow right away
+            updateScrollButtonVisibility();
+
+            // Set default view active button style
+            if (window.location.hash === '#step-by-step') {
+                selectRecipeMode('step-by-step');
+            } else {
+                document.getElementById('indicator-side-by-side').classList.add('active');
+            }
+
+            // Collapsible sections toggle logic for Side-by-Side view (Ingredients and Steps)
+            document.querySelectorAll('#menu .recipe-section-title').forEach(title => {
+                if (title.dataset.listenerAdded) return;
+                title.dataset.listenerAdded = "true";
+
+                title.addEventListener('click', () => {
+                    const section = title.closest('.recipe-section');
+                    if (section) {
+                        section.classList.toggle('collapsed');
+                        updateScrollButtonVisibility();
+                    }
+                });
+            });
+
+            // Clean existing observer if any
+            if (stepObserver) {
+                stepObserver.disconnect();
+            }
+
+            // Create IntersectionObserver to check which steps are scrolled into view
+            stepObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const stepNum = parseInt(entry.target.getAttribute('data-step'), 10);
+                    if (!isNaN(stepNum)) {
+                        if (entry.isIntersecting) {
+                            intersectingSteps.add(stepNum);
+                        } else {
+                            intersectingSteps.delete(stepNum);
+                        }
+                    }
+                });
+
+                if (intersectingSteps.size > 0) {
+                    let activeStep = null;
+                    let closestDistance = Infinity;
+                    const targetY = window.innerHeight * (window.innerWidth <= 900 ? 0.7 : 0.5);
+
+                    intersectingSteps.forEach(stepNum => {
+                        const slide = document.querySelector(`.step-slide[data-step="${stepNum}"]`) || document.getElementById('step-page-ingredients');
+                        if (slide) {
+                            const rect = slide.getBoundingClientRect();
+                            const slideCenter = rect.top + rect.height / 2;
+                            const distance = Math.abs(slideCenter - targetY);
+                            if (distance < closestDistance) {
+                                closestDistance = distance;
+                                activeStep = stepNum;
+                            }
+                        }
+                    });
+
+                    if (activeStep !== null) {
+                        updateStickyLayers(activeStep);
+                    }
+                } else {
+                    updateStickyLayers(0);
+                }
+            }, {
+                root: null,
+                rootMargin: '-10% 0px -10% 0px',
+                threshold: 0
+            });
+
+            // Observe the centered ingredients page
+            const ingredientsPage = document.getElementById('step-page-ingredients');
+            if (ingredientsPage) {
+                stepObserver.observe(ingredientsPage);
+            }
+
+            // Register observer to watch every step slide card
+            document.querySelectorAll('#steps-scrolling-column .step-slide').forEach(slide => {
+                stepObserver.observe(slide);
+            });
+        }
+
+        function updateStickyLayers(stepNum) {
+            const layers = document.querySelectorAll('#sketch-layers .sketch-layer');
+
+            // If there's only one layer (fallback mode), always keep it active
+            if (layers.length === 1 && layers[0].getAttribute('data-step') === '1') {
+                layers[0].classList.add('active');
+                return;
+            }
+
+            layers.forEach(layer => {
+                const layerStep = parseInt(layer.getAttribute('data-step'), 10);
+                if (layerStep === stepNum) {
+                    layer.classList.add('active');
+                } else {
+                    layer.classList.remove('active');
+                }
+            });
+        }
+
+        // Re-check scroll button overflow if the browser window changes dimensions
+        window.addEventListener('resize', updateScrollButtonVisibility);
+    </script>
+
+</body>
+
+</html>

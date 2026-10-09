@@ -22,6 +22,34 @@
     border-bottom-color: var(--text-subtitle);
 }
 
+.nav-item a.nav-home {
+    font-weight: 500;
+    color: var(--text-subtitle);
+    border-bottom: 1.5px solid var(--text-subtitle);
+}
+
+.nav-item a.nav-home:hover {
+    color: var(--link-hover);
+    border-bottom-color: var(--link-hover);
+}
+
+/* Focal brand link emphasis */
+.nav-item a.nav-focal {
+    font-weight: 600;
+    color: var(--text-title);
+    letter-spacing: -0.2px;
+}
+
+.nav-item a.nav-focal.nav-home {
+    font-weight: 600;
+    color: var(--text-subtitle);
+    border-bottom: 1.5px solid var(--text-subtitle);
+}
+
+.nav-item a.nav-focal:hover {
+    color: var(--link-hover);
+}
+
 /* -------------------------------------------------------------------------
    1. LAYOUT & SMOOTH SCROLLING OVERRIDES
    ------------------------------------------------------------------------- */
@@ -30,7 +58,8 @@ html {
     overflow-y: auto !important;
     height: auto !important;
     scroll-behavior: smooth;
-    scroll-snap-type: y proximity; /* Snap to sections cleanly when scrolling near them */
+    scroll-snap-type: y proximity;
+    /* Snap to sections cleanly when scrolling near them */
 }
 
 body {
@@ -61,12 +90,15 @@ body {
     justify-content: space-between;
     flex-shrink: 0;
     /* Prevent flex shrinking to respect min-height */
-    scroll-snap-align: start; /* Enable snap alignment */
-    scroll-margin-top: 100px; /* Offset the snap alignment to the top of the viewport */
+    scroll-snap-align: start;
+    /* Enable snap alignment */
+    scroll-margin-top: 100px;
+    /* Offset the snap alignment to the top of the viewport */
 }
 
 .hero-section .sketch-img {
-    max-height: calc(100vh - 235px);  /* Dynamically constrained to fit perfectly within the initial viewport */
+    max-height: calc(100vh - 235px);
+    /* Dynamically constrained to fit perfectly within the initial viewport */
 }
 
 .hero-section .scroll-indicator {
@@ -142,7 +174,8 @@ body {
     justify-content: space-between;
     flex-shrink: 0;
     /* Prevent flex shrinking to respect min-height */
-    scroll-snap-align: start; /* Enable snap alignment */
+    scroll-snap-align: start;
+    /* Enable snap alignment */
 }
 
 .menu-title {
@@ -300,7 +333,7 @@ body {
     color: var(--text-title);
     letter-spacing: -1px;
     text-transform: lowercase;
-    margin-bottom: 48px;
+    margin-bottom: 24px;
 }
 
 .about-section {
@@ -308,12 +341,48 @@ body {
     flex-direction: column;
     min-height: 100vh;
     /* Ensures the section is tall enough to scroll fully into view on all screens */
-    padding-top: 80px;
-    padding-bottom: 120px;
+    padding-top: 16px;
+    padding-bottom: 80px;
     /* Generous bottom spacing for footer and to guarantee smooth full scroll */
     flex-shrink: 0;
     /* Prevent flex shrinking to respect min-height */
-    scroll-snap-align: start; /* Enable snap alignment */
+}
+
+.about-text {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.4;
+    color: var(--text-body);
+}
+
+.about-text p {
+    margin: 0 0 1.25em 0;
+}
+
+.about-text p:last-child {
+    margin-bottom: 0;
+}
+
+.about-text strong {
+    font-weight: 600;
+    color: var(--text-title);
+}
+
+.about-text em {
+    font-style: italic;
+}
+
+.about-text a {
+    color: var(--link-color, #7c2d12);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: 500;
+    transition: color var(--transition-smooth);
+    cursor: pointer;
+}
+
+.about-text a:hover {
+    color: var(--link-hover, #ea580c);
 }
 
 .about-grid {
@@ -333,4 +402,64 @@ body {
     /* Removes any default inline margins or white space beneath the image */
     border-radius: 8px;
     /* Optional: adds nice rounded corners if you want it to look premium */
+}
+
+/* -------------------------------------------------------------------------
+   PHOTO SECTION & "FOR THEM" LINK
+   ------------------------------------------------------------------------- */
+
+.culture-link {
+    color: var(--link-color, #7c2d12);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: 500;
+    transition: color var(--transition-smooth);
+    cursor: pointer;
+}
+
+.culture-link:hover {
+    color: var(--link-hover, #ea580c);
+}
+
+.photo-section {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 32px 0 40px 0;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    scroll-margin-top: 0;
+}
+
+.photo-figure {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    max-width: 100%;
+}
+
+.photo-img {
+    max-height: calc(100vh - 140px);
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    display: block;
+}
+
+.photo-caption {
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 16px;
+    line-height: 1.5;
+    max-width: 600px;
 }
