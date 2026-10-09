@@ -86,6 +86,13 @@ const KITCHEN_CONFIG = {
             description: "Quintessential tarka."
         },
         {
+            category: "veg",
+            categoryUrdu: "سبزی",
+            name: "dahi ka bhagar",
+            url: "recipes/dahi_bhagar/",
+            description: "Yogurt, rice, daal. What else?"
+        },
+        {
             category: "meat",
             categoryUrdu: "گوشت",
             name: "keema",
