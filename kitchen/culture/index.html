@@ -27,7 +27,7 @@
         document.addEventListener("DOMContentLoaded", () => {
             // Update browser tab title
             if (typeof KITCHEN_CONFIG !== 'undefined') {
-                document.title = (KITCHEN_CONFIG.name || "the kitchen") + " — for them";
+                document.title = (KITCHEN_CONFIG.name || "the kitchen") + " — July 17, 1987";
             }
 
             // Load "this space" content dynamically from this_space.md
@@ -43,22 +43,22 @@
                             ? marked.parse(markdown)
                             : markdown.trim().split(/\n\s*\n/).map(p => `<p>${p.trim().replace(/\n/g, "<br>")}</p>`).join("");
 
-                        // Automatically link "for them" to #for-them if not already formatted as a link
-                        if (!html.includes('href="#for-them"')) {
-                            html = html.replace(/\b(for them)\b/gi, '<a href="#for-them" class="culture-link">$1</a>');
+                        // Automatically link "for them" to #arrival-picture if not already formatted as a link
+                        if (!html.includes('href="#arrival-picture"')) {
+                            html = html.replace(/\b(for them)\b/gi, '<a href="#arrival-picture" class="culture-link">$1</a>');
                         }
 
                         thisSpaceEl.innerHTML = html;
 
-                        // Ensure any links to #for-them scroll smoothly
-                        thisSpaceEl.querySelectorAll('a[href="#for-them"]').forEach(link => {
+                        // Ensure any links to #arrival-picture scroll smoothly
+                        thisSpaceEl.querySelectorAll('a[href="#arrival-picture"]').forEach(link => {
                             link.classList.add("culture-link");
                             link.addEventListener("click", (e) => {
                                 e.preventDefault();
-                                const target = document.getElementById("for-them");
+                                const target = document.getElementById("arrival-picture");
                                 if (target) {
                                     target.scrollIntoView({ behavior: "smooth" });
-                                    history.pushState(null, "", "#for-them");
+                                    history.pushState(null, "", "#arrival-picture");
                                 }
                             });
                         });
@@ -79,7 +79,7 @@
             <ul class="nav-links">
                 <li class="nav-item"><a href="../" class="nav-focal">the kitchen</a></li>
                 <li class="nav-divider" aria-hidden="true">|</li>
-                <li class="nav-item"><a href="./" class="nav-home">for them</a></li>
+                <li class="nav-item"><a href="./" class="nav-home">July 17, 1987</a></li>
                 <li class="nav-item"><a href="../me/">us</a></li>
             </ul>
         </header>
@@ -91,7 +91,7 @@
         </section>
 
         <!-- Photo Section -->
-        <section class="photo-section" id="for-them">
+        <section class="photo-section" id="arrival-picture">
             <figure class="photo-figure">
                 <img class="photo-img" src="../../assets/photos/ammi_and_abu_arrive_1.JPG"
                     alt="Ammi and Abu arriving with luggage.">
