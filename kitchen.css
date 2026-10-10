@@ -463,3 +463,9 @@ body {
     line-height: 1.5;
     max-width: 600px;
 }
+
+.photo-caption strong,
+.photo-date {
+    font-weight: 600;
+    color: var(--link-color, #7c2d12);
+}
