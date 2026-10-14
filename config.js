@@ -98,6 +98,13 @@ const KITCHEN_CONFIG = {
             name: "keema",
             url: "recipes/keema/",
             description: "One pot, super easy mattar keema dish."
+        },
+        {
+            category: "meat",
+            categoryUrdu: "کاری",
+            name: "cari",
+            url: "recipes/cari/",
+            description: "A coconut and anees dish unlike anything you've tried before. I."
         }
     ]
 };
