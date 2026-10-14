@@ -1,7 +1,7 @@
 const RECIPE_DATA = `
-title: "Ammi’s Yellow Daal"
-subtitle: "تڑکا دال"
-description: "One of the quintessential dishes demonstrating the beauty of a tarka."
+title: "Cari (Chawal)"
+subtitle: "کاری (چاول)"
+description: "A coconut and anees dish that my brother and I would inhale as kids. The curry leaves add a very nice aroma that for me was emblematic of this dish."
 image: "../../../assets/kitchen_sketch.png"
 
 ingredients:
@@ -23,7 +23,7 @@ ingredients:
   - section: "Frying and bhooning"
     items:
       - 1/2 cup vegetable oil
-      - 6-7 dried curry leaves
+      - 6-7 curry leaves (dry or fresh, fresh preferred)
       - 1/2 can of coconut milk
 
 steps:
