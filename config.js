@@ -104,7 +104,7 @@ const KITCHEN_CONFIG = {
             categoryUrdu: "کاری",
             name: "cari",
             url: "recipes/cari/",
-            description: "A coconut and anees dish unlike anything you've tried before. I."
+            description: "A coconut and anees dish unlike anything you've tried before. I promise."
         }
     ]
 };
