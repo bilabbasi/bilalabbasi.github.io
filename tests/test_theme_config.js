@@ -27,14 +27,14 @@ const scope = vm.runInContext(code + '\n;({ KITCHEN_CONFIG, styles })', context)
 // Assert theme object exists
 assert.ok(scope.KITCHEN_CONFIG, 'KITCHEN_CONFIG should exist');
 assert.ok(scope.KITCHEN_CONFIG.theme, 'KITCHEN_CONFIG.theme should exist');
-assert.strictEqual(scope.KITCHEN_CONFIG.theme.anchor, '#b45309', 'theme.anchor should match original subtitle #b45309');
-assert.strictEqual(scope.KITCHEN_CONFIG.theme.distinct, '#ff5722', 'theme.distinct should be #ff5722');
-assert.strictEqual(scope.KITCHEN_CONFIG.theme.pop, '#ccff00', 'theme.pop should be #ccff00');
+assert.ok(scope.KITCHEN_CONFIG.theme.anchor, 'theme.anchor should be defined');
+assert.ok(scope.KITCHEN_CONFIG.theme.distinct, 'theme.distinct should be defined');
+assert.ok(scope.KITCHEN_CONFIG.theme.pop, 'theme.pop should be defined');
 
-// Assert CSS variable injection happened
-assert.strictEqual(styles['--link-color'], '#b45309', '--link-color should be injected');
-assert.strictEqual(styles['--text-subtitle'], '#b45309', '--text-subtitle should be injected');
-assert.strictEqual(styles['--link-hover'], '#ff5722', '--link-hover should be injected');
-assert.strictEqual(styles['--color-pop'], '#ccff00', '--color-pop should be injected');
+// Assert dynamic CSS variable injection matches config
+assert.strictEqual(styles['--link-color'], scope.KITCHEN_CONFIG.theme.anchor, '--link-color should match theme.anchor');
+assert.strictEqual(styles['--text-subtitle'], scope.KITCHEN_CONFIG.theme.anchor, '--text-subtitle should match theme.anchor');
+assert.strictEqual(styles['--link-hover'], scope.KITCHEN_CONFIG.theme.distinct, '--link-hover should match theme.distinct');
+assert.strictEqual(styles['--color-pop'], scope.KITCHEN_CONFIG.theme.pop, '--color-pop should match theme.pop');
 
 console.log('PASS: test_theme_config.js passed all checks.');

@@ -89,9 +89,9 @@ const KITCHEN_CONFIG = {
     // Changing these colors will automatically propagate across all kitchen
     // and recipe pages without touching any CSS files.
     theme: {
-        anchor: "#b45309",    // Original warm amber/terracotta (exact match to www.bilalabbasi.com/kitchen subtitle)
-        distinct: "#ff5722",  // New distinct electric tangerine for hover & secondary emphasis
-        pop: "#ccff00"        // New Yellow Punk for badges, tags, and focal highlights
+        anchor: "#721817",    // Original warm amber/terracotta (exact match to www.bilalabbasi.com/kitchen subtitle)
+        distinct: "#fa9f42",  // New distinct electric tangerine for hover & secondary emphasis
+        pop: "#2b4162"        // New Yellow Punk for badges, tags, and focal highlights
     },
 
     // Recipes metadata list for dynamic menu generation

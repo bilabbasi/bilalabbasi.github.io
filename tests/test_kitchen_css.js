@@ -3,11 +3,11 @@ const fs = require('fs');
 
 const css = fs.readFileSync(__dirname + '/../kitchen.css', 'utf-8');
 
-// Check root variables
-assert.match(css, /--text-subtitle:\s*#b45309;/, '--text-subtitle should be #b45309 in :root');
-assert.match(css, /--link-color:\s*#b45309;/, '--link-color should be #b45309 in :root');
-assert.match(css, /--link-hover:\s*#ff5722;/, '--link-hover should be #ff5722 in :root');
-assert.match(css, /--color-pop:\s*#ccff00;/, '--color-pop should be #ccff00 in :root');
+// Ensure kitchen.css relies on dynamic CSS variables and does not hardcode static :root fallbacks
+assert.doesNotMatch(css, /:root\s*\{[^}]*--text-subtitle/, 'kitchen.css should not hardcode static --text-subtitle in :root');
+assert.match(css, /var\(--text-subtitle\)/, 'kitchen.css should use var(--text-subtitle)');
+assert.match(css, /var\(--link-color\)/, 'kitchen.css should use var(--link-color)');
+assert.match(css, /var\(--link-hover\)/, 'kitchen.css should use var(--link-hover)');
 
 // Check pop-tag / badge helper
 assert.ok(css.includes('.pop-tag') || css.includes('.badge-pop'), 'Should define .pop-tag or .badge-pop class');

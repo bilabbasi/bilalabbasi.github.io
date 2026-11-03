@@ -40,10 +40,10 @@ function createEnvironment(pathname, hasKitchenStylesheet = false) {
     const { context, styles } = createEnvironment('/kitchen/index.html', true);
     vm.runInContext(configCode + '\n;globalThis.KITCHEN_CONFIG = KITCHEN_CONFIG;', context);
 
-    assert.strictEqual(styles['--text-subtitle'], '#b45309', 'Kitchen page subtitle must match www.bilalabbasi.com/kitchen #b45309');
-    assert.strictEqual(styles['--link-color'], '#b45309', 'Kitchen page link-color should match anchor #b45309');
-    assert.strictEqual(styles['--link-hover'], '#ff5722', 'Kitchen page should have link-hover #ff5722');
-    assert.strictEqual(styles['--color-pop'], '#ccff00', 'Kitchen page should have pop color #ccff00');
+    assert.strictEqual(styles['--text-subtitle'], context.KITCHEN_CONFIG.theme.anchor, 'Kitchen page subtitle matches config anchor');
+    assert.strictEqual(styles['--link-color'], context.KITCHEN_CONFIG.theme.anchor, 'Kitchen page link-color matches config anchor');
+    assert.strictEqual(styles['--link-hover'], context.KITCHEN_CONFIG.theme.distinct, 'Kitchen page link-hover matches config distinct');
+    assert.strictEqual(styles['--color-pop'], context.KITCHEN_CONFIG.theme.pop, 'Kitchen page pop color matches config pop');
 
     // Test dynamic propagation using application code: KITCHEN_CONFIG.applyTheme()
     assert.strictEqual(typeof context.KITCHEN_CONFIG.applyTheme, 'function', 'KITCHEN_CONFIG.applyTheme should be a function');
@@ -58,9 +58,9 @@ function createEnvironment(pathname, hasKitchenStylesheet = false) {
     const { context, styles } = createEnvironment('/kitchen/recipes/yellowdaal/index.html', true);
     vm.runInContext(configCode + '\n;globalThis.KITCHEN_CONFIG = KITCHEN_CONFIG;', context);
 
-    assert.strictEqual(styles['--text-subtitle'], '#b45309', 'Recipe page subtitle should match #b45309');
-    assert.strictEqual(styles['--link-color'], '#b45309', 'Recipe page anchor should match #b45309');
-    assert.strictEqual(styles['--color-pop'], '#ccff00', 'Recipe page should have pop color #ccff00');
+    assert.strictEqual(styles['--text-subtitle'], context.KITCHEN_CONFIG.theme.anchor, 'Recipe page subtitle matches config anchor');
+    assert.strictEqual(styles['--link-color'], context.KITCHEN_CONFIG.theme.anchor, 'Recipe page anchor matches config anchor');
+    assert.strictEqual(styles['--color-pop'], context.KITCHEN_CONFIG.theme.pop, 'Recipe page pop color matches config pop');
 }
 
 // 3. Professional Page Isolation Test (Standard URL)

@@ -1,26 +1,15 @@
 /* =========================================================================
    KITCHEN WEBSITE STYLING SHEET
    =========================================================================
-   This file imports the main index.css styles and overrides specific color
-   variables to give the Kitchen page a warm, culinary aesthetic. */
+   This file imports the main index.css styles and styles the Kitchen page.
+   Color variables (--text-subtitle, --link-color, --link-hover, --color-pop)
+   are dynamically driven by KITCHEN_CONFIG.theme in config.js. */
 
 
-:root {
-    /* Color Palette Fallbacks (dynamically driven by config.js) */
-    --text-subtitle: #b45309;
-    /* Original warm dark amber/terracotta (exact match to www.bilalabbasi.com/kitchen subtitle) */
-    --link-color: #b45309;
-    /* Anchor red-brown / warm amber for links and titles */
-    --link-hover: #ff5722;
-    /* Distinct electric tangerine on hover */
-    --color-pop: #ccff00;
-    /* Yellow punk / acid lime for accent badges & tags */
-}
-
-/* Accent Pop Badge (Yellow Punk) */
+/* Accent Pop Badge */
 .pop-tag,
 .badge-pop {
-    background-color: var(--color-pop, #ccff00);
+    background-color: var(--color-pop);
     color: #18181b;
     font-size: 0.7rem;
     font-weight: 700;
@@ -392,7 +381,7 @@ body {
 }
 
 .about-text a {
-    color: var(--link-color, #7c2d12);
+    color: var(--link-color);
     text-decoration: underline;
     text-underline-offset: 3px;
     font-weight: 500;
@@ -401,7 +390,7 @@ body {
 }
 
 .about-text a:hover {
-    color: var(--link-hover, #ff5722);
+    color: var(--link-hover);
 }
 
 .about-grid {
@@ -428,7 +417,7 @@ body {
    ------------------------------------------------------------------------- */
 
 .culture-link {
-    color: var(--link-color, #7c2d12);
+    color: var(--link-color);
     text-decoration: underline;
     text-underline-offset: 3px;
     font-weight: 500;
@@ -437,7 +426,7 @@ body {
 }
 
 .culture-link:hover {
-    color: var(--link-hover, #ff5722);
+    color: var(--link-hover);
 }
 
 .photo-section {
@@ -486,5 +475,5 @@ body {
 .photo-caption strong,
 .photo-date {
     font-weight: 600;
-    color: var(--link-color, #7c2d12);
+    color: var(--link-color);
 }
