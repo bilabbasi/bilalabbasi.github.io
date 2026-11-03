@@ -79,7 +79,7 @@ const KITCHEN_CONFIG = {
     // Navigation bar tabs (used by nav.js to auto-render headers across all kitchen pages)
     nav: [
         { id: "kitchen", label: "the kitchen", path: "kitchen/", focal: true, dividerAfter: true },
-        { id: "culture", label: "July 17, 1987", path: "kitchen/culture/" },
+        { id: "culture", label: "customs", path: "kitchen/culture/" },
         { id: "ammi", label: "ammi", path: "kitchen/me/" }
     ],
 

@@ -66,7 +66,7 @@
             ? NAVIGATION_CONFIG[navKey]
             : (typeof KITCHEN_CONFIG !== "undefined" && KITCHEN_CONFIG.nav ? KITCHEN_CONFIG.nav : [
                 { id: "kitchen", label: "the kitchen", path: "kitchen/", focal: true, dividerAfter: true },
-                { id: "culture", label: "July 17, 1987", path: "kitchen/culture/" },
+                { id: "culture", label: "customs", path: "kitchen/culture/" },
                 { id: "ammi", label: "ammi", path: "kitchen/me/" }
             ]);
 
@@ -116,8 +116,8 @@
         const headers = document.querySelectorAll("header.navbar");
         headers.forEach(header => {
             const hasExplicitAttr = header.hasAttribute("data-current") ||
-                                    header.hasAttribute("data-nav") ||
-                                    header.hasAttribute("data-back");
+                header.hasAttribute("data-nav") ||
+                header.hasAttribute("data-back");
             const isEmpty = header.children.length === 0 || !header.querySelector(".nav-links");
 
             if (hasExplicitAttr || isEmpty) {
