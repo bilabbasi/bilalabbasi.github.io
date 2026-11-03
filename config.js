@@ -76,6 +76,13 @@ const KITCHEN_CONFIG = {
     // Tab title
     tab: "kitchen me",
 
+    // Navigation bar tabs (used by nav.js to auto-render headers across all kitchen pages)
+    nav: [
+        { id: "kitchen", label: "the kitchen", path: "kitchen/", focal: true, dividerAfter: true },
+        { id: "culture", label: "July 17, 1987", path: "kitchen/culture/" },
+        { id: "ammi", label: "ammi", path: "kitchen/me/" }
+    ],
+
     // -------------------------------------------------------------------------
     // Theme Colors for Kitchen & Recipes
     // -------------------------------------------------------------------------
@@ -118,6 +125,13 @@ const KITCHEN_CONFIG = {
             description: "A coconut and anees dish unlike anything you've tried before. I promise."
         }
     ]
+};
+
+// -------------------------------------------------------------------------
+// Navigation Configuration Registry
+// -------------------------------------------------------------------------
+const NAVIGATION_CONFIG = {
+    kitchen: KITCHEN_CONFIG.nav
 };
 
 // -------------------------------------------------------------------------

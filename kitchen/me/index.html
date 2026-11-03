@@ -22,6 +22,9 @@
     <!-- Configuration Data: Shared config containing both professional and kitchen bio contents -->
     <script src="../../config.js"></script>
 
+    <!-- Navigation Component -->
+    <script src="../../nav.js" defer></script>
+
     <!-- Loader Script: Automatically inserts the KITCHEN_CONFIG details when loaded -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
@@ -61,14 +64,7 @@
     <div class="app-wrapper">
 
         <!-- Header: Top bar with navigation for kitchen sections -->
-        <header class="navbar">
-            <ul class="nav-links">
-                <li class="nav-item"><a href="../" class="nav-focal">the kitchen</a></li>
-                <li class="nav-divider" aria-hidden="true">|</li>
-                <li class="nav-item"><a href="../culture/">July 17, 1987</a></li>
-                <li class="nav-item"><a href="./" class="nav-home">ammi</a></li>
-            </ul>
-        </header>
+        <header class="navbar" data-current="ammi"></header>
 
         <!-- About / Me Section -->
         <section class="about-section" id="me">
