@@ -76,6 +76,17 @@ const KITCHEN_CONFIG = {
     // Tab title
     tab: "kitchen me",
 
+    // -------------------------------------------------------------------------
+    // Theme Colors for Kitchen & Recipes (High Chroma Trio)
+    // -------------------------------------------------------------------------
+    // Changing these colors will automatically propagate across all kitchen
+    // and recipe pages without touching any CSS files.
+    theme: {
+        anchor: "#7c2d12",    // Primary red-brown for links, titles, and recipe names
+        distinct: "#ff5722",  // Electric tangerine for subtitles, categories, and hover
+        pop: "#ccff00"        // Yellow punk for badges, tags, and focal highlights
+    },
+
     // Recipes metadata list for dynamic menu generation
     recipes: [
         {
@@ -108,3 +119,43 @@ const KITCHEN_CONFIG = {
         }
     ]
 };
+
+// -------------------------------------------------------------------------
+// 3. AUTOMATIC KITCHEN THEME APPLICATOR
+// -------------------------------------------------------------------------
+// Applies KITCHEN_CONFIG.theme to CSS variables across kitchen and recipe pages.
+// Only applies if the current page is within the kitchen/ or recipes/ section,
+// ensuring the professional page remains strictly untouched.
+(function applyKitchenTheme() {
+    if (typeof KITCHEN_CONFIG !== "undefined" && KITCHEN_CONFIG.theme) {
+        const isKitchenPage = () => {
+            if (typeof window === "undefined" || !window.location) return true; // Default to true in node/testing
+            const path = window.location.pathname || "";
+            return path.includes("/kitchen") || path.includes("/recipes");
+        };
+
+        const apply = () => {
+            if (!isKitchenPage()) return;
+            if (typeof document !== "undefined" && document.documentElement) {
+                const root = document.documentElement;
+                if (KITCHEN_CONFIG.theme.anchor) {
+                    root.style.setProperty("--link-color", KITCHEN_CONFIG.theme.anchor);
+                }
+                if (KITCHEN_CONFIG.theme.distinct) {
+                    root.style.setProperty("--text-subtitle", KITCHEN_CONFIG.theme.distinct);
+                    root.style.setProperty("--link-hover", KITCHEN_CONFIG.theme.distinct);
+                }
+                if (KITCHEN_CONFIG.theme.pop) {
+                    root.style.setProperty("--color-pop", KITCHEN_CONFIG.theme.pop);
+                }
+            }
+        };
+
+        if (typeof document !== "undefined" && document.documentElement) {
+            apply();
+        }
+        if (typeof document !== "undefined" && document.addEventListener) {
+            document.addEventListener("DOMContentLoaded", apply);
+        }
+    }
+})();
