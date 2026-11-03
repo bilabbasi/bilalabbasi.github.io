@@ -6,13 +6,29 @@
 
 
 :root {
-    /* Override color accents with warm terracotta and amber tones */
-    --text-subtitle: #b45309;
-    /* Warm dark amber/terracotta */
+    /* High Chroma Color Palette Fallbacks (dynamically driven by config.js) */
     --link-color: #7c2d12;
-    /* Rich terracotta brown for links */
-    --link-hover: #ea580c;
-    /* Bright orange-amber on hover */
+    /* Rich terracotta red-brown for links and titles */
+    --text-subtitle: #ff5722;
+    /* Electric tangerine for subtitles and category headers */
+    --link-hover: #ff5722;
+    /* High-vibrancy tangerine on hover */
+    --color-pop: #ccff00;
+    /* Yellow punk / acid lime for accent badges & tags */
+}
+
+/* Accent Pop Badge (Yellow Punk) */
+.pop-tag, .badge-pop {
+    background-color: var(--color-pop, #ccff00);
+    color: #18181b;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    letter-spacing: 0.04em;
+    display: inline-flex;
+    align-items: center;
+    line-height: 1.2;
 }
 
 /* Style the active navigation link for the kitchen theme */
