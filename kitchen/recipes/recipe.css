@@ -35,7 +35,12 @@
 .nav-item a.active {
     font-weight: 600;
     color: var(--text-subtitle) !important;
-    border-bottom-color: var(--text-subtitle);
+    border-bottom-color: var(--link-hover);
+}
+
+.nav-item a:hover {
+    color: var(--link-hover);
+    border-bottom-color: var(--link-hover);
 }
 
 /* -------------------------------------------------------------------------

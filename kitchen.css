@@ -18,7 +18,8 @@
 }
 
 /* Accent Pop Badge (Yellow Punk) */
-.pop-tag, .badge-pop {
+.pop-tag,
+.badge-pop {
     background-color: var(--color-pop, #ccff00);
     color: #18181b;
     font-size: 0.7rem;
@@ -35,15 +36,16 @@
 .nav-item a.active {
     font-weight: 600;
     color: var(--text-subtitle) !important;
-    border-bottom-color: var(--text-subtitle);
+    border-bottom-color: var(--link-hover);
 }
 
 .nav-item a.nav-home {
     font-weight: 500;
     color: var(--text-subtitle);
-    border-bottom: 1.5px solid var(--text-subtitle);
+    border-bottom: 1.5px solid var(--link-hover);
 }
 
+.nav-item a:hover,
 .nav-item a.nav-home:hover {
     color: var(--link-hover);
     border-bottom-color: var(--link-hover);
@@ -59,11 +61,12 @@
 .nav-item a.nav-focal.nav-home {
     font-weight: 600;
     color: var(--text-subtitle);
-    border-bottom: 1.5px solid var(--text-subtitle);
+    border-bottom: 1.5px solid var(--link-hover);
 }
 
 .nav-item a.nav-focal:hover {
     color: var(--link-hover);
+    border-bottom-color: var(--link-hover);
 }
 
 /* -------------------------------------------------------------------------
