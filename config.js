@@ -77,14 +77,14 @@ const KITCHEN_CONFIG = {
     tab: "kitchen me",
 
     // -------------------------------------------------------------------------
-    // Theme Colors for Kitchen & Recipes (High Chroma Trio)
+    // Theme Colors for Kitchen & Recipes
     // -------------------------------------------------------------------------
     // Changing these colors will automatically propagate across all kitchen
     // and recipe pages without touching any CSS files.
     theme: {
-        anchor: "#7c2d12",    // Primary red-brown for links, titles, and recipe names
-        distinct: "#ff5722",  // Electric tangerine for subtitles, categories, and hover
-        pop: "#ccff00"        // Yellow punk for badges, tags, and focal highlights
+        anchor: "#b45309",    // Original warm amber/terracotta (exact match to www.bilalabbasi.com/kitchen subtitle)
+        distinct: "#ff5722",  // New distinct electric tangerine for hover & secondary emphasis
+        pop: "#ccff00"        // New Yellow Punk for badges, tags, and focal highlights
     },
 
     // Recipes metadata list for dynamic menu generation
@@ -153,10 +153,10 @@ const KITCHEN_CONFIG = {
             if (typeof document !== "undefined" && document.documentElement) {
                 const root = document.documentElement;
                 if (KITCHEN_CONFIG.theme.anchor) {
+                    root.style.setProperty("--text-subtitle", KITCHEN_CONFIG.theme.anchor);
                     root.style.setProperty("--link-color", KITCHEN_CONFIG.theme.anchor);
                 }
                 if (KITCHEN_CONFIG.theme.distinct) {
-                    root.style.setProperty("--text-subtitle", KITCHEN_CONFIG.theme.distinct);
                     root.style.setProperty("--link-hover", KITCHEN_CONFIG.theme.distinct);
                 }
                 if (KITCHEN_CONFIG.theme.pop) {

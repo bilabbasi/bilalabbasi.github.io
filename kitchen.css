@@ -6,13 +6,13 @@
 
 
 :root {
-    /* High Chroma Color Palette Fallbacks (dynamically driven by config.js) */
-    --link-color: #7c2d12;
-    /* Rich terracotta red-brown for links and titles */
-    --text-subtitle: #ff5722;
-    /* Electric tangerine for subtitles and category headers */
+    /* Color Palette Fallbacks (dynamically driven by config.js) */
+    --text-subtitle: #b45309;
+    /* Original warm dark amber/terracotta (exact match to www.bilalabbasi.com/kitchen subtitle) */
+    --link-color: #b45309;
+    /* Anchor red-brown / warm amber for links and titles */
     --link-hover: #ff5722;
-    /* High-vibrancy tangerine on hover */
+    /* Distinct electric tangerine on hover */
     --color-pop: #ccff00;
     /* Yellow punk / acid lime for accent badges & tags */
 }

@@ -40,8 +40,8 @@ function createEnvironment(pathname, hasKitchenStylesheet = false) {
     const { context, styles } = createEnvironment('/kitchen/index.html', true);
     vm.runInContext(configCode + '\n;globalThis.KITCHEN_CONFIG = KITCHEN_CONFIG;', context);
 
-    assert.strictEqual(styles['--link-color'], '#7c2d12', 'Kitchen page should have anchor color #7c2d12');
-    assert.strictEqual(styles['--text-subtitle'], '#ff5722', 'Kitchen page should have distinct subtitle #ff5722');
+    assert.strictEqual(styles['--text-subtitle'], '#b45309', 'Kitchen page subtitle must match www.bilalabbasi.com/kitchen #b45309');
+    assert.strictEqual(styles['--link-color'], '#b45309', 'Kitchen page link-color should match anchor #b45309');
     assert.strictEqual(styles['--link-hover'], '#ff5722', 'Kitchen page should have link-hover #ff5722');
     assert.strictEqual(styles['--color-pop'], '#ccff00', 'Kitchen page should have pop color #ccff00');
 
@@ -50,15 +50,16 @@ function createEnvironment(pathname, hasKitchenStylesheet = false) {
     context.KITCHEN_CONFIG.theme.anchor = '#123456';
     context.KITCHEN_CONFIG.applyTheme();
     assert.strictEqual(styles['--link-color'], '#123456', 'Propagated new color via KITCHEN_CONFIG.applyTheme()');
+    assert.strictEqual(styles['--text-subtitle'], '#123456', 'Propagated new subtitle via KITCHEN_CONFIG.applyTheme()');
 }
 
 // 2. Recipe Page Test
 {
     const { context, styles } = createEnvironment('/kitchen/recipes/yellowdaal/index.html', true);
-    vm.runInContext(configCode, context);
+    vm.runInContext(configCode + '\n;globalThis.KITCHEN_CONFIG = KITCHEN_CONFIG;', context);
 
-    assert.strictEqual(styles['--link-color'], '#7c2d12', 'Recipe page should have anchor color #7c2d12');
-    assert.strictEqual(styles['--text-subtitle'], '#ff5722', 'Recipe page should have distinct subtitle #ff5722');
+    assert.strictEqual(styles['--text-subtitle'], '#b45309', 'Recipe page subtitle should match #b45309');
+    assert.strictEqual(styles['--link-color'], '#b45309', 'Recipe page anchor should match #b45309');
     assert.strictEqual(styles['--color-pop'], '#ccff00', 'Recipe page should have pop color #ccff00');
 }
 
