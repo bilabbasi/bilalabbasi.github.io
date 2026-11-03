@@ -4,7 +4,7 @@ const vm = require('vm');
 
 const configCode = fs.readFileSync(__dirname + '/../config.js', 'utf-8');
 
-function createEnvironment(pathname) {
+function createEnvironment(pathname, hasKitchenStylesheet = false) {
     const styles = {};
     const context = {
         window: {
@@ -21,6 +21,12 @@ function createEnvironment(pathname) {
                     getPropertyValue: (prop) => styles[prop]
                 }
             },
+            querySelector: (sel) => {
+                if (hasKitchenStylesheet && (sel.includes('kitchen.css') || sel.includes('recipe.css'))) {
+                    return {};
+                }
+                return null;
+            },
             addEventListener: (evt, cb) => {}
         },
         console: console
@@ -31,7 +37,7 @@ function createEnvironment(pathname) {
 
 // 1. Kitchen Page Test
 {
-    const { context, styles } = createEnvironment('/kitchen/index.html');
+    const { context, styles } = createEnvironment('/kitchen/index.html', true);
     vm.runInContext(configCode + '\n;globalThis.KITCHEN_CONFIG = KITCHEN_CONFIG;', context);
 
     assert.strictEqual(styles['--link-color'], '#7c2d12', 'Kitchen page should have anchor color #7c2d12');
@@ -39,15 +45,16 @@ function createEnvironment(pathname) {
     assert.strictEqual(styles['--link-hover'], '#ff5722', 'Kitchen page should have link-hover #ff5722');
     assert.strictEqual(styles['--color-pop'], '#ccff00', 'Kitchen page should have pop color #ccff00');
 
-    // Test dynamic propagation: changing config color
+    // Test dynamic propagation using application code: KITCHEN_CONFIG.applyTheme()
+    assert.strictEqual(typeof context.KITCHEN_CONFIG.applyTheme, 'function', 'KITCHEN_CONFIG.applyTheme should be a function');
     context.KITCHEN_CONFIG.theme.anchor = '#123456';
-    context.document.documentElement.style.setProperty('--link-color', context.KITCHEN_CONFIG.theme.anchor);
-    assert.strictEqual(styles['--link-color'], '#123456', 'Propagated new color successfully');
+    context.KITCHEN_CONFIG.applyTheme();
+    assert.strictEqual(styles['--link-color'], '#123456', 'Propagated new color via KITCHEN_CONFIG.applyTheme()');
 }
 
 // 2. Recipe Page Test
 {
-    const { context, styles } = createEnvironment('/kitchen/recipes/yellowdaal/index.html');
+    const { context, styles } = createEnvironment('/kitchen/recipes/yellowdaal/index.html', true);
     vm.runInContext(configCode, context);
 
     assert.strictEqual(styles['--link-color'], '#7c2d12', 'Recipe page should have anchor color #7c2d12');
@@ -55,14 +62,23 @@ function createEnvironment(pathname) {
     assert.strictEqual(styles['--color-pop'], '#ccff00', 'Recipe page should have pop color #ccff00');
 }
 
-// 3. Professional Page Isolation Test
+// 3. Professional Page Isolation Test (Standard URL)
 {
-    const { context, styles } = createEnvironment('/professional/index.html');
+    const { context, styles } = createEnvironment('/professional/index.html', false);
     vm.runInContext(configCode, context);
 
     assert.strictEqual(styles['--link-color'], undefined, 'Professional page should NOT have kitchen link-color applied');
     assert.strictEqual(styles['--text-subtitle'], undefined, 'Professional page should NOT have kitchen text-subtitle applied');
     assert.strictEqual(styles['--color-pop'], undefined, 'Professional page should NOT have kitchen color-pop applied');
+}
+
+// 4. Professional Page Isolation on file:/// URL with "kitchen" in ancestor folder
+{
+    const { context, styles } = createEnvironment('/Users/bilalabbasi/kitchen-work/site/professional/index.html', false);
+    vm.runInContext(configCode, context);
+
+    assert.strictEqual(styles['--link-color'], undefined, 'Ancestor folder containing "kitchen" must not bleed into professional page');
+    assert.strictEqual(styles['--text-subtitle'], undefined, 'Ancestor folder containing "kitchen" must not bleed into professional page');
 }
 
 console.log('PASS: test_e2e_theme.js passed all end-to-end integration checks.');

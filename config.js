@@ -131,7 +131,21 @@ const KITCHEN_CONFIG = {
         const isKitchenPage = () => {
             if (typeof window === "undefined" || !window.location) return true; // Default to true in node/testing
             const path = window.location.pathname || "";
-            return path.includes("/kitchen") || path.includes("/recipes");
+
+            // Explicit exclusion for professional profile and root gateway pages
+            if (path.includes("/professional/") || path.endsWith("/professional") || path.endsWith("/professional/index.html")) {
+                return false;
+            }
+
+            // Check for presence of kitchen or recipe stylesheets in document
+            if (typeof document !== "undefined" && document.querySelector) {
+                if (document.querySelector('link[href*="kitchen.css"], link[href*="recipe.css"]')) {
+                    return true;
+                }
+            }
+
+            // Fallback: match kitchen/ or recipes/ as the immediate page/directory segment
+            return /\/(kitchen|recipes)(\/|$)/.test(path);
         };
 
         const apply = () => {
@@ -150,6 +164,9 @@ const KITCHEN_CONFIG = {
                 }
             }
         };
+
+        // Expose applyTheme for programmatic/dynamic updates
+        KITCHEN_CONFIG.applyTheme = apply;
 
         if (typeof document !== "undefined" && document.documentElement) {
             apply();

@@ -398,7 +398,7 @@ body {
 }
 
 .about-text a:hover {
-    color: var(--link-hover, #ea580c);
+    color: var(--link-hover, #ff5722);
 }
 
 .about-grid {
@@ -434,7 +434,7 @@ body {
 }
 
 .culture-link:hover {
-    color: var(--link-hover, #ea580c);
+    color: var(--link-hover, #ff5722);
 }
 
 .photo-section {
