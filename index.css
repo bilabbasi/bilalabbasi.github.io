@@ -13,21 +13,21 @@
     /* Background color of the entire screen */
     --text-title: #18181b;
     /* Color of your name and main headers (charcoal/dark gray) */
-    --text-subtitle: #6b6687;
-    /* Color of the subtitle (soft slate purple) */
+    --text-subtitle: #4b5563;
+    /* Color of the subtitle (muted charcoal) */
     --text-body: #4b5563;
     /* Color of your bio paragraphs (muted charcoal) */
     --text-muted: #9ca3af;
     /* Color for minor symbols and arrow indicators (light gray) */
     --link-color: #18181b;
     /* Default color of link text */
-    --link-hover: #6b6687;
+    --link-hover: #4b5563;
     /* Color of link text when hovered over */
     --border-color: #e5e7eb;
     /* Light gray borders (if used anywhere) */
 
     /* Font styles */
-    --font-serif: 'Lora', Georgia, serif;
+    --font-serif: 'Lora', Georgia, 'Noto Nastaliq Urdu', 'Geeza Pro', serif;
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
     /* Animation speed for links and transitions */
@@ -503,7 +503,7 @@ body {
 }
 
 .gateway-name-accent {
-    color: #7c2d12;
+    color: #721817;
 }
 
 .typewriter-cursor {
@@ -559,8 +559,8 @@ body {
 }
 
 .gateway-link.gateway-link-kitchen:hover {
-    color: #ea580c;
-    border-bottom-color: #ea580c;
+    color: #fa9f42;
+    border-bottom-color: #fa9f42;
 }
 
 .gateway-divider {

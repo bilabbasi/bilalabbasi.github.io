@@ -113,9 +113,9 @@
             if (recipe.ingredients && recipe.ingredients.length > 0) {
                 ingredientsContainer.innerHTML = recipe.ingredients.map(sec => `
                     <div class="recipe-section">
-                        <h4 class="recipe-section-title">
+                        <h4 class="recipe-section-title" role="button" tabindex="0" aria-expanded="true">
                             <span>${sec.section}</span>
-                            <svg class="collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg class="collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
                         </h4>
@@ -172,9 +172,9 @@
                     if (sectionTitle) {
                         stepsSideBySideHtml += `
                             <div class="recipe-section">
-                                <h4 class="recipe-section-title">
+                                <h4 class="recipe-section-title" role="button" tabindex="0" aria-expanded="true">
                                     <span>${sectionTitle}</span>
-                                    <svg class="collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <svg class="collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         <polyline points="6 9 12 15 18 9"></polyline>
                                     </svg>
                                 </h4>
@@ -479,11 +479,20 @@
                 if (title.dataset.listenerAdded) return;
                 title.dataset.listenerAdded = "true";
 
-                title.addEventListener('click', () => {
+                const toggleSection = () => {
                     const section = title.closest('.recipe-section');
                     if (section) {
-                        section.classList.toggle('collapsed');
+                        const isCollapsed = section.classList.toggle('collapsed');
+                        title.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
                         updateScrollButtonVisibility();
+                    }
+                };
+
+                title.addEventListener('click', toggleSection);
+                title.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleSection();
                     }
                 });
             });

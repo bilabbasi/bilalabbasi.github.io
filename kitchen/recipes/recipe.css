@@ -9,7 +9,7 @@
 /* Accent Pop Badge */
 .pop-tag, .badge-pop {
     background-color: var(--color-pop);
-    color: #18181b;
+    color: #ffffff;
     font-size: 0.7rem;
     font-weight: 700;
     padding: 2px 8px;
@@ -200,7 +200,10 @@ body {
 }
 
 .urdu-title {
+    font-family: 'Noto Nastaliq Urdu', 'Urdu Typesetting', 'Jameel Noori Nastaleeq', 'Geeza Pro', Tahoma, sans-serif;
     font-size: 1.6rem;
+    font-weight: 400;
+    line-height: 1.3;
 }
 
 /* -------------------------------------------------------------------------
@@ -894,6 +897,12 @@ body {
     align-items: center;
     user-select: none;
     transition: color var(--transition-smooth);
+}
+
+#menu .recipe-section-title:focus-visible {
+    outline: 2px solid var(--link-hover);
+    outline-offset: 4px;
+    border-radius: 4px;
 }
 
 #menu .recipe-section-title:hover {
