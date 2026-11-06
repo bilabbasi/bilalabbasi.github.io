@@ -94,21 +94,17 @@ body {
     height: 60px;
     flex-shrink: 0;
     /* Prevent compressing the header height */
+    view-transition-name: main-navbar;
 }
 
-/* Logo styling */
-.logo {
-    font-family: var(--font-sans);
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: var(--text-title);
-    letter-spacing: -0.5px;
-    text-transform: lowercase;
-    /* Renders the name in modern lowercase style */
+/* Enable Cross-Document View Transitions */
+@view-transition {
+    navigation: auto;
 }
 
 /* List holding navigation links */
 .nav-links {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 32px;
@@ -118,6 +114,7 @@ body {
 
 /* Navigation items link text */
 .nav-item a {
+    position: relative;
     text-decoration: none;
     font-size: 0.9rem;
     color: var(--text-body);
@@ -147,6 +144,59 @@ body {
 .nav-item a.nav-home:hover {
     color: var(--link-hover);
     border-bottom-color: var(--link-hover);
+}
+
+/* Continuous Active Navigation Indicator */
+.nav-indicator {
+    position: absolute;
+    bottom: -1.5px;
+    left: 0;
+    height: 1.5px;
+    background-color: var(--link-hover);
+    pointer-events: none;
+    border-radius: 1px;
+    opacity: 0;
+    transform-origin: left center;
+    transition: transform 0.28s cubic-bezier(0.25, 0.8, 0.25, 1),
+                width 0.28s cubic-bezier(0.25, 0.8, 0.25, 1),
+                opacity 0.2s ease;
+    will-change: transform, width;
+    view-transition-name: active-nav-underline;
+}
+
+/* When the continuous indicator is active, hide the static border */
+.nav-links.has-indicator .nav-indicator {
+    opacity: 1;
+}
+
+.nav-links.has-indicator .nav-item a {
+    border-bottom-color: transparent !important;
+}
+
+/* Fallback underline element */
+.nav-underline {
+    position: absolute;
+    bottom: -1.5px;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    background-color: var(--link-hover);
+    view-transition-name: active-nav-underline;
+    pointer-events: none;
+    border-radius: 1px;
+}
+
+/* View Transition animation for the sliding underline */
+::view-transition-group(active-nav-underline) {
+    animation-duration: 0.32s;
+    animation-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+::view-transition-old(active-nav-underline),
+::view-transition-new(active-nav-underline) {
+    animation: none;
+    mix-blend-mode: normal;
+    height: 100%;
 }
 
 /* Prominent emphasis for focal point section */

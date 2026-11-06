@@ -27,7 +27,7 @@
 
     <!-- Loader Script: Automatically inserts the KITCHEN_CONFIG details when loaded -->
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
+        window.initMePage = function () {
             // Update browser tab title
             if (typeof KITCHEN_CONFIG !== 'undefined') {
                 document.title = (KITCHEN_CONFIG.name || "the kitchen") + " — ammi";
@@ -36,7 +36,11 @@
             // Load "us" content dynamically from us.md
             const usSpaceEl = document.getElementById("us-content");
             if (usSpaceEl) {
-                fetch("us.md")
+                // If already populated, skip refetch
+                if (usSpaceEl.children.length > 0) return;
+
+                const mdUrl = new URL("us.md", window.location.href).href;
+                fetch(mdUrl)
                     .then(res => {
                         if (!res.ok) throw new Error("Could not fetch us.md");
                         return res.text();
@@ -56,7 +60,9 @@
                         console.warn("Using inline fallback content for this space:", err);
                     });
             }
-        });
+        };
+
+        document.addEventListener("DOMContentLoaded", window.initMePage);
     </script>
 </head>
 

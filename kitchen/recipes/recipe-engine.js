@@ -15,7 +15,7 @@
         <div class="app-wrapper">
             <header class="navbar">
                 <ul class="nav-links">
-                    <li class="nav-item"><a href="../../" class="active" id="kitchen-tab">← the kitchen</a></li>
+                    <li class="nav-item"><a href="../../" class="active" id="kitchen-tab">← the kitchen<span class="nav-underline" aria-hidden="true"></span></a></li>
                 </ul>
             </header>
 
