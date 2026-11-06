@@ -336,6 +336,76 @@ body {
 /* 2-column responsive grid layout */
 
 
+/* Split Title Header (Option 2: Semantic Pairing) */
+.split-title-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 18px;
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--border-color, #e7e5e4);
+}
+
+.split-title-header .about-title {
+    font-family: var(--font-serif);
+    font-size: 4rem;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--text-title);
+    letter-spacing: -1.5px;
+    text-transform: lowercase;
+    margin: 0;
+}
+
+.split-title-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.split-title-urdu {
+    font-family: 'Noto Nastaliq Urdu', 'Urdu Typesetting', 'Jameel Noori Nastaleeq', 'Geeza Pro', Tahoma, sans-serif;
+    font-size: 2.2rem;
+    font-weight: 400;
+    line-height: 1.35;
+    color: var(--text-subtitle);
+    margin-bottom: 8px;
+}
+
+.split-title-roman {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.05rem;
+    font-weight: 400;
+    color: var(--text-muted, #78716c);
+    letter-spacing: 0.02em;
+}
+
+/* Constrain customs page header and essay reading measure, ensuring single-screen fit */
+.about-section#about {
+    min-height: calc(100vh - 110px);
+    padding-top: 10px;
+    padding-bottom: 20px;
+    justify-content: flex-start;
+}
+
+.about-section#about .split-title-header {
+    max-width: 780px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+}
+
+.about-section#about .about-text {
+    max-width: 780px;
+    font-size: 1.05rem;
+    line-height: 1.4;
+}
+
+.about-section#about .about-text p {
+    margin: 0 0 0.45em 0;
+}
+
 .about-title {
     font-family: var(--font-serif);
     font-size: 3rem;
@@ -361,8 +431,8 @@ body {
 
 .about-text {
     font-family: var(--font-sans);
-    font-size: 1rem;
-    line-height: 1.4;
+    font-size: 1.05rem;
+    line-height: 1.55;
     color: var(--text-body);
 }
 
@@ -413,6 +483,48 @@ body {
     /* Removes any default inline margins or white space beneath the image */
     border-radius: 8px;
     /* Optional: adds nice rounded corners if you want it to look premium */
+}
+
+@media (max-width: 768px) {
+    .about-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+
+    .about-img {
+        width: 100%;
+        max-width: 440px;
+    }
+}
+
+@media (max-width: 600px) {
+    .split-title-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+        padding-bottom: 20px;
+        margin-bottom: 24px;
+    }
+
+    .split-title-header .about-title {
+        font-size: 2.6rem;
+    }
+
+    .split-title-right {
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .split-title-urdu {
+        font-size: 1.8rem;
+        line-height: 1.35;
+        margin-bottom: 8px;
+        align-self: flex-start;
+    }
+
+    .split-title-roman {
+        font-size: 0.95rem;
+    }
 }
 
 /* -------------------------------------------------------------------------
