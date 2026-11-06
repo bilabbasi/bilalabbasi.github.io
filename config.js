@@ -84,6 +84,24 @@ const KITCHEN_CONFIG = {
     ],
 
     // -------------------------------------------------------------------------
+    // Spaces Configuration (customs, ammi, etc.)
+    // -------------------------------------------------------------------------
+    // Defines metadata for sub-pages so their English, Urdu, and Roman transliterations
+    // are automatically inserted into <header class="split-title-header"> without copy-pasting.
+    spaces: {
+        culture: {
+            title: "customs",
+            urdu: "رسم و رواج",
+            roman: "rasm-o-riwāj"
+        },
+        ammi: {
+            title: "mom",
+            urdu: "امی",
+            roman: "ammi"
+        }
+    },
+
+    // -------------------------------------------------------------------------
     // Theme Colors for Kitchen & Recipes
     // -------------------------------------------------------------------------
     // Changing these colors will automatically propagate across all kitchen

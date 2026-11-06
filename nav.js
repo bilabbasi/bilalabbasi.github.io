@@ -407,9 +407,44 @@
     }
 
     /**
+     * Renders bipartite/tripartite space headers (<header class="split-title-header">)
+     * using metadata defined in KITCHEN_CONFIG.spaces.
+     * Prevents having to manually copy-paste Urdu, roman transliteration, and English title markup.
+     */
+    function renderSplitHeaders() {
+        if (typeof document === "undefined") return;
+        const splitHeaders = document.querySelectorAll("header.split-title-header");
+        splitHeaders.forEach(header => {
+            let spaceId = header.getAttribute("data-space");
+            if (!spaceId) {
+                const navbar = document.querySelector("header.navbar");
+                if (navbar) {
+                    spaceId = navbar.getAttribute("data-current");
+                }
+            }
+            if (!spaceId) return;
+
+            const spacesConfig = (typeof KITCHEN_CONFIG !== "undefined" && KITCHEN_CONFIG.spaces)
+                ? KITCHEN_CONFIG.spaces
+                : null;
+            const space = spacesConfig ? spacesConfig[spaceId] : null;
+            if (!space) return;
+
+            header.innerHTML = `
+                <h2 class="about-title">${space.title}</h2>
+                <div class="split-title-right">
+                    <div class="split-title-urdu" dir="rtl" lang="ur">${space.urdu}</div>
+                    <span class="split-title-roman">${space.roman}</span>
+                </div>
+            `.trim();
+        });
+    }
+
+    /**
      * Executes initializers for page-specific dynamic content.
      */
     function initActivePageContent() {
+        renderSplitHeaders();
         if (document.getElementById("recipes-menu-grid") || document.getElementById("main-title")) {
             if (typeof window.initKitchenDashboard === "function") {
                 window.initKitchenDashboard();
@@ -432,6 +467,7 @@
      */
     function initNavbars() {
         if (typeof document === "undefined") return;
+        renderSplitHeaders();
         const headers = document.querySelectorAll("header.navbar");
         headers.forEach(header => {
             const hasExplicitAttr = header.hasAttribute("data-current") ||
@@ -625,5 +661,6 @@
         window.renderSiteNavbar = renderNavbar;
         window.initSiteNavbars = initNavbars;
         window.updateNavIndicator = updateIndicator;
+        window.renderSplitHeaders = renderSplitHeaders;
     }
 })();

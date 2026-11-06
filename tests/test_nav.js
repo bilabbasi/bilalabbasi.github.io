@@ -82,6 +82,8 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
         }
     }
 
+    const splitHeader = new MockElement('header', '', 'split-title-header');
+
     const doc = {
         title: 'Initial Title',
         readyState: 'complete',
@@ -89,11 +91,13 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
         createElement: (tag) => new MockElement(tag),
         querySelectorAll: (sel) => {
             if (sel === 'header.navbar') return [header];
+            if (sel === 'header.split-title-header') return [splitHeader];
             return [];
         },
         querySelector: (sel) => {
             if (sel === 'header.navbar') return header;
             if (sel === '.app-wrapper') return appWrapper;
+            if (sel === 'header.split-title-header') return splitHeader;
             return null;
         },
         getElementById: (id) => {
@@ -155,7 +159,7 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
     };
 
     vm.createContext(context);
-    return { context, header, headerListeners, listeners, win, doc, appWrapper };
+    return { context, header, splitHeader, headerListeners, listeners, win, doc, appWrapper };
 }
 
 // 1. Test globals export
@@ -166,6 +170,7 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
     assert.strictEqual(typeof context.window.renderSiteNavbar, 'function', 'renderSiteNavbar should be exported');
     assert.strictEqual(typeof context.window.initSiteNavbars, 'function', 'initSiteNavbars should be exported');
     assert.strictEqual(typeof context.window.updateNavIndicator, 'function', 'updateNavIndicator should be exported');
+    assert.strictEqual(typeof context.window.renderSplitHeaders, 'function', 'renderSplitHeaders should be exported');
     console.log('PASS: nav.js loaded and exported globals successfully.');
 }
 
@@ -244,6 +249,29 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
     assert.strictEqual(mockIndicator.style.width, '85px', 'Indicator width should match target width 85px');
     assert.ok(mockNavLinks.className.includes('has-indicator'), 'nav-links container should receive has-indicator class');
     console.log('PASS: updateIndicator calculates geometry correctly.');
+}
+
+// 6. Test renderSplitHeaders with KITCHEN_CONFIG.spaces
+{
+    const { context, splitHeader } = createNavTestEnv('/kitchen/culture/index.html');
+    vm.runInContext(configCode + '\n' + navCode, context);
+
+    // Test with data-space="culture"
+    splitHeader.setAttribute('data-space', 'culture');
+    context.window.renderSplitHeaders();
+
+    assert.ok(splitHeader.innerHTML.includes('<h2 class="about-title">customs</h2>'), 'Should contain title customs');
+    assert.ok(splitHeader.innerHTML.includes('dir="rtl" lang="ur">رسم و رواج</div>'), 'Should contain Urdu script with dir=rtl');
+    assert.ok(splitHeader.innerHTML.includes('<span class="split-title-roman">rasm-o-riwāj</span>'), 'Should contain roman transliteration');
+
+    // Test with data-space="ammi"
+    splitHeader.setAttribute('data-space', 'ammi');
+    context.window.renderSplitHeaders();
+
+    assert.ok(splitHeader.innerHTML.includes('<h2 class="about-title">mom</h2>'), 'Should contain title mom');
+    assert.ok(splitHeader.innerHTML.includes('dir="rtl" lang="ur">امی</div>'), 'Should contain Urdu script for ammi');
+    assert.ok(splitHeader.innerHTML.includes('<span class="split-title-roman">ammi</span>'), 'Should contain roman transliteration ammi');
+    console.log('PASS: renderSplitHeaders stamps correct title, Urdu, and Roman transliteration from config.js.');
 }
 
 console.log('ALL NAV TESTS PASSED!');
