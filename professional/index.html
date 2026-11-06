@@ -25,7 +25,7 @@
             document.title = PROFESSIONAL_CONFIG.name;
 
             // 2. Set bio text
-            document.getElementById("bio-text").textContent = PROFESSIONAL_CONFIG.bio;
+            document.getElementById("bio-text").innerHTML = PROFESSIONAL_CONFIG.bio;
 
             // 3. Generate the social/profile links dynamically
             const linksList = document.getElementById("links-list");
@@ -97,7 +97,7 @@
         <header class="navbar profile-fade"></header>
 
         <!-- Main Content Area: Split into two columns -->
-        <main class="main-content" id="me">
+        <main class="main-content professional-content" id="me">
 
             <!-- Left Column: Biography headings and list of links -->
             <div class="info-column">
