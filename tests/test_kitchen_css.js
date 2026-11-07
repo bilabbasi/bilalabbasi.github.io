@@ -17,4 +17,9 @@ assert.match(css, /var\(--color-pop/, 'Pop badge should use var(--color-pop)');
 assert.match(css, /\.nav-item a:hover/, 'All nav links should have hover rule');
 assert.match(css, /\.nav-item a\.nav-focal\.nav-home\s*\{[^}]*border-bottom:\s*1\.5px solid var\(--link-hover\);/, 'The kitchen tab underline should use var(--link-hover)');
 
+// Check qalam brush stroke underline on recipe links and culture links
+assert.match(css, /\.recipe-link::after\s*\{[^}]*mask-image:\s*var\(--ink-brush-mask\)/, 'Recipe links should use --ink-brush-mask');
+assert.match(css, /\.recipe-link:hover::after[^{]*\{[^}]*animation:\s*qalam-stroke-draw/, 'Recipe links should animate qalam-stroke-draw on hover');
+assert.match(css, /\.culture-link::after\s*\{[^}]*mask-image:\s*var\(--ink-brush-mask\)/, 'Culture links should use --ink-brush-mask');
+
 console.log('PASS: test_kitchen_css.js passed all checks.');
