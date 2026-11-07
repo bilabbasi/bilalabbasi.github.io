@@ -58,6 +58,16 @@
     border-bottom-color: var(--link-hover);
 }
 
+/* Kitchen Nastaliq / Madder Ink Palette for the Brush Stroke Indicator */
+.navbar {
+    --ink-color: var(--link-color);
+    --ink-bleed-color: var(--link-hover);
+}
+
+.nav-indicator-ghost .nav-ink-core-path {
+    fill: var(--link-hover);
+}
+
 /* -------------------------------------------------------------------------
    1. LAYOUT & SMOOTH SCROLLING OVERRIDES
    ------------------------------------------------------------------------- */

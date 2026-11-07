@@ -274,4 +274,163 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
     console.log('PASS: renderSplitHeaders stamps correct title, Urdu, and Roman transliteration from config.js.');
 }
 
+// 7. Test accessible tablist semantics & procedural SVG brush stroke path morph compatibility
+{
+    const { context, header } = createNavTestEnv('/kitchen/index.html');
+    vm.runInContext(configCode + '\n' + navCode, context);
+
+    header.setAttribute('data-nav', 'kitchen');
+    header.setAttribute('data-current', 'kitchen');
+    context.window.renderSiteNavbar(header);
+
+    assert.ok(header.innerHTML.includes('<nav class="nav-container"'), 'Should wrap nav links in semantic <nav>');
+    assert.ok(header.innerHTML.includes('role="tablist"'), 'Should mark ul.nav-links with role="tablist"');
+    assert.ok(header.innerHTML.includes('role="tab" aria-selected="true" aria-current="page"'), 'Active tab should have aria-selected="true" and aria-current="page"');
+    assert.ok(header.innerHTML.includes('role="tab" aria-selected="false"'), 'Inactive tabs should have aria-selected="false"');
+
+    const paths = context.window.INK_BRUSH_PATHS;
+    assert.ok(paths && paths.CORE_REST && paths.CORE_STRETCH && paths.CORE_SETTLE, 'INK_BRUSH_PATHS should expose rest, stretch, and settle vector paths');
+    const countSegments = (d) => (d.match(/[MCZ]/g) || []).join('');
+    assert.strictEqual(countSegments(paths.CORE_REST), countSegments(paths.CORE_STRETCH), 'CORE_REST and CORE_STRETCH must share identical SVG path command topology for morphing');
+    assert.strictEqual(countSegments(paths.CORE_REST), countSegments(paths.CORE_SETTLE), 'CORE_REST and CORE_SETTLE must share identical SVG path command topology for morphing');
+    console.log('PASS: Accessible ARIA semantics and morph-compatible procedural brush paths verified.');
+}
+
+// 8. Test Kinetic Layout Engine (anisotropic qalam stretch, contraction, and 150ms bloom)
+{
+    const { context } = createNavTestEnv('/kitchen/index.html');
+    vm.runInContext(configCode + '\n' + navCode, context);
+
+    let stageKeyframes = null;
+    let stageOptions = null;
+    let bleedKeyframes = null;
+    let coreKeyframes = null;
+
+    const mockCorePath = {
+        animate: (kf) => { coreKeyframes = kf; return { cancel: () => {} }; }
+    };
+    const mockBleedPath = {
+        animate: (kf) => { bleedKeyframes = kf; return { cancel: () => {} }; }
+    };
+    const mockSvg = {
+        animate: () => ({ cancel: () => {} })
+    };
+    const mockStage = {
+        animate: (kf, opts) => {
+            stageKeyframes = kf;
+            stageOptions = opts;
+            return { cancel: () => {} };
+        },
+        querySelector: (sel) => {
+            if (sel === '.nav-ink-core-path') return mockCorePath;
+            if (sel === '.nav-ink-bleed-path') return mockBleedPath;
+            if (sel === '.nav-brush-svg') return mockSvg;
+            return null;
+        }
+    };
+
+    const mockIndicator = {
+        style: {},
+        classList: { add: () => {}, remove: () => {} },
+        querySelector: (sel) => (sel === '.nav-ink-stage' ? mockStage : null)
+    };
+
+    const mockNavLinks = {
+        dataset: {},
+        classList: { add: () => {} },
+        getBoundingClientRect: () => ({ left: 100, top: 40, width: 400, height: 30 }),
+        querySelector: (sel) => (sel === '.nav-indicator' ? mockIndicator : null)
+    };
+
+    const tab1 = { getBoundingClientRect: () => ({ left: 100, top: 40, width: 90, height: 20 }) };
+    const tab2 = { getBoundingClientRect: () => ({ left: 240, top: 40, width: 65, height: 20 }) };
+
+    // Initial placement (no travel animation)
+    context.window.updateNavIndicator(mockNavLinks, tab1, false);
+    assert.strictEqual(mockIndicator._inkState.left, 0);
+    assert.strictEqual(mockIndicator._inkState.width, 90);
+
+    // Animated transition to tab2 (moving right)
+    context.window.updateNavIndicator(mockNavLinks, tab2, true);
+    assert.strictEqual(mockIndicator._inkState.left, 140);
+    assert.strictEqual(mockIndicator._inkState.width, 65);
+    assert.strictEqual(mockIndicator._inkState.direction, 1);
+    assert.strictEqual(mockNavLinks.dataset.inkDirection, 'right');
+
+    assert.ok(Array.isArray(stageKeyframes) && stageKeyframes.length === 4, 'Stage WAAPI animation should have 4 keyframes (start, anisotropic stretch, landing contraction, settle)');
+    assert.ok(stageKeyframes[1].transform.includes('scaleY(0.84)'), 'Mid-flight keyframe should thin vertically under anisotropic tension');
+    assert.ok(stageKeyframes[2].transform.includes('scaleX(0.972) scaleY(1.06)'), 'Landing keyframe should contract gently');
+    assert.strictEqual(stageOptions.easing, 'cubic-bezier(0.22, 1, 0.36, 1)', 'Should use custom human motor deceleration curve');
+    assert.ok(Array.isArray(bleedKeyframes) && bleedKeyframes.length === 4, 'Wet ink bleed path should animate 150ms pigment bloom on landing');
+    assert.ok(Array.isArray(coreKeyframes) && coreKeyframes.length === 4, 'Core ink path should morph vector path d during travel and settle');
+    console.log('PASS: Kinetic layout engine animates anisotropic qalam stretch, contraction, and pigment bloom.');
+}
+
+// 9. Test Hover Ghost Trail, Press State (scaleY: 0.85), and Runtime Configurator
+{
+    const { context, doc } = createNavTestEnv('/kitchen/index.html');
+    const rootProps = {};
+    doc.documentElement = {
+        style: {
+            setProperty: (k, v) => { rootProps[k] = v; }
+        }
+    };
+    vm.runInContext(configCode + '\n' + navCode, context);
+
+    const classes = new Set();
+    const mockGhost = {
+        style: {},
+        classList: {
+            add: (c) => classes.add(c),
+            remove: (...cs) => cs.forEach(c => classes.delete(c)),
+            contains: (c) => classes.has(c)
+        },
+        querySelector: () => null
+    };
+    const indClasses = new Set();
+    const mockIndicator = {
+        style: {},
+        classList: {
+            add: (c) => indClasses.add(c),
+            remove: (c) => indClasses.delete(c),
+            contains: (c) => indClasses.has(c)
+        },
+        querySelector: () => ({})
+    };
+    const activeTab = { getBoundingClientRect: () => ({ left: 100, top: 40, width: 80, height: 20 }) };
+    const hoveredTab = { getBoundingClientRect: () => ({ left: 210, top: 40, width: 60, height: 20 }) };
+
+    const mockNavLinks = {
+        getBoundingClientRect: () => ({ left: 100, top: 40, width: 400, height: 30 }),
+        querySelector: (sel) => {
+            if (sel === '.nav-indicator') return mockIndicator;
+            if (sel === '.nav-indicator-ghost') return mockGhost;
+            if (sel === '.nav-home') return activeTab;
+            return null;
+        }
+    };
+
+    context.window.updateNavGhostIndicator(mockNavLinks, hoveredTab);
+    assert.strictEqual(mockGhost.style.transform, 'translateX(110px)');
+    assert.strictEqual(mockGhost.style.width, '60px');
+    assert.ok(mockGhost.classList.contains('is-visible'), 'Hovering non-active tab reveals faint brush ghost');
+
+    context.window.setNavPressedState(mockNavLinks, true);
+    assert.ok(mockIndicator.classList.contains('is-pressed'), 'Pressing tab adds is-pressed class for scaleY(0.85) ink compression');
+    context.window.setNavPressedState(mockNavLinks, false);
+    assert.ok(!mockIndicator.classList.contains('is-pressed'), 'Releasing tab removes is-pressed class');
+
+    context.window.configureInkNavbar({
+        strokeColor: '#2b1810',
+        transitionDuration: 480,
+        inkBleedIntensity: 3.1,
+        paperTextureOpacity: 0.28
+    });
+    assert.strictEqual(rootProps['--ink-color'], '#2b1810');
+    assert.strictEqual(rootProps['--ink-duration'], '480ms');
+    assert.strictEqual(rootProps['--ink-bleed-intensity'], '3.1');
+    assert.strictEqual(rootProps['--ink-paper-tooth'], '0.28');
+    console.log('PASS: Hover ghost trail, press state compression, and runtime configurator verified.');
+}
+
 console.log('ALL NAV TESTS PASSED!');

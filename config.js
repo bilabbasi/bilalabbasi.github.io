@@ -112,6 +112,24 @@ const KITCHEN_CONFIG = {
         pop: "#2b4162"        // New Yellow Punk for badges, tags, and focal highlights
     },
 
+    // -------------------------------------------------------------------------
+    // Tactile Ink Brush Indicator Parameters (Sumi-e / Nastaliq Qalam Dynamics)
+    // -------------------------------------------------------------------------
+    inkNav: {
+        strokeColor: "#721817",       // Primary qalam pigment (matches theme.anchor)
+        bleedColor: "#fa9f42",        // Capillary edge bleed wash (matches theme.distinct)
+        strokeOpacity: 0.92,          // Resting ink pigment translucency (0.0 - 1.0)
+        bleedOpacity: 0.38,           // Edge bleed halo translucency (0.0 - 1.0)
+        ghostOpacity: 0.24,           // Hover trail brush ghost translucency (0.0 - 1.0)
+        transitionDuration: 420,      // Reed pen travel duration in ms
+        bloomDuration: 150,           // Wet pigment absorption bloom on landing in ms
+        easing: "cubic-bezier(0.22, 1, 0.36, 1)", // Human motor deceleration curve
+        inkBleedIntensity: 2.4,       // SVG feDisplacementMap capillary scale
+        paperTextureOpacity: 0.22,    // Microscopic paper-fiber tooth intensity
+        anisotropicStretch: 1.0,      // Horizontal tension stretch factor during travel
+        pressScaleY: 0.85             // Vertical nib compression on press/click
+    },
+
     // Recipes metadata list for dynamic menu generation
     recipes: [
         {
