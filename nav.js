@@ -862,9 +862,170 @@
     }
 
     /**
+     * Resolves a root-relative asset path (e.g. "gifs/customs.gif") relative to a space's directory.
+     */
+    function resolveSpaceAssetPath(assetPath, spaceId) {
+        if (!assetPath) return "";
+        if (/^(https?:|data:|blob:|\/|\.\.?\/)/.test(assetPath)) {
+            return assetPath;
+        }
+        const navConfig = (typeof KITCHEN_CONFIG !== "undefined" && Array.isArray(KITCHEN_CONFIG.nav))
+            ? KITCHEN_CONFIG.nav
+            : [];
+        const matchedItem = navConfig.find(item => item.id === spaceId);
+        if (matchedItem && matchedItem.path) {
+            const depth = matchedItem.path.replace(/^\/|\/$/g, "").split("/").filter(Boolean).length;
+            return "../".repeat(depth) + assetPath.replace(/^\/+/, "");
+        }
+        if (typeof window !== "undefined" && window.location && window.location.pathname) {
+            const parts = window.location.pathname.replace(/\/[^/]*\.[a-zA-Z0-9]+$/, "").replace(/^\/|\/$/g, "").split("/").filter(Boolean);
+            const kitchenIdx = parts.indexOf("kitchen");
+            if (kitchenIdx !== -1) {
+                const depth = parts.length - kitchenIdx;
+                return "../".repeat(depth) + assetPath.replace(/^\/+/, "");
+            }
+        }
+        return "../../" + assetPath.replace(/^\/+/, "");
+    }
+
+    /**
+     * Checks whether a string looks like a media file path (.gif, .pdf, .png, .webp, .jpg, .jpeg, .svg).
+     */
+    function isUrduMediaPath(val) {
+        if (!val || typeof val !== "string") return false;
+        const clean = val.split(/[?#]/)[0].trim().toLowerCase();
+        return /\.(gif|pdf|png|webp|jpe?g|svg)$/.test(clean);
+    }
+
+    /**
+     * Strips the 19-byte GIF89a NETSCAPE2.0 infinite-loop application extension from a Uint8Array
+     * so any GIF exported from urdu_app automatically plays once and rests on its final frame.
+     */
+    function stripGifInfiniteLoop(bytes) {
+        if (!bytes || bytes.length < 32) return bytes;
+        // Signature: 0x21 0xFF 0x0B "NETSCAPE2.0" 0x03 0x01 <lo> <hi> 0x00
+        const sig = [0x21, 0xFF, 0x0B, 0x4E, 0x45, 0x54, 0x53, 0x43, 0x41, 0x50, 0x45, 0x32, 0x2E, 0x30, 0x03, 0x01];
+        const limit = Math.min(bytes.length - 19, 8192);
+        for (let i = 0; i <= limit; i++) {
+            let match = true;
+            for (let j = 0; j < sig.length; j++) {
+                if (bytes[i + j] !== sig[j]) {
+                    match = false;
+                    break;
+                }
+            }
+            if (match && bytes[i + 18] === 0x00) {
+                const out = new Uint8Array(bytes.length - 19);
+                out.set(bytes.subarray(0, i), 0);
+                out.set(bytes.subarray(i + 19), i);
+                return out;
+            }
+        }
+        return bytes;
+    }
+
+    /**
+     * Ensures a GIF <img> element plays from frame 0 on every page load/navigation,
+     * and enforces single-play unless shouldLoop is true.
+     */
+    function replayGifOnLoad(imgEl, gifSrc, shouldLoop) {
+        if (!imgEl || !gifSrc || typeof window === "undefined") return;
+        const isHttp = window.location && /^https?:$/.test(window.location.protocol);
+        if (!isHttp) return;
+
+        if (typeof window.fetch === "function" && typeof window.URL !== "undefined" && typeof window.URL.createObjectURL === "function" && typeof Blob !== "undefined") {
+            window.fetch(gifSrc, { cache: "no-cache" })
+                .then(res => res.ok ? res.arrayBuffer() : Promise.reject(new Error("fetch failed")))
+                .then(buf => {
+                    const rawBytes = new Uint8Array(buf);
+                    const finalBytes = shouldLoop ? rawBytes : stripGifInfiniteLoop(rawBytes);
+                    const blob = new Blob([finalBytes], { type: "image/gif" });
+                    const objUrl = window.URL.createObjectURL(blob);
+                    if (imgEl._urduBlobUrl) {
+                        window.URL.revokeObjectURL(imgEl._urduBlobUrl);
+                    }
+                    imgEl._urduBlobUrl = objUrl;
+                    imgEl.src = objUrl;
+                })
+                .catch(() => {
+                    imgEl.src = `${gifSrc}${gifSrc.includes("?") ? "&" : "?"}t=${Date.now()}`;
+                });
+        } else {
+            imgEl.src = `${gifSrc}${gifSrc.includes("?") ? "&" : "?"}t=${Date.now()}`;
+        }
+    }
+
+    /**
+     * Estimates the horizontal-to-vertical aspect ratio (1.0 for compact single words like "امی",
+     * up to ~2.47 for multi-word phrases like "رسم و رواج") so 512x512 exports from urdu_app
+     * automatically match the visual height of the English title without manual CSS tuning.
+     */
+    function estimateUrduAspect(urduText, explicitAspect) {
+        if (explicitAspect !== undefined && explicitAspect !== null && explicitAspect !== "") {
+            const parsed = parseFloat(explicitAspect);
+            if (!isNaN(parsed) && parsed > 0) return parsed;
+        }
+        if (!urduText || typeof urduText !== "string" || isUrduMediaPath(urduText)) {
+            return 2.47;
+        }
+        const nonSpaceLen = urduText.replace(/\s+/g, "").length;
+        const wordCount = urduText.trim().split(/\s+/).filter(Boolean).length;
+        if (wordCount <= 1 && nonSpaceLen <= 4) {
+            return 1.0;
+        }
+        return Math.max(1.0, Math.min(2.47, (nonSpaceLen + (wordCount - 1) * 0.6) / 3.7));
+    }
+
+    /**
+     * Builds the HTML markup for an Urdu calligraphy media asset (.gif, .pdf, .png, .webp, .svg)
+     * inside a split-title header or subtitle.
+     */
+    function buildUrduMediaMarkup(mediaSrc, altText, options = {}) {
+        const cleanExt = mediaSrc.split(/[?#]/)[0].trim().toLowerCase();
+        const isPdf = cleanExt.endsWith(".pdf");
+        const aspect = estimateUrduAspect(options.urduText, options.aspect);
+        const isCompact = aspect <= 1.25;
+        const styleVars = [`--urdu-media-aspect: ${aspect.toFixed(3)}`];
+        if (options.scale !== undefined && options.scale !== null && options.scale !== "") {
+            styleVars.push(`--urdu-media-scale: ${options.scale}`);
+        }
+        if (options.offsetX) {
+            styleVars.push(`--urdu-media-offset-x: ${options.offsetX}`);
+        }
+        if (options.offsetY) {
+            styleVars.push(`--urdu-media-offset-y: ${options.offsetY}`);
+        }
+        const styleAttr = styleVars.length ? ` style="${styleVars.join("; ")}"` : "";
+        const compactClass = isCompact ? " is-compact-urdu" : "";
+
+        if (isPdf) {
+            const pdfViewerSrc = mediaSrc.includes("#")
+                ? mediaSrc
+                : `${mediaSrc}#toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&view=Fit`;
+            return `
+                <div class="split-title-right split-title-right-gif split-title-right-pdf">
+                    <div class="split-title-gif-frame split-title-pdf-frame${compactClass}"${styleAttr}>
+                        <object class="split-title-gif split-title-pdf" data="${pdfViewerSrc}" type="application/pdf" aria-label="${altText}">
+                            <img class="split-title-gif" src="${mediaSrc}" alt="${altText}" decoding="async" />
+                        </object>
+                    </div>
+                </div>
+            `.trim();
+        }
+
+        return `
+            <div class="split-title-right split-title-right-gif">
+                <div class="split-title-gif-frame${compactClass}"${styleAttr}>
+                    <img class="split-title-gif" src="${mediaSrc}" alt="${altText}" decoding="async" />
+                </div>
+            </div>
+        `.trim();
+    }
+
+    /**
      * Renders bipartite/tripartite space headers (<header class="split-title-header">)
-     * using metadata defined in KITCHEN_CONFIG.spaces.
-     * Prevents having to manually copy-paste Urdu, roman transliteration, and English title markup.
+     * using metadata defined in KITCHEN_CONFIG.spaces or inline data-* HTML attributes.
+     * Supports Urdu text + Roman transliteration, single-play GIFs, PDFs, or images.
      */
     function renderSplitHeaders() {
         if (typeof document === "undefined") return;
@@ -877,21 +1038,93 @@
                     spaceId = navbar.getAttribute("data-current");
                 }
             }
-            if (!spaceId) return;
 
             const spacesConfig = (typeof KITCHEN_CONFIG !== "undefined" && KITCHEN_CONFIG.spaces)
                 ? KITCHEN_CONFIG.spaces
                 : null;
-            const space = spacesConfig ? spacesConfig[spaceId] : null;
-            if (!space) return;
+            const cfgSpace = (spacesConfig && spaceId) ? (spacesConfig[spaceId] || {}) : {};
+
+            // Allow inline data-* attributes on <header class="split-title-header"> to override or work standalone
+            const title = header.getAttribute("data-title") || cfgSpace.title;
+            if (!title) return;
+
+            const urdu = header.getAttribute("data-urdu") || cfgSpace.urdu || "";
+            const roman = header.getAttribute("data-roman") || cfgSpace.roman || "";
+            const explicitMedia = header.getAttribute("data-media") ||
+                header.getAttribute("data-gif") ||
+                header.getAttribute("data-pdf") ||
+                cfgSpace.media ||
+                cfgSpace.gif ||
+                cfgSpace.pdf ||
+                (isUrduMediaPath(urdu) ? urdu : null);
+
+            const scale = header.getAttribute("data-scale") || cfgSpace.scale;
+            const aspect = header.getAttribute("data-aspect") || cfgSpace.aspect;
+            const offsetX = header.getAttribute("data-offset-x") || cfgSpace.offsetX;
+            const offsetY = header.getAttribute("data-offset-y") || cfgSpace.offsetY;
+            const shouldLoop = header.getAttribute("data-loop") === "true" || cfgSpace.loop === true;
+
+            if (explicitMedia) {
+                const mediaSrc = resolveSpaceAssetPath(explicitMedia, spaceId);
+                const cleanUrduAlt = !isUrduMediaPath(urdu) && urdu ? urdu : "";
+                const altText = cleanUrduAlt
+                    ? `${cleanUrduAlt}${roman ? ` (${roman})` : ""}`
+                    : title;
+                const mediaHtml = buildUrduMediaMarkup(mediaSrc, altText, {
+                    scale,
+                    aspect,
+                    urduText: cleanUrduAlt,
+                    offsetX,
+                    offsetY
+                });
+                header.innerHTML = `
+                <h2 class="about-title">${title}</h2>
+                ${mediaHtml}
+                `.trim();
+
+                if (mediaSrc.split(/[?#]/)[0].toLowerCase().endsWith(".gif")) {
+                    const imgEl = header.querySelector && header.querySelector("img.split-title-gif");
+                    replayGifOnLoad(imgEl, mediaSrc, shouldLoop);
+                }
+                return;
+            }
 
             header.innerHTML = `
-                <h2 class="about-title">${space.title}</h2>
+                <h2 class="about-title">${title}</h2>
                 <div class="split-title-right">
-                    <div class="split-title-urdu" dir="rtl" lang="ur">${space.urdu}</div>
-                    <span class="split-title-roman">${space.roman}</span>
+                    <div class="split-title-urdu" dir="rtl" lang="ur">${urdu}</div>
+                    <span class="split-title-roman">${roman}</span>
                 </div>
             `.trim();
+        });
+    }
+
+    /**
+     * Automatically loads markdown into any element with a [data-markdown="file.md"] attribute
+     * so new sub-pages can be created without writing custom JavaScript loaders.
+     */
+    function renderMarkdownContainers() {
+        if (typeof document === "undefined" || typeof document.querySelectorAll !== "function") return;
+        const containers = document.querySelectorAll("[data-markdown]");
+        if (!containers || !containers.forEach) return;
+        containers.forEach(el => {
+            if (el.children && el.children.length > 0) return;
+            const mdFile = el.getAttribute("data-markdown");
+            if (!mdFile || typeof fetch !== "function" || typeof window === "undefined" || !window.location) return;
+            const mdUrl = new URL(mdFile, window.location.href).href;
+            fetch(mdUrl)
+                .then(res => {
+                    if (!res.ok) throw new Error(`Could not fetch ${mdFile}`);
+                    return res.text();
+                })
+                .then(markdown => {
+                    el.innerHTML = (typeof marked !== "undefined" && marked.parse)
+                        ? marked.parse(markdown)
+                        : markdown.trim().split(/\n\s*\n/).map(p => `<p>${p.trim().replace(/\n/g, "<br>")}</p>`).join("");
+                })
+                .catch(err => {
+                    console.warn(`Could not load markdown from ${mdFile}:`, err);
+                });
         });
     }
 
@@ -900,6 +1133,7 @@
      */
     function initActivePageContent() {
         renderSplitHeaders();
+        renderMarkdownContainers();
         if (document.getElementById("recipes-menu-grid") || document.getElementById("main-title")) {
             if (typeof window.initKitchenDashboard === "function") {
                 window.initKitchenDashboard();
@@ -923,6 +1157,7 @@
     function initNavbars() {
         if (typeof document === "undefined") return;
         renderSplitHeaders();
+        renderMarkdownContainers();
         const headers = document.querySelectorAll("header.navbar");
         headers.forEach(header => {
             const hasExplicitAttr = header.hasAttribute("data-current") ||
@@ -1122,5 +1357,9 @@
         window.INK_NAV_DEFAULTS = INK_NAV_DEFAULTS;
         window.INK_BRUSH_PATHS = INK_BRUSH_PATHS;
         window.renderSplitHeaders = renderSplitHeaders;
+        window.buildUrduMediaMarkup = buildUrduMediaMarkup;
+        window.stripGifInfiniteLoop = stripGifInfiniteLoop;
+        window.isUrduMediaPath = isUrduMediaPath;
+        window.replayGifOnLoad = replayGifOnLoad;
     }
 })();

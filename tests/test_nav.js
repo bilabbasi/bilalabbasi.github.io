@@ -256,22 +256,58 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
     const { context, splitHeader } = createNavTestEnv('/kitchen/culture/index.html');
     vm.runInContext(configCode + '\n' + navCode, context);
 
+    const kc = vm.runInContext('KITCHEN_CONFIG', context);
+
     // Test with data-space="culture"
     splitHeader.setAttribute('data-space', 'culture');
     context.window.renderSplitHeaders();
 
     assert.ok(splitHeader.innerHTML.includes('<h2 class="about-title">customs</h2>'), 'Should contain title customs');
-    assert.ok(splitHeader.innerHTML.includes('dir="rtl" lang="ur">رسم و رواج</div>'), 'Should contain Urdu script with dir=rtl');
-    assert.ok(splitHeader.innerHTML.includes('<span class="split-title-roman">rasm-o-riwāj</span>'), 'Should contain roman transliteration');
+    if (kc && kc.spaces.culture.gif) {
+        assert.ok(splitHeader.innerHTML.includes('class="split-title-gif"'), 'Should render split-title-gif image for culture');
+        assert.ok(splitHeader.innerHTML.includes('src="../../gifs/customs.gif"'), 'Should resolve customs.gif relative path');
+    } else {
+        assert.ok(splitHeader.innerHTML.includes('dir="rtl" lang="ur">رسم و رواج</div>'), 'Should contain Urdu script for culture');
+    }
 
     // Test with data-space="ammi"
     splitHeader.setAttribute('data-space', 'ammi');
     context.window.renderSplitHeaders();
 
     assert.ok(splitHeader.innerHTML.includes('<h2 class="about-title">mom</h2>'), 'Should contain title mom');
-    assert.ok(splitHeader.innerHTML.includes('dir="rtl" lang="ur">امی</div>'), 'Should contain Urdu script for ammi');
-    assert.ok(splitHeader.innerHTML.includes('<span class="split-title-roman">ammi</span>'), 'Should contain roman transliteration ammi');
-    console.log('PASS: renderSplitHeaders stamps correct title, Urdu, and Roman transliteration from config.js.');
+    if (kc && kc.spaces.ammi.gif) {
+        assert.ok(splitHeader.innerHTML.includes('class="split-title-gif"'), 'Should render split-title-gif image for ammi');
+        assert.ok(splitHeader.innerHTML.includes('src="../../gifs/ammi.gif"'), 'Should resolve ammi.gif relative path');
+        assert.ok(splitHeader.innerHTML.includes('is-compact-urdu'), 'Single-word Urdu GIF should use compact square framing');
+    } else {
+        assert.ok(splitHeader.innerHTML.includes('dir="rtl" lang="ur">امی</div>'), 'Should contain Urdu script for ammi');
+    }
+
+    // Test PDF support via data-pdf or space.pdf and custom scale/offset
+    splitHeader.setAttribute('data-space', 'custom_page');
+    splitHeader.setAttribute('data-title', 'notes');
+    splitHeader.setAttribute('data-pdf', 'gifs/notes.pdf');
+    splitHeader.setAttribute('data-scale', '1.1');
+    context.window.renderSplitHeaders();
+
+    assert.ok(splitHeader.innerHTML.includes('<h2 class="about-title">notes</h2>'), 'Should render inline data-title for new pages');
+    assert.ok(splitHeader.innerHTML.includes('type="application/pdf"'), 'Should render <object type="application/pdf"> when PDF is provided');
+    assert.ok(splitHeader.innerHTML.includes('data="../../gifs/notes.pdf#toolbar=0'), 'Should resolve PDF path and hide viewer toolbar');
+    assert.ok(splitHeader.innerHTML.includes('--urdu-media-scale: 1.1'), 'Should apply custom scale variable');
+
+    // Test single-play GIF verification on disk and in-memory NETSCAPE2.0 stripper
+    const gifBytes = fs.readFileSync(__dirname + '/../gifs/customs.gif');
+    assert.strictEqual(gifBytes.includes(Buffer.from('NETSCAPE2.0')), false, 'gifs/customs.gif on disk must be single-play (no NETSCAPE2.0 loop block)');
+
+    const mockLoopingGif = new Uint8Array([
+        0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
+        0x21, 0xFF, 0x0B, 0x4E, 0x45, 0x54, 0x53, 0x43, 0x41, 0x50, 0x45, 0x32, 0x2E, 0x30, 0x03, 0x01, 0x00, 0x00, 0x00,
+        0x3B
+    ]);
+    const stripped = context.window.stripGifInfiniteLoop(mockLoopingGif);
+    assert.strictEqual(stripped.length, mockLoopingGif.length - 19, 'stripGifInfiniteLoop should strip 19-byte NETSCAPE2.0 loop block');
+
+    console.log('PASS: renderSplitHeaders stamps correct title, Urdu, Roman, GIF, and PDF media from config.js or data-* attributes.');
 }
 
 // 7. Test accessible tablist semantics & procedural SVG brush stroke path morph compatibility

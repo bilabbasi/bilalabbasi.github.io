@@ -157,7 +157,26 @@
         if (titleEl) titleEl.textContent = recipe.title || "Recipe Name";
 
         const subtitleEl = document.getElementById("main-subtitle");
-        if (subtitleEl) subtitleEl.textContent = recipe.subtitle || "";
+        if (subtitleEl) {
+            const rawSub = recipe.subtitle || "";
+            const explicitMedia = recipe.media || recipe.gif || recipe.pdf ||
+                (/\.(gif|pdf|png|webp|jpe?g|svg)$/i.test(rawSub.split(/[?#]/)[0].trim()) ? rawSub : null);
+            if (explicitMedia) {
+                const resolvedSubMedia = resolveImagePath(explicitMedia.startsWith("gifs/") ? "../../../" + explicitMedia : explicitMedia);
+                const isPdf = resolvedSubMedia.split(/[?#]/)[0].toLowerCase().endsWith(".pdf");
+                const altLabel = (!/\.(gif|pdf|png|webp|jpe?g|svg)$/i.test(rawSub) && rawSub) ? rawSub : (recipe.title || "Recipe");
+                if (isPdf) {
+                    const pdfSrc = resolvedSubMedia.includes("#")
+                        ? resolvedSubMedia
+                        : `${resolvedSubMedia}#toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&view=Fit`;
+                    subtitleEl.innerHTML = `<span class="split-title-gif-frame split-title-pdf-frame"><object class="split-title-gif split-title-pdf" data="${pdfSrc}" type="application/pdf" aria-label="${altLabel}"><img class="split-title-gif" src="${resolvedSubMedia}" alt="${altLabel}" decoding="async" /></object></span>`;
+                } else {
+                    subtitleEl.innerHTML = `<span class="split-title-gif-frame"><img class="split-title-gif" src="${resolvedSubMedia}" alt="${altLabel}" decoding="async" /></span>`;
+                }
+            } else {
+                subtitleEl.textContent = rawSub;
+            }
+        }
 
         const bioEl = document.getElementById("bio-text");
         if (bioEl) bioEl.textContent = recipe.description || "";

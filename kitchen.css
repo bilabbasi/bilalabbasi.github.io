@@ -536,6 +536,57 @@ body {
     letter-spacing: 0.02em;
 }
 
+/* Animated Nastaliq Watercolor Calligraphy GIF / PDF in Split Title Header */
+.split-title-right-gif {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    line-height: 0;
+}
+
+.split-title-gif-frame {
+    --urdu-media-scale: 1;
+    --urdu-media-aspect: 2.47;
+    --urdu-media-offset-x: 0px;
+    --urdu-media-offset-y: 0px;
+    position: relative;
+    width: calc(104px * var(--urdu-media-aspect) * var(--urdu-media-scale));
+    height: calc(98px * var(--urdu-media-scale));
+    overflow: hidden;
+    margin-bottom: calc(-14px + var(--urdu-media-offset-y));
+    margin-right: calc(-1 * var(--urdu-media-offset-x));
+    pointer-events: none;
+    user-select: none;
+    mix-blend-mode: multiply;
+}
+
+.split-title-gif {
+    display: block;
+    width: calc(118px * var(--urdu-media-aspect) * var(--urdu-media-scale));
+    height: calc(118px * var(--urdu-media-aspect) * var(--urdu-media-scale));
+    max-width: none;
+    margin-top: calc((98px - (118px * var(--urdu-media-aspect))) * 0.48 * var(--urdu-media-scale));
+    margin-left: calc(-6px * var(--urdu-media-scale));
+    object-fit: contain;
+    border: 0;
+    background: transparent;
+    /* Lifts warm studio paper background (#eeeae2) to pure #ffffff so mix-blend-mode: multiply
+       renders the watercolor calligraphy and splatters directly onto the page with zero box edge */
+    filter: brightness(1.13) contrast(1.16) saturate(1.08);
+    -webkit-mask-image: radial-gradient(ellipse 49% 36% at 46% 49%, #000 78%, transparent 100%);
+    mask-image: radial-gradient(ellipse 49% 36% at 46% 49%, #000 78%, transparent 100%);
+}
+
+.split-title-gif-frame.is-compact-urdu .split-title-gif {
+    -webkit-mask-image: radial-gradient(ellipse 49% 49% at 50% 50%, #000 80%, transparent 100%);
+    mask-image: radial-gradient(ellipse 49% 49% at 50% 50%, #000 80%, transparent 100%);
+}
+
+.split-title-pdf {
+    pointer-events: none;
+    overflow: hidden;
+}
+
 /* Constrain customs page header and essay reading measure, ensuring single-screen fit */
 .about-section#about {
     min-height: calc(100vh - 110px);
@@ -720,6 +771,20 @@ body {
 
     .split-title-roman {
         font-size: 0.95rem;
+    }
+
+    .split-title-gif-frame {
+        width: calc(83px * var(--urdu-media-aspect) * var(--urdu-media-scale));
+        height: calc(78px * var(--urdu-media-scale));
+        margin-bottom: calc(-8px + var(--urdu-media-offset-y));
+        margin-left: calc(-6px + var(--urdu-media-offset-x));
+    }
+
+    .split-title-gif {
+        width: calc(92px * var(--urdu-media-aspect) * var(--urdu-media-scale));
+        height: calc(92px * var(--urdu-media-aspect) * var(--urdu-media-scale));
+        margin-top: calc((78px - (92px * var(--urdu-media-aspect))) * 0.48 * var(--urdu-media-scale));
+        margin-left: calc(-8px * var(--urdu-media-scale));
     }
 }
 

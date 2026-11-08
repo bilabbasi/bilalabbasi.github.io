@@ -84,20 +84,32 @@ const KITCHEN_CONFIG = {
     ],
 
     // -------------------------------------------------------------------------
-    // Spaces Configuration (customs, ammi, etc.)
+    // Spaces Configuration (customs, ammi, or any new sub-page)
     // -------------------------------------------------------------------------
-    // Defines metadata for sub-pages so their English, Urdu, and Roman transliterations
-    // are automatically inserted into <header class="split-title-header"> without copy-pasting.
+    // Defines header metadata for sub-pages (<header class="split-title-header" data-space="...">).
+    //
+    // HOW TO USE URDU MEDIA (GIF, PDF, PNG, WebP, SVG) OR TEXT:
+    //   - To show a single-play GIF or a PDF instead of Urdu text, set `media` (or `gif` / `pdf` / `urdu`)
+    //     to a root-relative path such as "gifs/customs.gif" or "gifs/customs.pdf".
+    //   - To show standard Urdu script + Roman transliteration, omit `media`/`gif`/`pdf` and set `urdu` + `roman`.
+    //   - Optional fine-tuning per space:
+    //       scale: 1.0,       // Multiplier to resize the calligraphy (e.g. 1.15 larger, 0.85 smaller)
+    //       offsetX: "0px",   // Horizontal nudge (e.g. "-8px" left, "8px" right)
+    //       offsetY: "0px",   // Vertical nudge (e.g. "-4px" up, "4px" down)
+    //       loop: false,      // Default false (plays once per page load); set true for infinite loop
+    //       markdown: "us.md" // Optional markdown file auto-loaded into [data-markdown] or space content
     spaces: {
         culture: {
             title: "customs",
             urdu: "رسم و رواج",
-            roman: "rasm-o-riwāj"
+            roman: "rasm-o-riwāj",
+            gif: "gifs/customs.gif"
         },
         ammi: {
             title: "mom",
             urdu: "امی",
-            roman: "ammi"
+            roman: "ammi",
+            gif: "gifs/ammi.gif"
         }
     },
 
