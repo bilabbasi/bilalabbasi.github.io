@@ -4,8 +4,8 @@
    This file controls the colors, sizes, alignment, and fonts of the page.
    Follow the comments below to easily customize the layout of your site. */
 
-/* Import Google Fonts (Lora for serif heading, Inter for clean body text) */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+/* Import Google Fonts (Lora for serif heading, Inter for clean body text, Noto Nastaliq Urdu for Urdu calligraphy) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Nastaliq+Urdu:wght@400..700&display=swap');
 
 /* Define design colors and settings so they can be changed in one place */
 :root {

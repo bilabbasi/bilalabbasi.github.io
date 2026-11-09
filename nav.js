@@ -864,10 +864,11 @@
     /**
      * Renders bipartite/tripartite space headers (<header class="split-title-header">)
      * using metadata defined in KITCHEN_CONFIG.spaces.
-     * Prevents having to manually copy-paste Urdu, roman transliteration, and English title markup.
      */
     function renderSplitHeaders() {
         if (typeof document === "undefined") return;
+        if (typeof KITCHEN_CONFIG === "undefined" || !KITCHEN_CONFIG.spaces) return;
+
         const splitHeaders = document.querySelectorAll("header.split-title-header");
         splitHeaders.forEach(header => {
             let spaceId = header.getAttribute("data-space");
@@ -877,19 +878,13 @@
                     spaceId = navbar.getAttribute("data-current");
                 }
             }
-            if (!spaceId) return;
+            if (!spaceId || !KITCHEN_CONFIG.spaces[spaceId]) return;
 
-            const spacesConfig = (typeof KITCHEN_CONFIG !== "undefined" && KITCHEN_CONFIG.spaces)
-                ? KITCHEN_CONFIG.spaces
-                : null;
-            const space = spacesConfig ? spacesConfig[spaceId] : null;
-            if (!space) return;
-
+            const space = KITCHEN_CONFIG.spaces[spaceId];
             header.innerHTML = `
                 <h2 class="about-title">${space.title}</h2>
                 <div class="split-title-right">
                     <div class="split-title-urdu" dir="rtl" lang="ur">${space.urdu}</div>
-                    <span class="split-title-roman">${space.roman}</span>
                 </div>
             `.trim();
         });

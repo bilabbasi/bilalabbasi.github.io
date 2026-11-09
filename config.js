@@ -86,8 +86,7 @@ const KITCHEN_CONFIG = {
     // -------------------------------------------------------------------------
     // Spaces Configuration (customs, ammi, etc.)
     // -------------------------------------------------------------------------
-    // Defines metadata for sub-pages so their English, Urdu, and Roman transliterations
-    // are automatically inserted into <header class="split-title-header"> without copy-pasting.
+    // Defines header metadata for sub-pages (title, Urdu script, transliteration)
     spaces: {
         culture: {
             title: "customs",
