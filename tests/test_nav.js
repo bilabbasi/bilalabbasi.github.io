@@ -256,22 +256,22 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
     const { context, splitHeader } = createNavTestEnv('/kitchen/culture/index.html');
     vm.runInContext(configCode + '\n' + navCode, context);
 
-    // Test with data-space="culture" (renders Urdu script without roman transliteration by default)
+    // Test with data-space="culture" (renders Urdu script without roman transliteration)
     splitHeader.setAttribute('data-space', 'culture');
     context.window.renderSplitHeaders();
 
     assert.ok(splitHeader.innerHTML.includes('<h2 class="about-title">customs</h2>'), 'Should contain title customs');
-    assert.ok(splitHeader.innerHTML.includes('dir="rtl" lang="ur">رسم و رواج</div>'), 'Should contain Urdu script with dir=rtl');
-    assert.ok(!splitHeader.innerHTML.includes('split-title-roman'), 'Should omit roman transliteration by default');
+    assert.ok(splitHeader.innerHTML.includes('dir="rtl" lang="ur" style="color: #b83b14;">رسم و رواج</div>'), 'Should contain Urdu script with urduColor from config');
+    assert.ok(!splitHeader.innerHTML.includes('split-title-roman'), 'Should omit roman transliteration');
 
     // Test with data-space="ammi"
     splitHeader.setAttribute('data-space', 'ammi');
     context.window.renderSplitHeaders();
 
     assert.ok(splitHeader.innerHTML.includes('<h2 class="about-title">mom</h2>'), 'Should contain title mom');
-    assert.ok(splitHeader.innerHTML.includes('dir="rtl" lang="ur">امی</div>'), 'Should contain Urdu script for ammi');
-    assert.ok(!splitHeader.innerHTML.includes('split-title-roman'), 'Should omit roman transliteration by default');
-    console.log('PASS: renderSplitHeaders stamps correct title and Urdu script from config.js.');
+    assert.ok(splitHeader.innerHTML.includes('dir="rtl" lang="ur" style="color: #b83b14;">امی</div>'), 'Should contain Urdu script for ammi with urduColor from config');
+    assert.ok(!splitHeader.innerHTML.includes('split-title-roman'), 'Should omit roman transliteration');
+    console.log('PASS: renderSplitHeaders stamps correct title, Urdu script, and configured color from config.js.');
 }
 
 // 7. Test accessible tablist semantics & procedural SVG brush stroke path morph compatibility

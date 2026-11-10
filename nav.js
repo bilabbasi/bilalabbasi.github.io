@@ -881,10 +881,12 @@
             if (!spaceId || !KITCHEN_CONFIG.spaces[spaceId]) return;
 
             const space = KITCHEN_CONFIG.spaces[spaceId];
+            const urduColor = header.getAttribute("data-urdu-color") || (space && (space.urduColor || space.color)) || "";
+            const urduStyle = urduColor ? ` style="color: ${urduColor};"` : "";
             header.innerHTML = `
                 <h2 class="about-title">${space.title}</h2>
                 <div class="split-title-right">
-                    <div class="split-title-urdu" dir="rtl" lang="ur">${space.urdu}</div>
+                    <div class="split-title-urdu" dir="rtl" lang="ur"${urduStyle}>${space.urdu}</div>
                 </div>
             `.trim();
         });

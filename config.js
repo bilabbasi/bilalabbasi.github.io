@@ -86,17 +86,17 @@ const KITCHEN_CONFIG = {
     // -------------------------------------------------------------------------
     // Spaces Configuration (customs, ammi, etc.)
     // -------------------------------------------------------------------------
-    // Defines header metadata for sub-pages (title, Urdu script, transliteration)
+    // Defines header metadata for sub-pages (title, Urdu script, and individual color)
     spaces: {
         culture: {
             title: "customs",
             urdu: "رسم و رواج",
-            roman: "rasm-o-riwāj"
+            urduColor: "#b83b14"
         },
         ammi: {
             title: "mom",
             urdu: "امی",
-            roman: "ammi"
+            urduColor: "#b83b14"
         }
     },
 
@@ -108,7 +108,8 @@ const KITCHEN_CONFIG = {
     theme: {
         anchor: "#721817",    // Original warm amber/terracotta (exact match to www.bilalabbasi.com/kitchen subtitle)
         distinct: "#fa9f42",  // New distinct electric tangerine for hover & secondary emphasis
-        pop: "#2b4162"        // New Yellow Punk for badges, tags, and focal highlights
+        pop: "#2b4162",       // New Yellow Punk for badges, tags, and focal highlights
+        urdu: "#b83b14"       // Rich terracotta pigment for Urdu subtitle calligraphy in space headers
     },
 
     // -------------------------------------------------------------------------
@@ -210,6 +211,9 @@ const NAVIGATION_CONFIG = {
                 }
                 if (KITCHEN_CONFIG.theme.pop) {
                     root.style.setProperty("--color-pop", KITCHEN_CONFIG.theme.pop);
+                }
+                if (KITCHEN_CONFIG.theme.urdu) {
+                    root.style.setProperty("--color-urdu", KITCHEN_CONFIG.theme.urdu);
                 }
             }
         };

@@ -1056,15 +1056,15 @@ body {
     font-family: 'Noto Nastaliq Urdu', 'Urdu Typesetting', 'Jameel Noori Nastaleeq', 'Geeza Pro', Tahoma, sans-serif;
     font-size: 2.65rem;
     font-weight: 500;
-    line-height: 2.25;
-    padding: 0 0.08em;
-    margin-top: -0.5em;
-    margin-bottom: -0.42em;
-    color: var(--link-hover, #fa9f42);
-    background: linear-gradient(135deg, var(--link-color, #721817) 0%, #b83b14 48%, var(--link-hover, #fa9f42) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    line-height: 1.6;
+    padding: 0 0.1em;
+    margin-bottom: 14px;
+    color: var(--color-urdu, #b83b14);
+    background: none;
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    -webkit-text-fill-color: initial;
+    user-select: none;
 }
 
 .split-title-roman {
@@ -1120,7 +1120,7 @@ body {
 
     .split-title-urdu {
         font-size: 1.8rem;
-        line-height: 1.35;
+        line-height: 1.5;
         margin-bottom: 8px;
         align-self: flex-start;
     }

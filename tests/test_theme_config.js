@@ -30,11 +30,13 @@ assert.ok(scope.KITCHEN_CONFIG.theme, 'KITCHEN_CONFIG.theme should exist');
 assert.ok(scope.KITCHEN_CONFIG.theme.anchor, 'theme.anchor should be defined');
 assert.ok(scope.KITCHEN_CONFIG.theme.distinct, 'theme.distinct should be defined');
 assert.ok(scope.KITCHEN_CONFIG.theme.pop, 'theme.pop should be defined');
+assert.ok(scope.KITCHEN_CONFIG.theme.urdu, 'theme.urdu should be defined');
 
 // Assert dynamic CSS variable injection matches config
 assert.strictEqual(styles['--link-color'], scope.KITCHEN_CONFIG.theme.anchor, '--link-color should match theme.anchor');
 assert.strictEqual(styles['--text-subtitle'], scope.KITCHEN_CONFIG.theme.anchor, '--text-subtitle should match theme.anchor');
 assert.strictEqual(styles['--link-hover'], scope.KITCHEN_CONFIG.theme.distinct, '--link-hover should match theme.distinct');
 assert.strictEqual(styles['--color-pop'], scope.KITCHEN_CONFIG.theme.pop, '--color-pop should match theme.pop');
+assert.strictEqual(styles['--color-urdu'], scope.KITCHEN_CONFIG.theme.urdu, '--color-urdu should match theme.urdu');
 
 console.log('PASS: test_theme_config.js passed all checks.');
