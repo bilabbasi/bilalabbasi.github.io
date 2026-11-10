@@ -22,62 +22,8 @@
     <!-- Configuration Data: Shared config containing both professional and kitchen bio contents -->
     <script src="../../config.js"></script>
 
-    <!-- Navigation Component -->
+    <!-- Navigation & Dynamic Content Controller: Automatically loads headers, markdown content, and ink interactions -->
     <script src="../../nav.js" defer></script>
-
-    <!-- Loader Script: Automatically inserts the KITCHEN_CONFIG details when loaded -->
-    <script>
-        window.initCulturePage = function () {
-            // Update browser tab title
-            if (typeof KITCHEN_CONFIG !== 'undefined') {
-                document.title = (KITCHEN_CONFIG.name || "the kitchen") + " — customs";
-            }
-
-            // Load "this space" content dynamically from this_space.md
-            const thisSpaceEl = document.getElementById("this-space-content");
-            if (thisSpaceEl) {
-                // If already populated, skip refetch
-                if (thisSpaceEl.children.length > 0) return;
-
-                const mdUrl = new URL("this_space.md", window.location.href).href;
-                fetch(mdUrl)
-                    .then(res => {
-                        if (!res.ok) throw new Error("Could not fetch this_space.md");
-                        return res.text();
-                    })
-                    .then(markdown => {
-                        let html = (typeof marked !== "undefined" && marked.parse)
-                            ? marked.parse(markdown)
-                            : markdown.trim().split(/\n\s*\n/).map(p => `<p>${p.trim().replace(/\n/g, "<br>")}</p>`).join("");
-
-                        // Automatically link "for them" to #arrival-picture if not already formatted as a link
-                        if (!html.includes('href="#arrival-picture"')) {
-                            html = html.replace(/\b(for them)\b/gi, '<a href="#arrival-picture" class="culture-link">$1</a>');
-                        }
-
-                        thisSpaceEl.innerHTML = html;
-
-                        // Ensure any links to #arrival-picture scroll smoothly
-                        thisSpaceEl.querySelectorAll('a[href="#arrival-picture"]').forEach(link => {
-                            link.classList.add("culture-link");
-                            link.addEventListener("click", (e) => {
-                                e.preventDefault();
-                                const target = document.getElementById("arrival-picture");
-                                if (target) {
-                                    target.scrollIntoView({ behavior: "smooth" });
-                                    history.pushState(null, "", "#arrival-picture");
-                                }
-                            });
-                        });
-                    })
-                    .catch(err => {
-                        console.warn("Using inline fallback content for this space:", err);
-                    });
-            }
-        };
-
-        document.addEventListener("DOMContentLoaded", window.initCulturePage);
-    </script>
 </head>
 
 <body>

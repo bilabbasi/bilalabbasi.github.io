@@ -24,16 +24,43 @@ kitchen/recipes/
 
 ### Adding a recipe is a 3-step process:
 
-1. **Create the recipe folder**: `kitchen/recipes/<slug>/`
+1. **Create the recipe folder**:
+   ```bash
+   mkdir -p kitchen/recipes/<dish-slug>/assets
+   ```
+
 2. **Add `index.html` and `recipe.js`** inside that folder:
-   - Copy `index.html` from an existing recipe (e.g. `yellowdaal/index.html`) and update the `<title>` and `<meta description>`.
-   - Create `recipe.js` containing `const RECIPE_DATA = \`...\`;`.
-   - (Optional) Put any dish-specific photos or sketches directly in `assets/`.
+   - **`index.html`**: Copy this 36-line shell directly:
+     ```html
+     <!DOCTYPE html>
+     <html lang="en">
+     <head>
+         <meta charset="UTF-8">
+         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+         <link rel="icon" type="image/png" href="../../../assets/favicon_ba_urdu_orange.png">
+         <title>Dish Name — the kitchen</title>
+         <meta name="description" content="A one-sentence description of the dish.">
+         <meta name="author" content="Bilal Abbasi">
+         <link rel="stylesheet" href="../../../index.css">
+         <link rel="stylesheet" href="../recipe.css">
+         <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+         <script src="../../../config.js"></script>
+         <script src="recipe.js"></script>
+         <script src="../recipe-engine.js" defer></script>
+     </head>
+     <body>
+         <div id="recipe-root"></div>
+     </body>
+     </html>
+     ```
+   - **`recipe.js`**: Create `recipe.js` containing `const RECIPE_DATA = \`...\`;` (see template below).
+   - *(Optional)* Put any dish-specific photos or sketches in `assets/`.
+
 3. **Register the recipe in [`config.js`](../../config.js)** under `KITCHEN_CONFIG.recipes`:
    ```javascript
    {
-       category: "veg",
-       categoryUrdu: "سبزی",
+       category: "veg",                     // "chicken" | "meat" | "veg" | "dessert"
+       categoryUrdu: "سبزی",                 // "مرغ" | "گوشت" | "سبزی" | "میٹھی"
        name: "yellow daal",
        url: "recipes/yellowdaal/",
        description: "Quintessential tarka."

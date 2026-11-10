@@ -86,7 +86,11 @@ const KITCHEN_CONFIG = {
     // -------------------------------------------------------------------------
     // Spaces Configuration (customs, ammi, etc.)
     // -------------------------------------------------------------------------
-    // Defines header metadata for sub-pages (title, Urdu script, and individual color)
+    // Configures the split header on sub-pages (e.g. kitchen/culture/ and kitchen/me/).
+    // - title: English title displayed on the left in large serif font.
+    // - urdu: Urdu calligraphy displayed on the right.
+    // - urduColor: Optional color override for the Urdu text on this specific page.
+    //              (Defaults to theme.urdu below if omitted).
     spaces: {
         culture: {
             title: "customs",
@@ -106,15 +110,16 @@ const KITCHEN_CONFIG = {
     // Changing these colors will automatically propagate across all kitchen
     // and recipe pages without touching any CSS files.
     theme: {
-        anchor: "#721817",    // Original warm amber/terracotta (exact match to www.bilalabbasi.com/kitchen subtitle)
-        distinct: "#fa9f42",  // New distinct electric tangerine for hover & secondary emphasis
-        pop: "#2b4162",       // New Yellow Punk for badges, tags, and focal highlights
-        urdu: "#b83b14"       // Rich terracotta pigment for Urdu subtitle calligraphy in space headers
+        anchor: "#721817",    // Primary warm amber/terracotta: links, subtitles, resting ink
+        distinct: "#fa9f42",  // Electric tangerine: hover states & active underline
+        pop: "#2b4162",       // Accent slate: badges, category tags, focal highlights
+        urdu: "#b83b14"       // Rich terracotta pigment: Urdu calligraphy subtitle in space headers
     },
 
     // -------------------------------------------------------------------------
     // Tactile Ink Brush Indicator Parameters (Sumi-e / Nastaliq Qalam Dynamics)
     // -------------------------------------------------------------------------
+    // Controls the fluid brush stroke underline that follows your cursor on tabs and links.
     inkNav: {
         strokeColor: "#721817",       // Primary qalam pigment (matches theme.anchor)
         bleedColor: "#fa9f42",        // Capillary edge bleed wash (matches theme.distinct)
@@ -130,7 +135,31 @@ const KITCHEN_CONFIG = {
         pressScaleY: 0.85             // Vertical nib compression on press/click
     },
 
-    // Recipes metadata list for dynamic menu generation
+    // -------------------------------------------------------------------------
+    // RECIPES LIST & MENU DIRECTORY
+    // -------------------------------------------------------------------------
+    // This list powers the recipe menu grid on the kitchen home page.
+    //
+    // HOW TO ADD A NEW RECIPE IN 3 SIMPLE STEPS:
+    // -------------------------------------------------------------------------
+    // Step 1: Create a new folder under "kitchen/recipes/<dish-name>/"
+    //         (e.g., "kitchen/recipes/biryani/").
+    //
+    // Step 2: Add two files in that folder:
+    //         a) "index.html" -> Copy directly from "kitchen/recipes/yellowdaal/index.html"
+    //            and change the <title> tag to your dish name.
+    //         b) "recipe.js"  -> Copy from yellowdaal/recipe.js and customize your
+    //            ingredients, quantities, steps, and optional sketch images.
+    //
+    // Step 3: Add an entry to the "recipes" list below:
+    //         {
+    //             category: "chicken" | "meat" | "veg" | "dessert",
+    //             categoryUrdu: "مرغ" | "گوشت" | "سبزی" | "میٹھی",
+    //             name: "my dish name",
+    //             url: "recipes/<dish-name>/",
+    //             description: "A short, mouth-watering one-liner about this dish."
+    //         }
+    // -------------------------------------------------------------------------
     recipes: [
         {
             category: "veg",

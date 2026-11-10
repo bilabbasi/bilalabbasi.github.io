@@ -893,24 +893,167 @@
     }
 
     /**
+     * Initializes the main Kitchen dashboard (recipes grid, title, bio, external links).
+     * Automatically called by initActivePageContent() when on the kitchen home page.
+     */
+    function initKitchenDashboard() {
+        if (typeof KITCHEN_CONFIG === "undefined") return;
+
+        document.title = KITCHEN_CONFIG.name;
+        const titleEl = document.getElementById("main-title");
+        if (titleEl) titleEl.textContent = KITCHEN_CONFIG.name;
+        const subtitleEl = document.getElementById("main-subtitle");
+        if (subtitleEl) subtitleEl.textContent = KITCHEN_CONFIG.subtitle;
+        const bioEl = document.getElementById("bio-text");
+        if (bioEl) bioEl.textContent = KITCHEN_CONFIG.bio;
+
+        const kitchenTab = document.getElementById("kitchen-tab");
+        if (kitchenTab) {
+            kitchenTab.textContent = KITCHEN_CONFIG.name;
+        }
+
+        const linksList = document.getElementById("links-list");
+        if (linksList) {
+            const links = KITCHEN_CONFIG.links || [];
+            linksList.innerHTML = links.map(link => `
+                <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="external-link">
+                    ${link.label}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"></line>
+                        <polyline points="7 7 17 7 17 17"></polyline>
+                    </svg>
+                </a>
+            `).join("");
+        }
+
+        const menuGrid = document.getElementById("recipes-menu-grid");
+        if (menuGrid) {
+            const recipes = KITCHEN_CONFIG.recipes || [];
+            const categories = {
+                chicken: { title: "chicken", titleUrdu: "مرغ", items: [] },
+                meat: { title: "meat", titleUrdu: "گوشت", items: [] },
+                veg: { title: "veg", titleUrdu: "سبزی", items: [] },
+                dessert: { title: "dessert", titleUrdu: "میٹھی", items: [] }
+            };
+            recipes.forEach(recipe => {
+                const cat = recipe.category || "other";
+                if (!categories[cat]) {
+                    categories[cat] = {
+                        title: cat,
+                        titleUrdu: recipe.categoryUrdu || "",
+                        items: []
+                    };
+                }
+                categories[cat].items.push(recipe);
+            });
+
+            menuGrid.innerHTML = Object.values(categories).map(cat => `
+                <div class="menu-column">
+                    <h3 class="column-title">${cat.title} ${cat.titleUrdu ? `<span class="urdu-title">${cat.titleUrdu}</span>` : ""}</h3>
+                    <div class="menu-items">
+                        ${cat.items.map(item => `
+                            <div class="menu-item">
+                                <a href="${item.url || `recipes/template.html?file=${item.file}`}" class="recipe-link">
+                                    <span class="recipe-name">${item.name}</span>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                        stroke-linecap="round" stroke-linejoin="round" class="link-arrow">
+                                        <line x1="7" y1="17" x2="17" y2="7"></line>
+                                        <polyline points="7 7 17 7 17 17"></polyline>
+                                    </svg>
+                                </a>
+                                <p class="recipe-description">${item.description}</p>
+                            </div>
+                        `).join("")}
+                    </div>
+                </div>
+            `).join("");
+        }
+    }
+
+    /**
+     * Initializes the Customs page by loading markdown from this_space.md.
+     */
+    function initCulturePage() {
+        if (typeof KITCHEN_CONFIG !== "undefined") {
+            document.title = (KITCHEN_CONFIG.name || "the kitchen") + " — customs";
+        }
+        const thisSpaceEl = document.getElementById("this-space-content");
+        if (thisSpaceEl) {
+            if (thisSpaceEl.children.length > 0) return;
+            const mdUrl = new URL("this_space.md", window.location.href).href;
+            fetch(mdUrl)
+                .then(res => {
+                    if (!res.ok) throw new Error("Could not fetch this_space.md");
+                    return res.text();
+                })
+                .then(markdown => {
+                    let html = (typeof marked !== "undefined" && marked.parse)
+                        ? marked.parse(markdown)
+                        : markdown.trim().split(/\n\s*\n/).map(p => `<p>${p.trim().replace(/\n/g, "<br>")}</p>`).join("");
+                    if (!html.includes('href="#arrival-picture"')) {
+                        html = html.replace(/\b(for them)\b/gi, '<a href="#arrival-picture" class="culture-link">$1</a>');
+                    }
+                    thisSpaceEl.innerHTML = html;
+                    thisSpaceEl.querySelectorAll('a[href="#arrival-picture"]').forEach(link => {
+                        link.classList.add("culture-link");
+                        link.addEventListener("click", (e) => {
+                            e.preventDefault();
+                            const target = document.getElementById("arrival-picture");
+                            if (target) {
+                                target.scrollIntoView({ behavior: "smooth" });
+                                history.pushState(null, "", "#arrival-picture");
+                            }
+                        });
+                    });
+                })
+                .catch(err => {
+                    console.warn("Using inline fallback content for this space:", err);
+                });
+        }
+    }
+
+    /**
+     * Initializes the Ammi / Mom page by loading markdown from us.md.
+     */
+    function initMePage() {
+        if (typeof KITCHEN_CONFIG !== "undefined") {
+            document.title = (KITCHEN_CONFIG.name || "the kitchen") + " — ammi";
+        }
+        const usSpaceEl = document.getElementById("us-content");
+        if (usSpaceEl) {
+            if (usSpaceEl.children.length > 0) return;
+            const mdUrl = new URL("us.md", window.location.href).href;
+            fetch(mdUrl)
+                .then(res => {
+                    if (!res.ok) throw new Error("Could not fetch us.md");
+                    return res.text();
+                })
+                .then(markdown => {
+                    if (typeof marked !== "undefined" && marked.parse) {
+                        usSpaceEl.innerHTML = marked.parse(markdown);
+                    } else {
+                        usSpaceEl.innerHTML = markdown.trim().split(/\n\s*\n/).map(p => `<p>${p.trim().replace(/\n/g, "<br>")}</p>`).join("");
+                    }
+                })
+                .catch(err => {
+                    console.warn("Using inline fallback content for this space:", err);
+                });
+        }
+    }
+
+    /**
      * Executes initializers for page-specific dynamic content.
      */
     function initActivePageContent() {
         renderSplitHeaders();
         if (document.getElementById("recipes-menu-grid") || document.getElementById("main-title")) {
-            if (typeof window.initKitchenDashboard === "function") {
-                window.initKitchenDashboard();
-            }
+            initKitchenDashboard();
         }
         if (document.getElementById("this-space-content")) {
-            if (typeof window.initCulturePage === "function") {
-                window.initCulturePage();
-            }
+            initCulturePage();
         }
         if (document.getElementById("us-content")) {
-            if (typeof window.initMePage === "function") {
-                window.initMePage();
-            }
+            initMePage();
         }
     }
 
@@ -919,7 +1062,7 @@
      */
     function initNavbars() {
         if (typeof document === "undefined") return;
-        renderSplitHeaders();
+        initActivePageContent();
         const headers = document.querySelectorAll("header.navbar");
         headers.forEach(header => {
             const hasExplicitAttr = header.hasAttribute("data-current") ||
@@ -933,154 +1076,6 @@
                 attachContinuousNav(header);
             }
         });
-    }
-
-    // Shared page initializers guarantee any page works regardless of entry point
-    if (typeof window !== "undefined") {
-        if (typeof window.initKitchenDashboard !== "function") {
-            window.initKitchenDashboard = function () {
-                if (typeof KITCHEN_CONFIG === "undefined") return;
-
-                document.title = KITCHEN_CONFIG.name;
-                const titleEl = document.getElementById("main-title");
-                if (titleEl) titleEl.textContent = KITCHEN_CONFIG.name;
-                const subtitleEl = document.getElementById("main-subtitle");
-                if (subtitleEl) subtitleEl.textContent = KITCHEN_CONFIG.subtitle;
-                const bioEl = document.getElementById("bio-text");
-                if (bioEl) bioEl.textContent = KITCHEN_CONFIG.bio;
-
-                const kitchenTab = document.getElementById("kitchen-tab");
-                if (kitchenTab) {
-                    kitchenTab.textContent = KITCHEN_CONFIG.name;
-                }
-
-                const linksList = document.getElementById("links-list");
-                if (linksList) {
-                    const links = KITCHEN_CONFIG.links || [];
-                    linksList.innerHTML = links.map(link => `
-                        <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="external-link">
-                            ${link.label}
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="7" y1="17" x2="17" y2="7"></line>
-                                <polyline points="7 7 17 7 17 17"></polyline>
-                            </svg>
-                        </a>
-                    `).join("");
-                }
-
-                const menuGrid = document.getElementById("recipes-menu-grid");
-                if (menuGrid) {
-                    const recipes = KITCHEN_CONFIG.recipes || [];
-                    const categories = {
-                        chicken: { title: "chicken", titleUrdu: "مرغ", items: [] },
-                        meat: { title: "meat", titleUrdu: "گوشت", items: [] },
-                        veg: { title: "veg", titleUrdu: "سبزی", items: [] },
-                        dessert: { title: "dessert", titleUrdu: "میٹھی", items: [] }
-                    };
-                    recipes.forEach(recipe => {
-                        const cat = recipe.category || "other";
-                        if (!categories[cat]) {
-                            categories[cat] = {
-                                title: cat,
-                                titleUrdu: recipe.categoryUrdu || "",
-                                items: []
-                            };
-                        }
-                        categories[cat].items.push(recipe);
-                    });
-
-                    menuGrid.innerHTML = Object.values(categories).map(cat => `
-                        <div class="menu-column">
-                            <h3 class="column-title">${cat.title} ${cat.titleUrdu ? `<span class="urdu-title">${cat.titleUrdu}</span>` : ""}</h3>
-                            <div class="menu-items">
-                                ${cat.items.map(item => `
-                                    <div class="menu-item">
-                                        <a href="${item.url || `recipes/template.html?file=${item.file}`}" class="recipe-link">
-                                            <span class="recipe-name">${item.name}</span>
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                                                stroke-linecap="round" stroke-linejoin="round" class="link-arrow">
-                                                <line x1="7" y1="17" x2="17" y2="7"></line>
-                                                <polyline points="7 7 17 7 17 17"></polyline>
-                                            </svg>
-                                        </a>
-                                        <p class="recipe-description">${item.description}</p>
-                                    </div>
-                                `).join("")}
-                            </div>
-                        </div>
-                    `).join("");
-                }
-            };
-        }
-
-        if (typeof window.initCulturePage !== "function") {
-            window.initCulturePage = function () {
-                if (typeof KITCHEN_CONFIG !== "undefined") {
-                    document.title = (KITCHEN_CONFIG.name || "the kitchen") + " — customs";
-                }
-                const thisSpaceEl = document.getElementById("this-space-content");
-                if (thisSpaceEl) {
-                    if (thisSpaceEl.children.length > 0) return;
-                    const mdUrl = new URL("this_space.md", window.location.href).href;
-                    fetch(mdUrl)
-                        .then(res => {
-                            if (!res.ok) throw new Error("Could not fetch this_space.md");
-                            return res.text();
-                        })
-                        .then(markdown => {
-                            let html = (typeof marked !== "undefined" && marked.parse)
-                                ? marked.parse(markdown)
-                                : markdown.trim().split(/\n\s*\n/).map(p => `<p>${p.trim().replace(/\n/g, "<br>")}</p>`).join("");
-                            if (!html.includes('href="#arrival-picture"')) {
-                                html = html.replace(/\b(for them)\b/gi, '<a href="#arrival-picture" class="culture-link">$1</a>');
-                            }
-                            thisSpaceEl.innerHTML = html;
-                            thisSpaceEl.querySelectorAll('a[href="#arrival-picture"]').forEach(link => {
-                                link.classList.add("culture-link");
-                                link.addEventListener("click", (e) => {
-                                    e.preventDefault();
-                                    const target = document.getElementById("arrival-picture");
-                                    if (target) {
-                                        target.scrollIntoView({ behavior: "smooth" });
-                                        history.pushState(null, "", "#arrival-picture");
-                                    }
-                                });
-                            });
-                        })
-                        .catch(err => {
-                            console.warn("Using inline fallback content for this space:", err);
-                        });
-                }
-            };
-        }
-
-        if (typeof window.initMePage !== "function") {
-            window.initMePage = function () {
-                if (typeof KITCHEN_CONFIG !== "undefined") {
-                    document.title = (KITCHEN_CONFIG.name || "the kitchen") + " — ammi";
-                }
-                const usSpaceEl = document.getElementById("us-content");
-                if (usSpaceEl) {
-                    if (usSpaceEl.children.length > 0) return;
-                    const mdUrl = new URL("us.md", window.location.href).href;
-                    fetch(mdUrl)
-                        .then(res => {
-                            if (!res.ok) throw new Error("Could not fetch us.md");
-                            return res.text();
-                        })
-                        .then(markdown => {
-                            if (typeof marked !== "undefined" && marked.parse) {
-                                usSpaceEl.innerHTML = marked.parse(markdown);
-                            } else {
-                                usSpaceEl.innerHTML = markdown.trim().split(/\n\s*\n/).map(p => `<p>${p.trim().replace(/\n/g, "<br>")}</p>`).join("");
-                            }
-                        })
-                        .catch(err => {
-                            console.warn("Using inline fallback content for this space:", err);
-                        });
-                }
-            };
-        }
     }
 
     if (typeof document !== "undefined") {
@@ -1110,6 +1105,10 @@
 
     // Expose globally for dynamic or manual access
     if (typeof window !== "undefined") {
+        window.initKitchenDashboard = initKitchenDashboard;
+        window.initCulturePage = initCulturePage;
+        window.initMePage = initMePage;
+        window.initActivePageContent = initActivePageContent;
         window.renderSiteNavbar = renderNavbar;
         window.initSiteNavbars = initNavbars;
         window.updateNavIndicator = updateIndicator;

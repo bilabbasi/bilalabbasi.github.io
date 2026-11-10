@@ -1,7 +1,8 @@
 .DS_Store
 **/.DS_Store
 .superpowers/
-.agents/skills/
+.impeccable/
+.agents/skills/impeccable/
 .codex/
 skills-lock.json
 .impeccable/*.local.json
