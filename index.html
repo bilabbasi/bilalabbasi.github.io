@@ -19,15 +19,22 @@
     <!-- Configuration Data -->
     <script src="config.js"></script>
 
-    <!-- Page Loader & Revolving Door Controller -->
+    <!-- Page Loader & Faded Flat Reel Controller -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const config = (typeof GATEWAY_CONFIG !== 'undefined') ? GATEWAY_CONFIG : {
                 name: "hi, i'm bilal",
+                greetingPrefix: "hi, i'm bilal, the",
                 links: [
-                    { label: "professional", url: "professional/" },
-                    { label: "kitchen", url: "kitchen/" }
-                ]
+                    { label: "professional", url: "professional/", target: "professional" },
+                    { label: "kitchen", url: "kitchen/", target: "kitchen" }
+                ],
+                reel: {
+                    colors: {
+                        professional: "#4b5563",
+                        kitchen: "#b83b14"
+                    }
+                }
             };
 
             if (config.name) {
@@ -40,8 +47,8 @@
                 linksContainer.innerHTML = config.links.map((link, index) => {
                     const isKitchen = link.url.includes("kitchen");
                     const extraClass = isKitchen ? "gateway-link-kitchen" : "gateway-link-professional";
-                    const doorKey = isKitchen ? "kitchen" : "professional";
-                    const linkHtml = `<a href="${link.url}" class="gateway-link ${extraClass}" data-door="${doorKey}">${link.label}</a>`;
+                    const targetKey = isKitchen ? "kitchen" : "professional";
+                    const linkHtml = `<a href="${link.url}" class="gateway-link ${extraClass}" data-reel="${targetKey}" data-door="${targetKey}">${link.label}</a>`;
                     return index < config.links.length - 1
                         ? `${linkHtml}<span class="gateway-divider">/</span>`
                         : linkHtml;
@@ -49,26 +56,21 @@
             }
 
             // =====================================================================
-            // 3D Vertical Revolving Door Controller
+            // Faded Flat Reel Controller (Descriptor Stack)
             // =====================================================================
-            // Beside "bilal", a 4-faced cylinder vertically revolves along the X-axis:
-            // - Hovering "professional" revolves forward to reveal "the scientist" in slate grey.
-            // - Hovering "kitchen" revolves forward to reveal "the cook" in terracotta.
-            // - The greeting "hi, i'm bilal" stays 100% stationary (the door is absolutely positioned).
-            // - Moving between the two links continuously rolls forward in the same direction.
-            // - Leaving the links revolves forward into a blank face and fades out.
-            const doorEl = document.getElementById("gateway-door");
-            const cylinderEl = document.getElementById("door-cylinder");
-            let currentStep = 0;
-            let currentState = "idle"; // "idle" | "professional" | "kitchen"
+            // The stack has 4 items: runner (0), cook (1), scientist (2), reader (3).
+            // - Resting state: Midpoint between cook and scientist aligns with the sentence baseline.
+            // - Hovering "kitchen": Slides "cook" onto the baseline in warm terracotta (#b83b14).
+            // - Hovering "professional": Slides "scientist" onto the baseline in slate grey (#4b5563).
+            // - Mouse leave: Smoothly slides back to the resting mid-split.
+            const reelEl = document.getElementById("gateway-reel");
+            let currentState = "resting"; // "resting" | "professional" | "kitchen"
             let leaveTimer = null;
 
-            const doorConfig = (config && config.door) ? config.door : {
-                professional: { text: ", the scientist", color: "#4b5563" },
-                kitchen: { text: ", the cook", color: "#b83b14" }
-            };
-
-            function setDoorState(newState) {
+            function setReelState(newState) {
+                if (!newState || newState === "idle") {
+                    newState = "resting";
+                }
                 if (newState === currentState) return;
                 currentState = newState;
 
@@ -77,64 +79,36 @@
                     leaveTimer = null;
                 }
 
-                if (!doorEl || !cylinderEl) return;
-
-                if (newState === "idle") {
-                    // Step forward to a clean blank face and fade out
-                    currentStep++;
-                    const targetFaceIdx = currentStep % 4;
-                    const targetFace = document.getElementById(`door-face-${targetFaceIdx}`);
-                    if (targetFace) {
-                        targetFace.textContent = "";
-                        targetFace.className = `door-face face-${targetFaceIdx} face-blank`;
-                    }
-                    cylinderEl.style.transform = `rotateX(${-currentStep * 90}deg)`;
-                    doorEl.classList.remove("is-active");
-                } else {
-                    const item = doorConfig[newState];
-                    if (!item) return;
-
-                    currentStep++;
-                    const targetFaceIdx = currentStep % 4;
-                    const targetFace = document.getElementById(`door-face-${targetFaceIdx}`);
-                    if (targetFace) {
-                        const rawText = item.text || "";
-                        const cleanText = rawText.replace(/^[,\s]+/, "");
-                        targetFace.innerHTML = `<span class="door-comma">,</span> <span class="door-text">${cleanText}</span>`;
-                        targetFace.style.color = item.color;
-                        const extraClass = newState === "kitchen" ? "face-kitchen" : "face-professional";
-                        targetFace.className = `door-face face-${targetFaceIdx} ${extraClass}`;
-                    }
-                    cylinderEl.style.transform = `rotateX(${-currentStep * 90}deg)`;
-                    doorEl.classList.add("is-active");
-                }
+                if (!reelEl) return;
+                reelEl.setAttribute("data-state", newState);
             }
 
-            // Expose globally for inspection and test harnesses
-            window.setDoorState = setDoorState;
+            // Expose globally for tests and inspectability
+            window.setReelState = setReelState;
+            window.setDoorState = setReelState; // Backward compatibility alias
 
             // Wire hover listeners with a 100ms grace period on mouseleave to avoid flicker
             if (linksContainer) {
                 linksContainer.addEventListener("mouseover", (event) => {
-                    const link = event.target.closest("a[data-door]");
+                    const link = event.target.closest("a[data-reel], a[data-door]");
                     if (link) {
-                        const doorKey = link.getAttribute("data-door");
-                        setDoorState(doorKey);
+                        const targetKey = link.getAttribute("data-reel") || link.getAttribute("data-door");
+                        setReelState(targetKey);
                     }
                 });
 
                 linksContainer.addEventListener("mouseleave", () => {
                     leaveTimer = setTimeout(() => {
-                        setDoorState("idle");
+                        setReelState("resting");
                     }, 100);
                 });
             }
 
-            // Preview query param for headless verification (?state=professional or ?state=kitchen)
+            // Preview query param for headless verification (?state=professional, ?state=kitchen, ?state=resting)
             const urlParams = new URLSearchParams(window.location.search);
             const previewState = urlParams.get("state");
-            if (previewState && (previewState === "professional" || previewState === "kitchen")) {
-                setDoorState(previewState);
+            if (previewState && (previewState === "professional" || previewState === "kitchen" || previewState === "resting")) {
+                setReelState(previewState);
             }
         });
     </script>
@@ -146,20 +120,24 @@
 
         <main class="gateway-card">
             <h1 class="gateway-title" id="gateway-title">
-                <span class="gateway-greeting" id="gateway-greeting">hi, i'm <span class="gateway-name-accent">bilal</span></span>
-                <span class="gateway-door" id="gateway-door" aria-hidden="true">
-                    <span class="door-cylinder" id="door-cylinder">
-                        <span class="door-face face-0" id="door-face-0"></span>
-                        <span class="door-face face-1" id="door-face-1"></span>
-                        <span class="door-face face-2" id="door-face-2"></span>
-                        <span class="door-face face-3" id="door-face-3"></span>
+                <span class="gateway-static" id="gateway-static">
+                    <span class="gateway-intro" id="gateway-intro">hi, i'm <span class="gateway-name-accent">bilal</span>,</span>
+                    <span class="gateway-article" id="gateway-article">the</span>
+                </span>
+                <span class="gateway-reel" id="gateway-reel" data-state="resting" aria-hidden="true">
+                    <span class="reel-baseline-anchor">scientist</span>
+                    <span class="reel-track" id="reel-track">
+                        <span class="reel-item reel-runner" id="reel-item-runner">runner</span>
+                        <span class="reel-item reel-cook" id="reel-item-cook">cook</span>
+                        <span class="reel-item reel-scientist" id="reel-item-scientist">scientist</span>
+                        <span class="reel-item reel-reader" id="reel-item-reader">reader</span>
                     </span>
                 </span>
             </h1>
             <nav class="gateway-links" id="gateway-links">
-                <a href="professional/" class="gateway-link gateway-link-professional" data-door="professional">professional</a>
+                <a href="professional/" class="gateway-link gateway-link-professional" data-reel="professional" data-door="professional">professional</a>
                 <span class="gateway-divider">/</span>
-                <a href="kitchen/" class="gateway-link gateway-link-kitchen" data-door="kitchen">kitchen</a>
+                <a href="kitchen/" class="gateway-link gateway-link-kitchen" data-reel="kitchen" data-door="kitchen">kitchen</a>
             </nav>
         </main>
 

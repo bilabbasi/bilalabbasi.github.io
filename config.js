@@ -9,29 +9,48 @@
 // -------------------------------------------------------------------------
 const GATEWAY_CONFIG = {
     name: "hi, i'm bilal",
+    greetingPrefix: "hi, i'm bilal, the",
     links: [
         {
             label: "professional",
-            url: "professional/"
+            url: "professional/",
+            target: "professional"
         },
         {
             label: "kitchen",
-            url: "kitchen/"
+            url: "kitchen/",
+            target: "kitchen"
         }
     ],
 
-    // Revolving door animation (beside "bilal" on the gateway page).
-    // When hovering over "professional" or "kitchen", the door vertically
-    // rolls to show ", the scientist" (in slate grey) or ", the cook" (in terracotta).
-    // The greeting "hi, i'm bilal" remains completely stationary.
+    // Faded flat reel (descriptor stack) beside "hi, i'm bilal, the".
+    // In resting state, all options are visible in faded grey, with the midline
+    // between "cook" and "scientist" inline with the sentence baseline.
+    // Hovering "kitchen" slides "cook" into alignment (terracotta).
+    // Hovering "professional" slides "scientist" into alignment (slate grey).
+    reel: {
+        items: [
+            { id: "runner", label: "runner", atmospheric: true },
+            { id: "cook", label: "cook", target: "kitchen", color: "#b83b14" },
+            { id: "scientist", label: "scientist", target: "professional", color: "#4b5563" },
+            { id: "reader", label: "reader", atmospheric: true }
+        ],
+        // Colors for each interactive target
+        colors: {
+            professional: "#4b5563",
+            kitchen: "#b83b14"
+        }
+    },
+
+    // Backward compatibility for existing door references
     door: {
         professional: {
             text: ", the scientist",
-            color: "#4b5563"       // Slate grey matching the professional page subtitle
+            color: "#4b5563"
         },
         kitchen: {
             text: ", the cook",
-            color: "#b83b14"       // Rich terracotta matching the kitchen theme
+            color: "#b83b14"
         }
     }
 };
