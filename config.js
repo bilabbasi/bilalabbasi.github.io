@@ -98,7 +98,7 @@ const KITCHEN_CONFIG = {
             urduColor: "#b83b14"
         },
         ammi: {
-            title: "mom",
+            title: "ammi",
             urdu: "امی",
             urduColor: "#b83b14"
         }
