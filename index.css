@@ -701,6 +701,7 @@ body {
 }
 
 .gateway-title {
+    position: relative;
     font-family: var(--font-serif);
     font-size: 3.75rem;
     font-weight: 500;
@@ -708,46 +709,119 @@ body {
     color: var(--text-title);
     letter-spacing: -1.5px;
     min-height: 1.15em;
-    display: inline-flex;
-    align-items: baseline;
-    justify-content: center;
+    display: inline-block;
+    text-align: center;
+}
+
+.gateway-greeting {
+    display: inline;
 }
 
 .gateway-name-accent {
     color: #721817;
 }
 
-.typewriter-cursor {
-    display: inline-block;
-    font-weight: 300;
-    font-size: 0.9em;
-    margin-left: 2px;
-    color: var(--text-subtitle);
-    animation: cursor-blink 0.85s infinite;
+/* =========================================================================
+   3D VERTICAL REVOLVING DOOR
+   =========================================================================
+   Positioned absolutely right after "bilal", so the comma and following words
+   flow naturally as an authentic, seamless part of the sentence.
+   Because it is absolutely positioned, "hi, i'm bilal" never moves. */
+
+.gateway-door {
+    position: absolute;
+    left: 100%;
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    width: 9.5em;
+    opacity: 0;
+    perspective: 800px;
+    perspective-origin: 50% 50%;
+    pointer-events: none;
+    overflow: visible;
+    transition: opacity 0.25s ease;
+}
+
+.gateway-door.is-active {
+    opacity: 1;
+}
+
+/* Cylinder holding the 4 faces of the revolving door */
+.door-cylinder {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Base style for every face of the cylinder:
+   Inherits font-family, font-size, font-weight, line-height, and letter-spacing
+   from .gateway-title so it is an exact typographic continuation of the sentence. */
+.door-face {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    text-align: left;
+    line-height: inherit;
+    font-family: inherit;
+    font-size: 1em;
+    font-weight: inherit;
+    letter-spacing: inherit;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    white-space: nowrap;
     user-select: none;
-    transition: opacity 0.5s ease;
+    pointer-events: none;
 }
 
-@keyframes cursor-blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
+/* Position the 4 faces evenly around the cylinder axis */
+.door-face.face-0 {
+    transform: rotateX(0deg);
+}
+.door-face.face-1 {
+    transform: rotateX(90deg);
+}
+.door-face.face-2 {
+    transform: rotateX(180deg);
+}
+.door-face.face-3 {
+    transform: rotateX(270deg);
 }
 
-.typewriter-cursor.finished {
-    opacity: 0.4;
+/* Professional face: "the scientist" in slate grey */
+.door-face.face-professional {
+    color: var(--text-subtitle, #4b5563);
 }
 
+/* Kitchen face: "the cook" in warm terracotta */
+.door-face.face-kitchen {
+    color: #b83b14;
+}
+
+/* Blank face when the door is closed/resting */
+.door-face.face-blank {
+    color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gateway-door,
+    .door-cylinder {
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Navigation Links below the title */
 .gateway-links {
     display: flex;
     align-items: center;
     gap: 28px;
     list-style: none;
-    opacity: 0;
-    transform: translateY(6px);
-    transition: opacity 0.6s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-.gateway-links.visible {
     opacity: 1;
     transform: translateY(0);
 }
@@ -785,16 +859,56 @@ body {
     text-align: center;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 900px) {
     .gateway-title {
-        font-size: 2.75rem;
+        font-size: clamp(2.4rem, 5.5vw, 3.2rem);
+    }
+}
+
+@media (max-width: 640px) {
+    .gateway-title {
+        font-size: clamp(2rem, 7.5vw, 2.5rem);
+        letter-spacing: -1px;
+    }
+
+    .gateway-door {
+        left: 50%;
+        top: calc(100% + 0.15em);
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 320px;
+    }
+
+    .door-comma {
+        display: none;
+    }
+
+    .door-face {
+        text-align: center;
+        font-size: 0.85em;
     }
 
     .gateway-links {
+        margin-top: 1.4em;
         gap: 20px;
     }
 
     .gateway-link {
         font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .gateway-title {
+        font-size: clamp(1.6rem, 6.5vw, 2.15rem);
+        letter-spacing: -0.5px;
+    }
+
+    .gateway-links {
+        gap: 16px;
+    }
+
+    .gateway-link {
+        font-size: 0.95rem;
     }
 }

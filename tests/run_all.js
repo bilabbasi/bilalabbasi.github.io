@@ -11,7 +11,8 @@ const path = require('path');
 const testFiles = [
     'test_theme.js',
     'test_styles.js',
-    'test_nav.js'
+    'test_nav.js',
+    'test_gateway.js'
 ];
 
 console.log('Running test suite...\n');

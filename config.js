@@ -18,7 +18,22 @@ const GATEWAY_CONFIG = {
             label: "kitchen",
             url: "kitchen/"
         }
-    ]
+    ],
+
+    // Revolving door animation (beside "bilal" on the gateway page).
+    // When hovering over "professional" or "kitchen", the door vertically
+    // rolls to show ", the scientist" (in slate grey) or ", the cook" (in terracotta).
+    // The greeting "hi, i'm bilal" remains completely stationary.
+    door: {
+        professional: {
+            text: ", the scientist",
+            color: "#4b5563"       // Slate grey matching the professional page subtitle
+        },
+        kitchen: {
+            text: ", the cook",
+            color: "#b83b14"       // Rich terracotta matching the kitchen theme
+        }
+    }
 };
 
 // -------------------------------------------------------------------------
