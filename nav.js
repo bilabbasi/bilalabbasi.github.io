@@ -592,16 +592,36 @@
             // 3. Wait for exit animation to complete (~140ms)
             await new Promise(r => setTimeout(r, 140));
 
-            // 4. Update browser tab title
+            // 4. Update browser history state before mounting nodes so document base URL matches
+            if (pushState && window.history && window.history.pushState) {
+                window.history.pushState({ href, targetNavId }, newDoc.title || "", href);
+            }
+
+            // 5. Update browser tab title
             if (newDoc.title) {
                 document.title = newDoc.title;
             }
 
-            // 5. Remove old content nodes
+            // 6. Remove old content nodes
             contentNodes.forEach(node => node.remove());
 
-            // 6. Extract new content nodes and mount them with entrance animation
+            // 7. Extract new content nodes and mount them with entrance animation
             const newWrapper = newDoc.querySelector(".app-wrapper");
+
+            // Normalize relative media paths against target base URL to prevent 404s
+            // across different folder depths (e.g. /kitchen/culture/ -> /kitchen/)
+            const targetBaseUrl = response.url || (typeof window !== "undefined" ? window.location.href : href);
+            if (newWrapper) {
+                newWrapper.querySelectorAll("img[src]").forEach(img => {
+                    const rawSrc = img.getAttribute("src");
+                    if (rawSrc && !rawSrc.startsWith("http://") && !rawSrc.startsWith("https://") && !rawSrc.startsWith("data:") && !rawSrc.startsWith("/")) {
+                        try {
+                            img.src = new URL(rawSrc, targetBaseUrl).href;
+                        } catch (e) {}
+                    }
+                });
+            }
+
             const newContentNodes = newWrapper ? Array.from(newWrapper.children).filter(el =>
                 !el.classList.contains("navbar") && !el.classList.contains("footer")
             ) : [];
@@ -625,11 +645,6 @@
                     });
                 });
             });
-
-            // 7. Update browser history state
-            if (pushState) {
-                window.history.pushState({ href, targetNavId }, newDoc.title, href);
-            }
 
             // 8. Update Navbar in-place WITHOUT destroying or recreating the .nav-links DOM!
             if (header && navLinks) {

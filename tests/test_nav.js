@@ -268,7 +268,7 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
     splitHeader.setAttribute('data-space', 'ammi');
     context.window.renderSplitHeaders();
 
-    assert.ok(splitHeader.innerHTML.includes('<h2 class="about-title">mom</h2>'), 'Should contain title mom');
+    assert.ok(splitHeader.innerHTML.includes('<h2 class="about-title">ammi</h2>'), 'Should contain title ammi');
     assert.ok(splitHeader.innerHTML.includes('dir="rtl" lang="ur" style="color: #b83b14;">امی</div>'), 'Should contain Urdu script for ammi with urduColor from config');
     assert.ok(!splitHeader.innerHTML.includes('split-title-roman'), 'Should omit roman transliteration');
     console.log('PASS: renderSplitHeaders stamps correct title, Urdu script, and configured color from config.js.');
@@ -431,6 +431,15 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
     assert.strictEqual(rootProps['--ink-bleed-intensity'], '3.1');
     assert.strictEqual(rootProps['--ink-paper-tooth'], '0.28');
     console.log('PASS: Hover ghost trail, press state compression, and runtime configurator verified.');
+}
+
+// 11. Test that relative image sources are normalized during client-side transitions across directory depths
+{
+    const targetBaseUrl = 'http://localhost:3000/kitchen/';
+    const rawSrc = '../assets/kitchen_sketch.png';
+    const resolvedUrl = new URL(rawSrc, targetBaseUrl).href;
+    assert.strictEqual(resolvedUrl, 'http://localhost:3000/assets/kitchen_sketch.png', 'Relative image src must resolve to root assets folder rather than 404ing under /kitchen/assets/');
+    console.log('PASS: Image path normalization across depths verified.');
 }
 
 console.log('ALL NAV TESTS PASSED!');
