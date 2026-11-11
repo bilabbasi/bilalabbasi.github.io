@@ -130,3 +130,9 @@ To maintain absolute visual stability, the elements on the professional landing 
 * Always run `git status` and `git diff` before committing.
 * Do not stage or commit changes unless explicitly requested by the user.
 * Avoid committing sensitive files (`.env`, credentials, SSH keys).
+
+### E. Visual Verification Mandate (CRITICAL)
+* Whenever making ANY aesthetic, CSS, typography, layout, or visual styling changes, you MUST look at the rendered website.
+* Capture screenshots of the modified pages across relevant viewports (desktop and mobile) using headless Chrome or a local browser.
+* Inspect the captured screenshot files directly using `read_file` to evaluate visual balance, typography, alignment, hierarchy, and potential clipping or collision.
+* Never rely solely on unit tests, linters, or code diffs for aesthetic and visual modifications. Visual evidence is strictly required before proposing or finalizing styling changes.

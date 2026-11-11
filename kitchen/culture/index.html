@@ -22,70 +22,18 @@
     <!-- Configuration Data: Shared config containing both professional and kitchen bio contents -->
     <script src="../../config.js"></script>
 
-    <!-- Loader Script: Automatically inserts the KITCHEN_CONFIG details when loaded -->
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            // Update browser tab title
-            if (typeof KITCHEN_CONFIG !== 'undefined') {
-                document.title = (KITCHEN_CONFIG.name || "the kitchen") + " — July 17, 1987";
-            }
-
-            // Load "this space" content dynamically from this_space.md
-            const thisSpaceEl = document.getElementById("this-space-content");
-            if (thisSpaceEl) {
-                fetch("this_space.md")
-                    .then(res => {
-                        if (!res.ok) throw new Error("Could not fetch this_space.md");
-                        return res.text();
-                    })
-                    .then(markdown => {
-                        let html = (typeof marked !== "undefined" && marked.parse)
-                            ? marked.parse(markdown)
-                            : markdown.trim().split(/\n\s*\n/).map(p => `<p>${p.trim().replace(/\n/g, "<br>")}</p>`).join("");
-
-                        // Automatically link "for them" to #arrival-picture if not already formatted as a link
-                        if (!html.includes('href="#arrival-picture"')) {
-                            html = html.replace(/\b(for them)\b/gi, '<a href="#arrival-picture" class="culture-link">$1</a>');
-                        }
-
-                        thisSpaceEl.innerHTML = html;
-
-                        // Ensure any links to #arrival-picture scroll smoothly
-                        thisSpaceEl.querySelectorAll('a[href="#arrival-picture"]').forEach(link => {
-                            link.classList.add("culture-link");
-                            link.addEventListener("click", (e) => {
-                                e.preventDefault();
-                                const target = document.getElementById("arrival-picture");
-                                if (target) {
-                                    target.scrollIntoView({ behavior: "smooth" });
-                                    history.pushState(null, "", "#arrival-picture");
-                                }
-                            });
-                        });
-                    })
-                    .catch(err => {
-                        console.warn("Using inline fallback content for this space:", err);
-                    });
-            }
-        });
-    </script>
+    <!-- Navigation & Dynamic Content Controller: Automatically loads headers, markdown content, and ink interactions -->
+    <script src="../../nav.js" defer></script>
 </head>
 
 <body>
     <div class="app-wrapper">
 
         <!-- Header: Top bar with navigation for kitchen sections -->
-        <header class="navbar">
-            <ul class="nav-links">
-                <li class="nav-item"><a href="../" class="nav-focal">the kitchen</a></li>
-                <li class="nav-divider" aria-hidden="true">|</li>
-                <li class="nav-item"><a href="./" class="nav-home">July 17, 1987</a></li>
-                <li class="nav-item"><a href="../me/">ammi</a></li>
-            </ul>
-        </header>
+        <header class="navbar" data-current="culture"></header>
 
         <section class="about-section" id="about">
-            <h2 class="about-title">this space</h2>
+            <header class="split-title-header" data-space="culture"></header>
 
             <div class="about-text" id="this-space-content"></div>
         </section>
@@ -96,7 +44,8 @@
                 <img class="photo-img" src="../../assets/photos/ammi_and_abu_arrive_1.JPG"
                     alt="Ammi and Abu arriving with luggage.">
                 <figcaption class="photo-caption">
-                    Ammi and abu arriving to Toronto for the first time, with my brother in hand.<br><br>
+                    Ammi and abu arriving to Toronto for the first time, with my brother in hand.<br>Just after clearing
+                    customs.<br><br>
                     <strong class="photo-date">July 17, 1987</strong>
                 </figcaption>
             </figure>

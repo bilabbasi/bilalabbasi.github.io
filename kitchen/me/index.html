@@ -22,60 +22,23 @@
     <!-- Configuration Data: Shared config containing both professional and kitchen bio contents -->
     <script src="../../config.js"></script>
 
-    <!-- Loader Script: Automatically inserts the KITCHEN_CONFIG details when loaded -->
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            // Update browser tab title
-            if (typeof KITCHEN_CONFIG !== 'undefined') {
-                document.title = (KITCHEN_CONFIG.name || "the kitchen") + " — ammi";
-            }
-
-            // Load "us" content dynamically from us.md
-            const usSpaceEl = document.getElementById("us-content");
-            if (usSpaceEl) {
-                fetch("us.md")
-                    .then(res => {
-                        if (!res.ok) throw new Error("Could not fetch us.md");
-                        return res.text();
-                    })
-                    .then(markdown => {
-                        if (typeof marked !== "undefined" && marked.parse) {
-                            usSpaceEl.innerHTML = marked.parse(markdown);
-                        } else {
-                            usSpaceEl.innerHTML = markdown
-                                .trim()
-                                .split(/\n\s*\n/)
-                                .map(para => `<p>${para.trim().replace(/\n/g, "<br>")}</p>`)
-                                .join("");
-                        }
-                    })
-                    .catch(err => {
-                        console.warn("Using inline fallback content for this space:", err);
-                    });
-            }
-        });
-    </script>
+    <!-- Navigation & Dynamic Content Controller: Automatically loads headers, markdown content, and ink interactions -->
+    <script src="../../nav.js" defer></script>
 </head>
 
 <body>
     <div class="app-wrapper">
 
         <!-- Header: Top bar with navigation for kitchen sections -->
-        <header class="navbar">
-            <ul class="nav-links">
-                <li class="nav-item"><a href="../" class="nav-focal">the kitchen</a></li>
-                <li class="nav-divider" aria-hidden="true">|</li>
-                <li class="nav-item"><a href="../culture/">July 17, 1987</a></li>
-                <li class="nav-item"><a href="./" class="nav-home">ammi</a></li>
-            </ul>
-        </header>
+        <header class="navbar" data-current="ammi"></header>
 
         <!-- About / Me Section -->
         <section class="about-section" id="me">
-            <h2 class="about-title">ammi</h2>
-
             <div class="about-grid">
-                <div class="about-column about-text" id="us-content"></div>
+                <div class="about-column about-text">
+                    <header class="split-title-header" data-space="ammi"></header>
+                    <div id="us-content"></div>
+                </div>
                 <div class="about-column">
                     <img class="about-img" src="../../assets/photos/bilal_baby.png"
                         alt="Picture of Bilal's mom holding him in the kitchen sink.">

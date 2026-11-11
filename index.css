@@ -4,8 +4,8 @@
    This file controls the colors, sizes, alignment, and fonts of the page.
    Follow the comments below to easily customize the layout of your site. */
 
-/* Import Google Fonts (Lora for serif heading, Inter for clean body text) */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+/* Import Google Fonts (Lora for serif heading, Inter for clean body text, Noto Nastaliq Urdu for Urdu calligraphy) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Nastaliq+Urdu:wght@400..700&display=swap');
 
 /* Define design colors and settings so they can be changed in one place */
 :root {
@@ -13,25 +13,38 @@
     /* Background color of the entire screen */
     --text-title: #18181b;
     /* Color of your name and main headers (charcoal/dark gray) */
-    --text-subtitle: #6b6687;
-    /* Color of the subtitle (soft slate purple) */
+    --text-subtitle: #4b5563;
+    /* Color of the subtitle (muted charcoal) */
     --text-body: #4b5563;
     /* Color of your bio paragraphs (muted charcoal) */
     --text-muted: #9ca3af;
     /* Color for minor symbols and arrow indicators (light gray) */
     --link-color: #18181b;
     /* Default color of link text */
-    --link-hover: #6b6687;
+    --link-hover: #4b5563;
     /* Color of link text when hovered over */
     --border-color: #e5e7eb;
     /* Light gray borders (if used anywhere) */
 
     /* Font styles */
-    --font-serif: 'Lora', Georgia, serif;
+    --font-serif: 'Lora', Georgia, 'Noto Nastaliq Urdu', 'Geeza Pro', serif;
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
     /* Animation speed for links and transitions */
     --transition-smooth: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+    /* Tactile Ink Brush Indicator Parameters (Sumi-e / Nastaliq Qalam Dynamics) */
+    --ink-color: #18181b;
+    --ink-bleed-color: #4b5563;
+    --ink-opacity: 0.92;
+    --ink-bleed-opacity: 0.36;
+    --ink-ghost-opacity: 0.24;
+    --ink-duration: 420ms;
+    --ink-bloom-duration: 150ms;
+    --ink-easing: cubic-bezier(0.22, 1, 0.36, 1);
+    --ink-bleed-intensity: 2.4;
+    --ink-paper-tooth: 0.22;
+    --ink-press-scale-y: 0.85;
 }
 
 /* Reset default browser margins and spacings to start with a clean slate */
@@ -94,21 +107,23 @@ body {
     height: 60px;
     flex-shrink: 0;
     /* Prevent compressing the header height */
+    view-transition-name: main-navbar;
 }
 
-/* Logo styling */
-.logo {
-    font-family: var(--font-sans);
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: var(--text-title);
-    letter-spacing: -0.5px;
-    text-transform: lowercase;
-    /* Renders the name in modern lowercase style */
+/* Enable Cross-Document View Transitions */
+@view-transition {
+    navigation: auto;
+}
+
+/*Semantic nav container inside header.navbar */
+.nav-container {
+    display: flex;
+    align-items: center;
 }
 
 /* List holding navigation links */
 .nav-links {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 32px;
@@ -118,14 +133,24 @@ body {
 
 /* Navigation items link text */
 .nav-item a {
+    position: relative;
+    display: inline-block;
     text-decoration: none;
     font-size: 0.9rem;
+    letter-spacing: 0.01em;
     color: var(--text-body);
-    transition: var(--transition-smooth);
+    transition: color var(--transition-smooth), transform 0.14s ease;
     border-bottom: 1.5px solid transparent;
     /* Reserve space to prevent layout baseline shifts */
-    padding-bottom: 2px;
+    padding-bottom: 3px;
     /* Reserve space to prevent layout baseline shifts */
+    outline: none;
+}
+
+.nav-item a:focus-visible {
+    color: var(--text-title);
+    border-radius: 2px;
+    box-shadow: 0 0 0 2px var(--bg-main), 0 0 0 3.5px var(--ink-color, var(--text-title));
 }
 
 .nav-item a:hover {
@@ -147,6 +172,154 @@ body {
 .nav-item a.nav-home:hover {
     color: var(--link-hover);
     border-bottom-color: var(--link-hover);
+}
+
+/* Tactile Sumi-e / Nastaliq Qalam Brush Stroke Indicator */
+.nav-indicator,
+.nav-indicator-ghost {
+    position: absolute;
+    bottom: -4.5px;
+    left: 0;
+    height: 7.5px;
+    pointer-events: none;
+    opacity: 0;
+    transform-origin: left center;
+    will-change: transform, opacity;
+}
+
+.nav-indicator {
+    z-index: 2;
+    background-color: var(--ink-color, var(--link-hover));
+    border-radius: 1px;
+    transition: opacity 0.2s ease;
+    view-transition-name: active-nav-underline;
+}
+
+.nav-indicator.is-ink-hydrated {
+    background-color: transparent;
+    border-radius: 0;
+}
+
+/* Faint hover brush ghost trailing under non-active hovered tabs */
+.nav-indicator-ghost {
+    z-index: 1;
+    transition: opacity 0.22s ease;
+}
+
+.nav-indicator-ghost.is-visible {
+    opacity: var(--ink-ghost-opacity, 0.24);
+}
+
+/* Hardware-accelerated kinetic stage (animated via transform: translate3d, scaleX, scaleY) */
+.nav-ink-stage {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform-origin: 0% 50%;
+    will-change: transform, opacity;
+    transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Press state: slight vertical ink compression (scaleY: 0.85) on click before release */
+.nav-indicator.is-pressed .nav-ink-stage,
+.nav-indicator-ghost.is-pressed .nav-ink-stage {
+    transform: scaleY(var(--ink-press-scale-y, 0.85)) scaleX(1.025);
+}
+
+.nav-brush-svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    mix-blend-mode: multiply;
+    filter: url(#nav-ink-filter);
+    opacity: var(--ink-opacity, 0.92);
+}
+
+/* Wet capillary edge bleed halo path */
+.nav-ink-bleed-path {
+    fill: var(--ink-bleed-color, var(--link-hover));
+    opacity: var(--ink-bleed-opacity, 0.36);
+    transform-origin: 50% 50%;
+    will-change: opacity, transform;
+}
+
+/* Mid-tone translucent ink wash body (creates longitudinal sumi gradation) */
+.nav-ink-wash-path {
+    fill: var(--ink-color, var(--text-title));
+    opacity: 0.48;
+}
+
+/* Primary concentrated pigment core path */
+.nav-ink-core-path {
+    fill: var(--ink-color, var(--text-title));
+    opacity: 0.92;
+    transition: d var(--ink-duration, 420ms) var(--ink-easing, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+/* Feathered dry-brush bristle filaments at stroke terminals */
+.nav-ink-bristles-path {
+    fill: none;
+    stroke: var(--ink-color, var(--text-title));
+    stroke-width: 0.65;
+    stroke-linecap: round;
+    opacity: 0.45;
+    vector-effect: non-scaling-stroke;
+}
+
+/* Subtle paper-fiber tooth highlight along trailing bristle split */
+.nav-ink-dry-path {
+    fill: none;
+    stroke: var(--bg-main, #ffffff);
+    stroke-width: 0.45;
+    stroke-linecap: round;
+    opacity: 0.28;
+    vector-effect: non-scaling-stroke;
+}
+
+/* When the continuous indicator is active, hide the static border */
+.nav-links.has-indicator .nav-indicator {
+    opacity: 1;
+}
+
+.nav-links.has-indicator .nav-item a {
+    border-bottom-color: transparent !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .nav-ink-stage,
+    .nav-ink-core-path,
+    .nav-indicator,
+    .nav-indicator-ghost {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+}
+
+/* Fallback underline element */
+.nav-underline {
+    position: absolute;
+    bottom: -1.5px;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    background-color: var(--link-hover);
+    view-transition-name: active-nav-underline;
+    pointer-events: none;
+    border-radius: 1px;
+}
+
+/* View Transition animation for the sliding underline */
+::view-transition-group(active-nav-underline) {
+    animation-duration: 0.32s;
+    animation-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+::view-transition-old(active-nav-underline),
+::view-transition-new(active-nav-underline) {
+    animation: none;
+    mix-blend-mode: normal;
+    height: 100%;
 }
 
 /* Prominent emphasis for focal point section */
@@ -253,6 +426,21 @@ body {
     /* Justify text to align cleanly with both left and right column boundaries */
 }
 
+/* Inline links inside bio paragraph: discreet by default, reveals color on hover */
+.bio-paragraph a {
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color var(--transition-smooth);
+}
+
+.bio-paragraph a:hover,
+.bio-paragraph a:focus,
+.bio-paragraph a:focus-visible {
+    color: var(--link-hover, #0f172a);
+    font-weight: 600;
+}
+
 /* Outer wrapper block for the social links row */
 .external-links {
     display: flex;
@@ -350,10 +538,33 @@ body {
     pointer-events: none;              /* Prevents mouse dragging/saving issues on clicks */
 }
 
-/* Optical alignment for the professional page functions illustration */
+/* Enhanced presence and gravitas for professional page illustration */
 @media (min-width: 901px) {
+    .main-content.professional-content {
+        grid-template-columns: 1fr 1.35fr;
+        gap: 56px;
+    }
+
     .professional-sketch {
-        margin-top: -35px;
+        margin-top: -45px;
+    }
+
+    .professional-sketch .sketch-img {
+        max-height: calc(100vh - 145px);
+        opacity: 0.98;
+        filter: contrast(1.04) saturate(1.03);
+    }
+}
+
+@media (max-width: 900px) {
+    .professional-sketch {
+        max-width: 460px;
+    }
+
+    .professional-sketch .sketch-img {
+        max-height: 52vh;
+        opacity: 0.98;
+        filter: contrast(1.04) saturate(1.03);
     }
 }
 
@@ -503,7 +714,7 @@ body {
 }
 
 .gateway-name-accent {
-    color: #7c2d12;
+    color: #721817;
 }
 
 .typewriter-cursor {
@@ -559,8 +770,8 @@ body {
 }
 
 .gateway-link.gateway-link-kitchen:hover {
-    color: #ea580c;
-    border-bottom-color: #ea580c;
+    color: #fa9f42;
+    border-bottom-color: #fa9f42;
 }
 
 .gateway-divider {

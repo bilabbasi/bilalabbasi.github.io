@@ -4,7 +4,7 @@ my story is certainly not unique, but it is my own
 
 through recipes given by my mom, this space is hopefully a reminder that food is more then just a dictation of ingredients and steps
 
-it’s a collection of nostalgia, heritage, and tradition
+it’s a collection of nostalgia, heritage, and customs
 
 this space is a tribute to all of the kids who were too embarassed to bring their food to school
 
