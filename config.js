@@ -110,8 +110,8 @@ const KITCHEN_CONFIG = {
     // Changing these colors will automatically propagate across all kitchen
     // and recipe pages without touching any CSS files.
     theme: {
-        anchor: "#721817",    // Primary warm amber/terracotta: links, subtitles, resting ink
-        distinct: "#fa9f42",  // Electric tangerine: hover states & active underline
+        anchor: "#c55c00ff",    // Primary warm amber/terracotta: links, subtitles, resting ink
+        distinct: "#693501ff",  // Electric tangerine: hover states & active underline
         pop: "#2b4162",       // Accent slate: badges, category tags, focal highlights
         urdu: "#b83b14"       // Rich terracotta pigment: Urdu calligraphy subtitle in space headers
     },

@@ -21,6 +21,7 @@ assert.match(kitchenCss, /var\(--text-subtitle\)/, 'kitchen.css should use var(-
 assert.match(kitchenCss, /var\(--link-color\)/, 'kitchen.css should use var(--link-color)');
 assert.match(kitchenCss, /var\(--link-hover\)/, 'kitchen.css should use var(--link-hover)');
 assert.match(kitchenCss, /var\(--color-urdu/, 'kitchen.css should use var(--color-urdu)');
+assert.match(kitchenCss, /\.urdu-title\s*\{[^}]*color:\s*var\(--color-urdu\)/, '.urdu-title should use var(--color-urdu) in kitchen.css');
 
 assert.ok(kitchenCss.includes('.pop-tag') || kitchenCss.includes('.badge-pop'), 'kitchen.css should define .pop-tag or .badge-pop');
 assert.match(kitchenCss, /var\(--color-pop/, 'Pop badge should use var(--color-pop)');
@@ -37,6 +38,7 @@ assert.match(recipeCss, /var\(--text-subtitle/, 'recipe.css should use var(--tex
 assert.match(recipeCss, /var\(--link-hover/, 'recipe.css should use var(--link-hover)');
 assert.match(recipeCss, /var\(--color-pop\)/, 'recipe.css should use var(--color-pop)');
 assert.match(recipeCss, /var\(--color-urdu/, 'recipe.css should use var(--color-urdu)');
+assert.match(recipeCss, /\.urdu-title\s*\{[^}]*color:\s*var\(--color-urdu\)/, '.urdu-title should use var(--color-urdu) in recipe.css');
 
 assert.match(recipeCss, /\.recipe-link::after\s*\{[^}]*mask-image:\s*var\(--ink-brush-mask\)/, 'recipe.css links should use --ink-brush-mask');
 assert.match(recipeCss, /\.nav-item a\.active::after\s*\{[^}]*mask-image:\s*var\(--ink-brush-mask\)/, 'Active back-link should use --ink-brush-mask');
