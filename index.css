@@ -719,6 +719,7 @@ body {
    GATEWAY / COVER PAGE STYLES
    ========================================================================= */
 
+/* Full-viewport flex container centering the entire landing card */
 .gateway-wrapper {
     position: relative;
     display: flex;
@@ -733,24 +734,27 @@ body {
     box-sizing: border-box;
 }
 
+/* Main card wrapper containing title, reel, divider, and links */
 .gateway-card {
+    /* Optical vertical offset: lifts card slightly above exact center to avoid looking bottom-heavy */
     --gateway-y: -20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     gap: 0;
-    /* Optical vertical centering adjustment */
     transform: translateY(var(--gateway-y));
     transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* Exit transition state: smooth dissolve and slight upward drift before navigating */
 .gateway-card.is-exiting {
     opacity: 0;
     transform: translateY(calc(var(--gateway-y) - 8px));
     pointer-events: none;
 }
 
+/* Title stack: Line 1 = "hi, i'm bilal,", Line 2 = revolving descriptor reel */
 .gateway-title {
     position: relative;
     display: flex;
@@ -764,7 +768,9 @@ body {
     color: var(--text-title);
     letter-spacing: -1.2px;
     text-align: center;
-    gap: 2.3em; /* Generous breathing room so "the runner" and "the cook" sit comfortably below "hi, i'm bilal," */
+    /* Vertical gap between "hi, i'm bilal," and the reel slot.
+       2.3em gives comfortable clearance so fading upper items never crowd Line 1. */
+    gap: 2.3em;
 }
 
 .gateway-static {
@@ -777,24 +783,37 @@ body {
     display: inline;
 }
 
+/* Deep wine red accent for the name "bilal" */
 .gateway-name-accent {
     color: #721817;
 }
 
 /* =========================================================================
-   FADED FLAT REEL (DESCRIPTOR STACK)
+   FADED FLAT REEL (DESCRIPTOR STACK & INFINITE CYLINDER)
    =========================================================================
    Positioned beneath "hi, i'm bilal,", horizontally centered. */
 
+/* The reel's in-flow footprint: occupies strictly one line height (1.15em)
+   in the page flow so scrolling descriptors never cause layout shifts. */
 .gateway-reel {
     position: relative;
     display: inline-block;
-    overflow: visible;
+    height: 1.15em;
+    line-height: 1.15em;
     text-align: center;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.gateway-reel.is-dragging {
+    cursor: grabbing;
 }
 
 /* Invisible in-flow anchor matching the longest phrase ("the scientist")
-   to ensure the reel container has exact typographic width and baseline. */
+   to ensure the reel container reserves exact typographic width and baseline.
+   This prevents horizontal width jitter as words of different lengths spin through. */
 .reel-baseline-anchor {
     visibility: hidden;
     display: inline-block;
@@ -809,7 +828,23 @@ body {
     text-align: center;
 }
 
-/* Track holding the 4 descriptor items, sliding vertically via translateY */
+/* Masked viewing aperture extending above and below the anchor (4.6em total height).
+   The CSS gradient mask dissolves descriptors into transparency at the top and bottom
+   edges, creating a smooth fading cylinder effect without hard clipping lines. */
+.reel-viewport {
+    position: absolute;
+    top: -1.725em;
+    bottom: -1.725em;
+    left: -24px;
+    right: -24px;
+    height: 4.6em;
+    overflow: hidden;
+    pointer-events: auto;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
+}
+
+/* Track holding descriptor items, translated vertically by JavaScript */
 .reel-track {
     position: absolute;
     left: 0;
@@ -820,7 +855,7 @@ body {
     align-items: center;
     pointer-events: none;
     user-select: none;
-    transition: transform 0.46s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
 }
 
 /* Base style for each item in the reel: centered in the track */
@@ -838,76 +873,9 @@ body {
     text-align: center;
     white-space: nowrap;
     color: var(--text-muted, #9ca3af);
-    transition: color 0.35s ease, opacity 0.35s ease;
-}
-
-/* --- State: Resting (Frozen Mid-Spin Split) --- */
-/* Boundary between cook (item 1) and scientist (item 2) sits at 50% of track.
-   Translating by -37.5% places that boundary exactly at the vertical midline. */
-.gateway-reel[data-state="resting"] .reel-track {
-    transform: translateY(-37.5%);
-}
-
-.gateway-reel[data-state="resting"] .reel-cook,
-.gateway-reel[data-state="resting"] .reel-scientist {
-    color: var(--text-muted, #9ca3af);
-    opacity: 0.40;
-}
-
-.gateway-reel[data-state="resting"] .reel-runner,
-.gateway-reel[data-state="resting"] .reel-reader {
-    color: var(--text-muted, #9ca3af);
     opacity: 0.18;
-}
-
-/* --- State: Kitchen ("cook" aligned in terracotta) --- */
-.gateway-reel[data-state="kitchen"] .reel-track {
-    transform: translateY(-25%);
-}
-
-.gateway-reel[data-state="kitchen"] .reel-cook {
-    color: #b83b14;
-    opacity: 1;
-}
-
-.gateway-reel[data-state="kitchen"] .reel-scientist {
-    color: var(--text-muted, #9ca3af);
-    opacity: 0.28;
-}
-
-.gateway-reel[data-state="kitchen"] .reel-runner {
-    color: var(--text-muted, #9ca3af);
-    opacity: 0.20;
-}
-
-.gateway-reel[data-state="kitchen"] .reel-reader {
-    color: var(--text-muted, #9ca3af);
-    opacity: 0.12;
-}
-
-/* --- State: Professional ("scientist" aligned in slate grey) --- */
-.gateway-reel[data-state="professional"] .reel-track {
-    transform: translateY(-50%);
-}
-
-.gateway-reel[data-state="professional"] .reel-scientist {
-    color: var(--text-subtitle, #4b5563);
-    opacity: 1;
-}
-
-.gateway-reel[data-state="professional"] .reel-cook {
-    color: var(--text-muted, #9ca3af);
-    opacity: 0.28;
-}
-
-.gateway-reel[data-state="professional"] .reel-runner {
-    color: var(--text-muted, #9ca3af);
-    opacity: 0.12;
-}
-
-.gateway-reel[data-state="professional"] .reel-reader {
-    color: var(--text-muted, #9ca3af);
-    opacity: 0.20;
+    transition: color 0.22s ease, opacity 0.22s ease;
+    will-change: opacity, color;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -917,12 +885,13 @@ body {
     }
 }
 
-/* Minimal Boundary Line separating the animation and navigation links */
+/* Minimal Boundary Line separating the revolving animation above and navigation menu below */
 .gateway-divider-line {
     width: 44px;
     height: 1px;
     background-color: rgba(30, 41, 59, 0.16);
-    margin-top: 156px; /* Balanced clearance placing boundary line symmetrically below lowest reel item */
+    /* Clearance placing the divider line symmetrically below the lowest faded reel item */
+    margin-top: 156px;
     margin-bottom: 24px;
     border: none;
     border-radius: 1px;
@@ -991,12 +960,18 @@ body {
     pointer-events: none;
 }
 
+/* =========================================================================
+   GATEWAY RESPONSIVE BREAKPOINTS (TABLETS & MOBILE)
+   ========================================================================= */
+
+/* Tablets / Medium Viewports */
 @media (max-width: 900px) {
     .gateway-title {
         font-size: clamp(2.6rem, 5.5vw, 3.2rem);
     }
 }
 
+/* Mobile Screens (portrait smartphones & large phablets) */
 @media (max-width: 640px) {
     .gateway-card {
         --gateway-y: -16px;
@@ -1005,10 +980,12 @@ body {
     }
 
     .gateway-title {
+        /* Scaled typography for mobile: ensures "the scientist" fits horizontally */
         font-size: clamp(2.1rem, 7vw, 2.6rem);
         letter-spacing: -0.8px;
         line-height: 1.15;
-        gap: 2.2em; /* Generous breathing room so "the runner" and "the cook" sit comfortably below "hi, i'm bilal," */
+        /* Vertical clearance between "hi, i'm bilal," and top edge of reel */
+        gap: 2.2em;
         white-space: normal;
     }
 
@@ -1017,6 +994,7 @@ body {
         text-align: center;
     }
 
+    /* Boundary line clearance scaled for mobile reel height */
     .gateway-divider-line {
         width: 36px;
         margin-top: 112px;
@@ -1033,6 +1011,7 @@ body {
     }
 }
 
+/* Compact Smartphones */
 @media (max-width: 480px) {
     .gateway-title {
         font-size: clamp(1.95rem, 6.5vw, 2.35rem);

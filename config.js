@@ -10,37 +10,68 @@
 const GATEWAY_CONFIG = {
     name: "hi, i'm bilal",
     greetingPrefix: "hi, i'm bilal, the",
+    // Navigation links shown at the bottom of the gateway
     links: [
         {
-            label: "professional",
-            url: "professional/",
-            target: "professional"
+            label: "professional", // Display text for the link
+            url: "professional/",   // Destination URL
+            target: "professional"  // Associates link with "the scientist" reel state
         },
         {
-            label: "kitchen",
-            url: "kitchen/",
-            target: "kitchen"
+            label: "kitchen",       // Display text for the link
+            url: "kitchen/",        // Destination URL
+            target: "kitchen"       // Associates link with "the cook" reel state
         }
     ],
 
-    // Faded flat reel (descriptor stack) beneath "hi, i'm bilal,".
-    // In resting state, all options are visible in faded grey, with the midline
-    // between "the cook" and "the scientist" centered on the second line.
-    // Hovering "kitchen" slides "the cook" into alignment (terracotta).
-    // Hovering "professional" slides "the scientist" into alignment (slate grey).
+    // Faded flat reel (descriptor stack) positioned beneath "hi, i'm bilal,".
+    // - In resting state: all options are visible in faded grey, with the midline
+    //   between "the cook" and "the scientist" centered on the second line.
+    // - Hovering/clicking "kitchen": smoothly rolls "the cook" into alignment (terracotta).
+    // - Hovering/clicking "professional": smoothly rolls "the scientist" into alignment (slate grey).
+    // - Scrolling (mouse wheel, drag, or touch swipe): lets visitors explore all other descriptors (easter egg).
     reel: {
+        // Descriptors in the circular reel. You can add, edit, or reorder items freely here.
+        // - id: unique slug for DOM classes and query parameters (?item=<id>)
+        // - label: visible text rendered on the reel
+        // - target: optional ("kitchen" | "professional"); associates item with a navigation link
+        // - color: hex color used when this item is active/locked
+        // - atmospheric: true = easter egg descriptor (renders in dark charcoal #1e293b when centered)
         items: [
             { id: "runner", label: "the runner", atmospheric: true },
             { id: "cook", label: "the cook", target: "kitchen", color: "#b83b14" },
             { id: "scientist", label: "the scientist", target: "professional", color: "#4b5563" },
-            { id: "reader", label: "the reader", atmospheric: true }
+            { id: "reader", label: "the reader", atmospheric: true },
+            { id: "son", label: "the son", atmospheric: true },
+            { id: "husband", label: "the husband", atmospheric: true },
+            { id: "cyclist", label: "the cyclist", atmospheric: true },
+            { id: "gamer", label: "the gamer", atmospheric: true },
+            { id: "friend", label: "the friend", atmospheric: true },
+            { id: "brother", label: "the brother", atmospheric: true }
         ],
+        // Scroll physics for desktop wheel & trackpad:
+        // - wheelSensitivity: How far the reel moves per wheel tick.
+        //   * 0.15 = slower, heavier, more deliberate (good for trackpad precision)
+        //   * 0.35 = balanced default
+        //   * 0.60 = fast, spins freely through items
+        wheelSensitivity: 0.15,
+
+        // - friction: Momentum glide deceleration after releasing a flick.
+        //   * 0.85 = brisk stop (little momentum)
+        //   * 0.92 = smooth natural decay (default)
+        //   * 0.96 = long glide before magnetic settling
+        friction: 0.92,
+
         // Colors for each interactive target
         colors: {
             professional: "#4b5563",
             kitchen: "#b83b14"
         }
     },
+
+    // How long (in milliseconds) the highlighted title stays on screen before transitioning pages.
+    // e.g. 900 = balanced hold; 1400 = longer hold so visitors clearly read the title; 500 = fast
+    navigationDelay: 1100,
 
     // Backward compatibility for existing door references
     door: {

@@ -56,22 +56,182 @@
             }
 
             // =====================================================================
-            // Faded Flat Reel Controller (Descriptor Stack)
+            // Circular Infinite Reel Controller & Easter Egg Scroller
             // =====================================================================
-            // The stack has 4 items: runner (0), cook (1), scientist (2), reader (3).
-            // - Resting state: Midpoint between cook and scientist aligns with the sentence baseline.
-            // - Hovering "kitchen": Slides "cook" onto the baseline in warm terracotta (#b83b14).
-            // - Hovering "professional": Slides "scientist" onto the baseline in slate grey (#4b5563).
-            // - Mouse leave: Smoothly slides back to the resting mid-split.
             const reelEl = document.getElementById("gateway-reel");
-            let currentState = "resting"; // "resting" | "professional" | "kitchen"
+            const trackEl = document.getElementById("reel-track");
+            const anchorEl = document.querySelector(".reel-baseline-anchor");
+
+            const items = (config.reel && Array.isArray(config.reel.items)) ? config.reel.items : [];
+
+            const N = items.length;
+            const cookIndex = items.findIndex(it => it.id === "cook" || it.target === "kitchen");
+            const scientistIndex = items.findIndex(it => it.id === "scientist" || it.target === "professional");
+
+            // Build 3 sets of items for seamless circular infinite wrapping
+            let trackHtml = "";
+            for (let c = 0; c < 3; c++) {
+                items.forEach((item, idx) => {
+                    const isMiddleCycle = (c === 1);
+                    const originalIdAttr = isMiddleCycle ? ` id="reel-item-${item.id}"` : "";
+                    trackHtml += `<span class="reel-item reel-${item.id}"${originalIdAttr} data-item-id="${item.id}" data-cycle="${c}" data-index="${idx}">${item.label}</span>`;
+                });
+            }
+            if (trackEl) {
+                trackEl.innerHTML = trackHtml;
+            }
+
+            function getItemHeight() {
+                if (anchorEl && anchorEl.offsetHeight > 0) {
+                    return anchorEl.offsetHeight;
+                }
+                return 56;
+            }
+
+            // Target positions for canonical states:
+            // Center of aperture is 2.0 * H.
+            // Target index K has center (K + 0.5) * H.
+            // So T = (K - 1.5) * H.
+            function getTargetOffset(state) {
+                const H = getItemHeight();
+                if (state === "kitchen") {
+                    const idx = (cookIndex >= 0 ? cookIndex : 1);
+                    return (N + idx - 1.5) * H;
+                } else if (state === "professional") {
+                    const idx = (scientistIndex >= 0 ? scientistIndex : 2);
+                    return (N + idx - 1.5) * H;
+                } else {
+                    // Resting: midpoint between cook and scientist
+                    const mid = ((cookIndex >= 0 ? cookIndex : 1) + (scientistIndex >= 0 ? scientistIndex : 2)) / 2;
+                    return (N + mid - 1.5) * H;
+                }
+            }
+
+            // Preview query param for headless verification (?state=professional, ?state=kitchen, ?state=resting, ?item=cyclist, etc.)
+            const urlParams = new URLSearchParams(window.location.search);
+            const previewState = urlParams.get("state");
+            const previewItem = urlParams.get("item");
+
+            let initialTarget = "resting";
+            if (previewState && (previewState === "professional" || previewState === "kitchen" || previewState === "resting")) {
+                initialTarget = previewState;
+            }
+
+            let currentState = initialTarget;
+            let currentT = getTargetOffset(initialTarget);
+
+            if (previewItem) {
+                const itemIdx = items.findIndex(it => it.id === previewItem);
+                if (itemIdx >= 0) {
+                    const H = getItemHeight();
+                    currentT = (N + itemIdx - 1.5) * H;
+                    currentState = "scrolling";
+                }
+            }
+
+            if (reelEl) {
+                reelEl.setAttribute("data-state", currentState);
+            }
+
             let leaveTimer = null;
+            let animRafId = null;
+            let momentumRafId = null;
+
+            function cancelAnimation() {
+                if (animRafId) {
+                    cancelAnimationFrame(animRafId);
+                    animRafId = null;
+                }
+            }
+
+            function cancelMomentum() {
+                if (momentumRafId) {
+                    cancelAnimationFrame(momentumRafId);
+                    momentumRafId = null;
+                }
+            }
+
+            function renderTrack() {
+                if (!trackEl) return;
+                const H = getItemHeight();
+                const C = N * H;
+
+                // Circular wrap currentT into Copy 1 range [0.5 * C, 1.5 * C)
+                while (currentT < 0.5 * C) currentT += C;
+                while (currentT >= 1.5 * C) currentT -= C;
+
+                trackEl.style.transform = `translateY(${-currentT}px)`;
+
+                const viewportCenterY = 2.0 * H;
+                const children = trackEl.children;
+                const totalChildren = children.length;
+
+                for (let i = 0; i < totalChildren; i++) {
+                    const el = children[i];
+                    const itemCenterY = (i + 0.5) * H;
+                    const screenDist = itemCenterY - currentT - viewportCenterY;
+                    const d = Math.abs(screenDist) / H;
+
+                    if (d < 0.28) {
+                        el.style.opacity = "1";
+                        const itemId = el.getAttribute("data-item-id");
+                        if (itemId === "cook" && currentState === "kitchen") {
+                            el.style.color = "#b83b14";
+                        } else if (itemId === "scientist" && currentState === "professional") {
+                            el.style.color = "#4b5563";
+                        } else {
+                            el.style.color = "var(--text-title, #1e293b)";
+                        }
+                    } else if (d < 0.78) {
+                        el.style.opacity = "0.40";
+                        el.style.color = "var(--text-muted, #9ca3af)";
+                    } else if (d < 1.78) {
+                        el.style.opacity = "0.18";
+                        el.style.color = "var(--text-muted, #9ca3af)";
+                    } else {
+                        el.style.opacity = "0";
+                        el.style.color = "var(--text-muted, #9ca3af)";
+                    }
+                }
+            }
+
+            function animateTo(targetT, duration = 460, onComplete = null) {
+                cancelAnimation();
+                cancelMomentum();
+                const H = getItemHeight();
+                const C = N * H;
+
+                // Pick shortest direction around circle
+                let delta = ((targetT - currentT) % C + C * 1.5) % C - 0.5 * C;
+                const startT = currentT;
+                const endT = currentT + delta;
+                const startTime = performance.now();
+
+                function step(now) {
+                    const elapsed = now - startTime;
+                    const progress = Math.min(1, elapsed / duration);
+                    // Quintic smooth cubic bezier easing (0.22, 1, 0.36, 1)
+                    const t = 1 - Math.pow(1 - progress, 3);
+                    currentT = startT + (endT - startT) * t;
+                    renderTrack();
+
+                    if (progress < 1) {
+                        animRafId = requestAnimationFrame(step);
+                    } else {
+                        animRafId = null;
+                        currentT = endT;
+                        renderTrack();
+                        if (onComplete) onComplete();
+                    }
+                }
+
+                animRafId = requestAnimationFrame(step);
+            }
 
             function setReelState(newState) {
                 if (!newState || newState === "idle") {
                     newState = "resting";
                 }
-                if (newState === currentState) return;
                 currentState = newState;
 
                 if (leaveTimer) {
@@ -79,18 +239,193 @@
                     leaveTimer = null;
                 }
 
-                if (!reelEl) return;
-                reelEl.setAttribute("data-state", newState);
+                if (reelEl) {
+                    reelEl.setAttribute("data-state", newState);
+                }
+
+                const targetT = getTargetOffset(newState);
+                animateTo(targetT, 460);
             }
 
             // Expose globally for tests and inspectability
             window.setReelState = setReelState;
             window.setDoorState = setReelState; // Backward compatibility alias
 
-            // Wire click listeners: provide ~850ms choreographed transition (revolver roll -> smooth exit fade -> navigation)
+            // =====================================================================
+            // Free-Scroll & Magnetic Snap Physics (Easter Egg)
+            // =====================================================================
+            let velocity = 0;
+            let isDragging = false;
+            let touchStartY = 0;
+            let lastTouchY = 0;
+            let lastTouchTime = 0;
+
+            function snapToNearest() {
+                const H = getItemHeight();
+                const C = N * H;
+
+                const mid = ((cookIndex >= 0 ? cookIndex : 1) + (scientistIndex >= 0 ? scientistIndex : 2)) / 2;
+                const candidates = [mid];
+                for (let k = 0; k < N; k++) {
+                    candidates.push(k);
+                }
+
+                let bestTarget = null;
+                let minDelta = Infinity;
+
+                candidates.forEach(cand => {
+                    const candTarget = (N + cand - 1.5) * H;
+                    let delta = ((candTarget - currentT) % C + C * 1.5) % C - 0.5 * C;
+                    if (Math.abs(delta) < Math.abs(minDelta)) {
+                        minDelta = delta;
+                        bestTarget = currentT + delta;
+                    }
+                });
+
+                if (bestTarget !== null) {
+                    animateTo(bestTarget, 240);
+                }
+            }
+
+            const wheelSensitivity = (config.reel && typeof config.reel.wheelSensitivity === "number")
+                ? config.reel.wheelSensitivity
+                : 0.35;
+            const friction = (config.reel && typeof config.reel.friction === "number")
+                ? config.reel.friction
+                : 0.92;
+
+            function startMomentum() {
+                cancelMomentum();
+                cancelAnimation();
+
+                function physicsStep() {
+                    currentT += velocity;
+                    velocity *= friction;
+                    renderTrack();
+
+                    if (Math.abs(velocity) > 0.35) {
+                        momentumRafId = requestAnimationFrame(physicsStep);
+                    } else {
+                        momentumRafId = null;
+                        snapToNearest();
+                    }
+                }
+
+                momentumRafId = requestAnimationFrame(physicsStep);
+            }
+
+            if (reelEl) {
+                // Wheel / Trackpad listener
+                reelEl.addEventListener("wheel", (e) => {
+                    if (isNavigating) return;
+                    e.preventDefault();
+                    cancelAnimation();
+                    cancelMomentum();
+                    currentState = "scrolling";
+                    reelEl.setAttribute("data-state", "scrolling");
+
+                    velocity += e.deltaY * wheelSensitivity;
+                    const maxVel = getItemHeight() * 1.5;
+                    if (velocity > maxVel) velocity = maxVel;
+                    if (velocity < -maxVel) velocity = -maxVel;
+
+                    startMomentum();
+                }, { passive: false });
+
+                // Touch listeners (Mobile swipe)
+                reelEl.addEventListener("touchstart", (e) => {
+                    if (isNavigating || e.touches.length !== 1) return;
+                    cancelAnimation();
+                    cancelMomentum();
+                    currentState = "scrolling";
+                    reelEl.setAttribute("data-state", "scrolling");
+
+                    touchStartY = e.touches[0].clientY;
+                    lastTouchY = touchStartY;
+                    lastTouchTime = performance.now();
+                    isDragging = true;
+                    velocity = 0;
+                }, { passive: true });
+
+                reelEl.addEventListener("touchmove", (e) => {
+                    if (!isDragging || e.touches.length !== 1) return;
+                    const touchY = e.touches[0].clientY;
+                    const deltaY = lastTouchY - touchY;
+                    const now = performance.now();
+                    const dt = Math.max(1, now - lastTouchTime);
+                    velocity = (deltaY / dt) * 16;
+                    lastTouchY = touchY;
+                    lastTouchTime = now;
+
+                    currentT += deltaY;
+                    renderTrack();
+                }, { passive: true });
+
+                reelEl.addEventListener("touchend", () => {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    startMomentum();
+                });
+
+                reelEl.addEventListener("touchcancel", () => {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    startMomentum();
+                });
+
+                // Mouse drag listeners (Desktop drag)
+                reelEl.addEventListener("mousedown", (e) => {
+                    if (isNavigating || e.button !== 0) return;
+                    cancelAnimation();
+                    cancelMomentum();
+                    currentState = "scrolling";
+                    reelEl.setAttribute("data-state", "scrolling");
+
+                    touchStartY = e.clientY;
+                    lastTouchY = touchStartY;
+                    lastTouchTime = performance.now();
+                    isDragging = true;
+                    velocity = 0;
+                    reelEl.classList.add("is-dragging");
+                });
+
+                window.addEventListener("mousemove", (e) => {
+                    if (!isDragging) return;
+                    const touchY = e.clientY;
+                    const deltaY = lastTouchY - touchY;
+                    const now = performance.now();
+                    const dt = Math.max(1, now - lastTouchTime);
+                    velocity = (deltaY / dt) * 16;
+                    lastTouchY = touchY;
+                    lastTouchTime = now;
+
+                    currentT += deltaY;
+                    renderTrack();
+                });
+
+                window.addEventListener("mouseup", () => {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    reelEl.classList.remove("is-dragging");
+                    startMomentum();
+                });
+            }
+
+            window.addEventListener("resize", () => {
+                renderTrack();
+            });
+
+            // Initial render
+            renderTrack();
+
+            // Wire click listeners: provide choreographed transition (revolver roll -> hold highlight -> smooth exit fade -> navigation)
             let isNavigating = false;
-            const NAVIGATION_DELAY_MS = 850; // Allows reel animation to settle and exit dissolve to complete
-            const EXIT_FADE_DELAY_MS = 460;  // Begins exit dissolve immediately after reel arrives at target
+            // Total time before changing pages (default 900ms). Can also be set via config.navigationDelay in config.js
+            const NAVIGATION_DELAY_MS = (config.navigationDelay && typeof config.navigationDelay === "number")
+                ? config.navigationDelay
+                : 900;
+            // Begins exit fade 350ms before navigation so the title stays highlighted on screen for the hold duration
+            const EXIT_FADE_DELAY_MS = Math.max(200, NAVIGATION_DELAY_MS - 350);
 
             if (linksContainer) {
                 linksContainer.addEventListener("click", (event) => {
@@ -148,10 +483,6 @@
                 });
             }
 
-            // Preview query param for headless verification (?state=professional, ?state=kitchen, ?state=resting)
-            const urlParams = new URLSearchParams(window.location.search);
-            const previewState = urlParams.get("state");
-
             function resetGatewayState() {
                 isNavigating = false;
                 const card = document.querySelector(".gateway-card");
@@ -159,7 +490,7 @@
                 if (card) card.classList.remove("is-exiting");
                 if (footer) footer.classList.remove("is-exiting");
                 document.querySelectorAll(".gateway-link").forEach(l => l.classList.remove("is-selected"));
-                if (!previewState) {
+                if (!previewState && !previewItem) {
                     setReelState("resting");
                 }
             }
@@ -174,10 +505,6 @@
                     resetGatewayState();
                 }
             });
-
-            if (previewState && (previewState === "professional" || previewState === "kitchen" || previewState === "resting")) {
-                setReelState(previewState);
-            }
         });
     </script>
 </head>
@@ -189,23 +516,28 @@
         <main class="gateway-card">
             <h1 class="gateway-title" id="gateway-title">
                 <span class="gateway-static" id="gateway-static">
-                    <span class="gateway-intro" id="gateway-intro">hi, i'm <span class="gateway-name-accent">bilal</span>,</span>
+                    <span class="gateway-intro" id="gateway-intro">hi, i'm <span
+                            class="gateway-name-accent">bilal</span>,</span>
                 </span>
                 <span class="gateway-reel" id="gateway-reel" data-state="resting" aria-hidden="true">
                     <span class="reel-baseline-anchor">the scientist</span>
-                    <span class="reel-track" id="reel-track">
-                        <span class="reel-item reel-runner" id="reel-item-runner">the runner</span>
-                        <span class="reel-item reel-cook" id="reel-item-cook">the cook</span>
-                        <span class="reel-item reel-scientist" id="reel-item-scientist">the scientist</span>
-                        <span class="reel-item reel-reader" id="reel-item-reader">the reader</span>
+                    <span class="reel-viewport" id="reel-viewport">
+                        <span class="reel-track" id="reel-track">
+                            <span class="reel-item reel-runner" id="reel-item-runner">the runner</span>
+                            <span class="reel-item reel-cook" id="reel-item-cook">the cook</span>
+                            <span class="reel-item reel-scientist" id="reel-item-scientist">the scientist</span>
+                            <span class="reel-item reel-reader" id="reel-item-reader">the reader</span>
+                        </span>
                     </span>
                 </span>
             </h1>
             <div class="gateway-divider-line" aria-hidden="true"></div>
             <nav class="gateway-links" id="gateway-links">
-                <a href="professional/" class="gateway-link gateway-link-professional" data-reel="professional" data-door="professional">professional</a>
+                <a href="professional/" class="gateway-link gateway-link-professional" data-reel="professional"
+                    data-door="professional">professional</a>
                 <span class="gateway-divider">/</span>
-                <a href="kitchen/" class="gateway-link gateway-link-kitchen" data-reel="kitchen" data-door="kitchen">kitchen</a>
+                <a href="kitchen/" class="gateway-link gateway-link-kitchen" data-reel="kitchen"
+                    data-door="kitchen">kitchen</a>
             </nav>
         </main>
 
