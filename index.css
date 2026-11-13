@@ -96,6 +96,18 @@ body {
     /* Maximum width to prevent content stretching on huge screens */
     margin: 0 auto;
     /* Centers the website block horizontally */
+    animation: page-enter 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes page-enter {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* --- Navigation Bar (Top) --- */
@@ -287,6 +299,16 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+    .app-wrapper {
+        animation: none !important;
+    }
+
+    .gateway-card.is-exiting,
+    .gateway-footer.is-exiting {
+        opacity: 1 !important;
+        transform: translateY(var(--gateway-y, -20px)) !important;
+    }
+
     .nav-ink-stage,
     .nav-ink-core-path,
     .nav-indicator,
@@ -619,18 +641,29 @@ body {
     .app-wrapper {
         height: auto;
         min-height: 100vh;
-        padding: 32px 24px;
+        padding: 24px 20px;
     }
 
     .navbar {
-        margin-bottom: 60px;
+        height: auto;
+        min-height: 36px;
+        margin-bottom: 20px;
+    }
+
+    .navbar:empty {
+        display: none;
     }
 
     /* Stack the left text and right image vertically instead of side-by-side */
     .main-content {
         grid-template-columns: 1fr;
-        gap: 60px;
-        margin-bottom: 60px;
+        gap: 40px;
+        margin-top: 0;
+        margin-bottom: 40px;
+    }
+
+    .main-content.professional-content {
+        margin-top: 36px; /* Elevates text on mobile while preserving comfortable top breathing room */
     }
 
     .info-column {
@@ -652,15 +685,17 @@ body {
 
 /* Small Smart Phones */
 @media (max-width: 480px) {
+    .app-wrapper {
+        padding: 20px 18px;
+    }
+
     .navbar {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
         height: auto;
+        margin-bottom: 16px;
     }
 
     .nav-links {
-        gap: 20px;
+        gap: 16px;
     }
 
     .main-title {
@@ -669,6 +704,10 @@ body {
 
     .main-subtitle {
         font-size: 1.8rem;
+    }
+
+    .main-content.professional-content {
+        margin-top: 28px;
     }
 
     .external-links {
@@ -680,81 +719,200 @@ body {
    GATEWAY / COVER PAGE STYLES
    ========================================================================= */
 
+/* Full-viewport flex container centering the entire landing card */
 .gateway-wrapper {
+    position: relative;
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    padding: 40px 24px 24px 24px;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px 24px 60px 24px;
     max-width: 1440px;
     margin: 0 auto;
     width: 100%;
     box-sizing: border-box;
 }
 
+/* Main card wrapper containing title, reel, divider, and links */
 .gateway-card {
-    margin: auto;
+    /* Optical vertical offset: lifts card slightly above exact center to avoid looking bottom-heavy */
+    --gateway-y: -20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 24px;
+    gap: 0;
+    transform: translateY(var(--gateway-y));
+    transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* Exit transition state: smooth dissolve and slight upward drift before navigating */
+.gateway-card.is-exiting {
+    opacity: 0;
+    transform: translateY(calc(var(--gateway-y) - 8px));
+    pointer-events: none;
+}
+
+/* Title stack: Line 1 = "hi, i'm bilal,", Line 2 = revolving descriptor reel */
 .gateway-title {
-    font-family: var(--font-serif);
-    font-size: 3.75rem;
-    font-weight: 500;
-    line-height: 1.1;
-    color: var(--text-title);
-    letter-spacing: -1.5px;
-    min-height: 1.15em;
-    display: inline-flex;
-    align-items: baseline;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
+    font-family: var(--font-serif);
+    font-size: 3.5rem;
+    font-weight: 500;
+    line-height: 1.15;
+    color: var(--text-title);
+    letter-spacing: -1.2px;
+    text-align: center;
+    /* Vertical gap between "hi, i'm bilal," and the reel slot.
+       2.3em gives comfortable clearance so fading upper items never crowd Line 1. */
+    gap: 2.3em;
 }
 
+.gateway-static {
+    display: block;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.gateway-intro {
+    display: inline;
+}
+
+/* Deep wine red accent for the name "bilal" */
 .gateway-name-accent {
     color: #721817;
 }
 
-.typewriter-cursor {
+/* =========================================================================
+   FADED FLAT REEL (DESCRIPTOR STACK & INFINITE CYLINDER)
+   =========================================================================
+   Positioned beneath "hi, i'm bilal,", horizontally centered. */
+
+/* The reel's in-flow footprint: occupies strictly one line height (1.15em)
+   in the page flow so scrolling descriptors never cause layout shifts. */
+.gateway-reel {
+    position: relative;
     display: inline-block;
-    font-weight: 300;
-    font-size: 0.9em;
-    margin-left: 2px;
-    color: var(--text-subtitle);
-    animation: cursor-blink 0.85s infinite;
+    height: 1.15em;
+    line-height: 1.15em;
+    text-align: center;
+    cursor: grab;
+    touch-action: none;
     user-select: none;
-    transition: opacity 0.5s ease;
+    -webkit-user-select: none;
 }
 
-@keyframes cursor-blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
+.gateway-reel.is-dragging {
+    cursor: grabbing;
 }
 
-.typewriter-cursor.finished {
-    opacity: 0.4;
+/* Invisible in-flow anchor matching the longest phrase ("the scientist")
+   to ensure the reel container reserves exact typographic width and baseline.
+   This prevents horizontal width jitter as words of different lengths spin through. */
+.reel-baseline-anchor {
+    visibility: hidden;
+    display: inline-block;
+    height: 1.15em;
+    line-height: 1.15em;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    letter-spacing: inherit;
+    user-select: none;
+    pointer-events: none;
+    text-align: center;
 }
 
+/* Masked viewing aperture extending above and below the anchor (4.6em total height).
+   The CSS gradient mask dissolves descriptors into transparency at the top and bottom
+   edges, creating a smooth fading cylinder effect without hard clipping lines. */
+.reel-viewport {
+    position: absolute;
+    top: -1.725em;
+    bottom: -1.725em;
+    left: -24px;
+    right: -24px;
+    height: 4.6em;
+    overflow: hidden;
+    pointer-events: auto;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
+}
+
+/* Track holding descriptor items, translated vertically by JavaScript */
+.reel-track {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    user-select: none;
+    will-change: transform;
+}
+
+/* Base style for each item in the reel: centered in the track */
+.reel-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 1.15em;
+    line-height: 1.15em;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    letter-spacing: inherit;
+    text-align: center;
+    white-space: nowrap;
+    color: var(--text-muted, #9ca3af);
+    opacity: 0.18;
+    transition: color 0.22s ease, opacity 0.22s ease;
+    will-change: opacity, color;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reel-track,
+    .reel-item {
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Minimal Boundary Line separating the revolving animation above and navigation menu below */
+.gateway-divider-line {
+    width: 44px;
+    height: 1px;
+    background-color: rgba(30, 41, 59, 0.16);
+    /* Clearance placing the divider line symmetrically below the lowest faded reel item */
+    margin-top: 156px;
+    margin-bottom: 24px;
+    border: none;
+    border-radius: 1px;
+    flex-shrink: 0;
+}
+
+/* Navigation Links below the title */
 .gateway-links {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 28px;
     list-style: none;
-    opacity: 0;
-    transform: translateY(6px);
-    transition: opacity 0.6s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-.gateway-links.visible {
+    margin-top: 0;
     opacity: 1;
     transform: translateY(0);
 }
 
 .gateway-link {
     font-family: var(--font-sans);
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     font-weight: 400;
     color: var(--text-body);
     text-decoration: none;
@@ -764,14 +922,22 @@ body {
     padding-bottom: 2px;
 }
 
-.gateway-link:hover {
+.gateway-link:hover,
+.gateway-link.is-selected {
     color: var(--text-title);
     border-bottom-color: var(--text-title);
 }
 
-.gateway-link.gateway-link-kitchen:hover {
-    color: #fa9f42;
-    border-bottom-color: #fa9f42;
+.gateway-link.gateway-link-kitchen:hover,
+.gateway-link.gateway-link-kitchen.is-selected {
+    color: #b83b14;
+    border-bottom-color: #b83b14;
+}
+
+.gateway-link.gateway-link-professional:hover,
+.gateway-link.gateway-link-professional.is-selected {
+    color: #4b5563;
+    border-bottom-color: #4b5563;
 }
 
 .gateway-divider {
@@ -781,20 +947,89 @@ body {
 }
 
 .gateway-footer {
-    margin-top: auto;
+    position: absolute;
+    bottom: 24px;
+    left: 0;
+    right: 0;
     text-align: center;
+    transition: opacity 0.3s ease;
 }
 
-@media (max-width: 480px) {
+.gateway-footer.is-exiting {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* =========================================================================
+   GATEWAY RESPONSIVE BREAKPOINTS (TABLETS & MOBILE)
+   ========================================================================= */
+
+/* Tablets / Medium Viewports */
+@media (max-width: 900px) {
     .gateway-title {
-        font-size: 2.75rem;
+        font-size: clamp(2.6rem, 5.5vw, 3.2rem);
+    }
+}
+
+/* Mobile Screens (portrait smartphones & large phablets) */
+@media (max-width: 640px) {
+    .gateway-card {
+        --gateway-y: -16px;
+        transform: translateY(var(--gateway-y));
+        width: 100%;
+    }
+
+    .gateway-title {
+        /* Scaled typography for mobile: ensures "the scientist" fits horizontally */
+        font-size: clamp(2.1rem, 7vw, 2.6rem);
+        letter-spacing: -0.8px;
+        line-height: 1.15;
+        /* Vertical clearance between "hi, i'm bilal," and top edge of reel */
+        gap: 2.2em;
+        white-space: normal;
+    }
+
+    .gateway-static {
+        display: block;
+        text-align: center;
+    }
+
+    /* Boundary line clearance scaled for mobile reel height */
+    .gateway-divider-line {
+        width: 36px;
+        margin-top: 112px;
+        margin-bottom: 20px;
     }
 
     .gateway-links {
+        margin-top: 0;
+        gap: 24px;
+    }
+
+    .gateway-link {
+        font-size: 1.15rem;
+    }
+}
+
+/* Compact Smartphones */
+@media (max-width: 480px) {
+    .gateway-title {
+        font-size: clamp(1.95rem, 6.5vw, 2.35rem);
+        letter-spacing: -0.6px;
+    }
+
+    .gateway-divider-line {
+        width: 32px;
+        margin-top: 104px;
+        margin-bottom: 18px;
+    }
+
+    .gateway-links {
+        margin-top: 0;
         gap: 20px;
     }
 
     .gateway-link {
-        font-size: 1rem;
+        font-size: 1.1rem;
     }
 }
