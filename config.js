@@ -47,7 +47,8 @@ const GATEWAY_CONFIG = {
             { id: "cyclist", label: "the cyclist", atmospheric: true },
             { id: "gamer", label: "the gamer", atmospheric: true },
             { id: "friend", label: "the friend", atmospheric: true },
-            { id: "brother", label: "the brother", atmospheric: true }
+            { id: "brother", label: "the brother", atmospheric: true },
+            { id: "foodie", label: "the foodie", atmospheric: true }
         ],
         // Scroll physics for desktop wheel & trackpad:
         // - wheelSensitivity: How far the reel moves per wheel tick.
