@@ -641,18 +641,29 @@ body {
     .app-wrapper {
         height: auto;
         min-height: 100vh;
-        padding: 32px 24px;
+        padding: 24px 20px;
     }
 
     .navbar {
-        margin-bottom: 60px;
+        height: auto;
+        min-height: 36px;
+        margin-bottom: 20px;
+    }
+
+    .navbar:empty {
+        display: none;
     }
 
     /* Stack the left text and right image vertically instead of side-by-side */
     .main-content {
         grid-template-columns: 1fr;
-        gap: 60px;
-        margin-bottom: 60px;
+        gap: 40px;
+        margin-top: 0;
+        margin-bottom: 40px;
+    }
+
+    .main-content.professional-content {
+        margin-top: 36px; /* Elevates text on mobile while preserving comfortable top breathing room */
     }
 
     .info-column {
@@ -674,15 +685,17 @@ body {
 
 /* Small Smart Phones */
 @media (max-width: 480px) {
+    .app-wrapper {
+        padding: 20px 18px;
+    }
+
     .navbar {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
         height: auto;
+        margin-bottom: 16px;
     }
 
     .nav-links {
-        gap: 20px;
+        gap: 16px;
     }
 
     .main-title {
@@ -691,6 +704,10 @@ body {
 
     .main-subtitle {
         font-size: 1.8rem;
+    }
+
+    .main-content.professional-content {
+        margin-top: 28px;
     }
 
     .external-links {
