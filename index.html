@@ -87,9 +87,52 @@
             window.setReelState = setReelState;
             window.setDoorState = setReelState; // Backward compatibility alias
 
-            // Wire hover listeners with a 100ms grace period on mouseleave to avoid flicker
+            // Wire click listeners: provide ~850ms choreographed transition (revolver roll -> smooth exit fade -> navigation)
+            let isNavigating = false;
+            const NAVIGATION_DELAY_MS = 850; // Allows reel animation to settle and exit dissolve to complete
+            const EXIT_FADE_DELAY_MS = 460;  // Begins exit dissolve immediately after reel arrives at target
+
             if (linksContainer) {
+                linksContainer.addEventListener("click", (event) => {
+                    const link = event.target.closest("a[data-reel], a[data-door]");
+                    if (!link) return;
+
+                    // Support keyboard modifiers (Cmd+Click, Ctrl+Click, Shift+Click) to open new tabs natively
+                    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    if (isNavigating) return;
+                    isNavigating = true;
+
+                    const targetKey = link.getAttribute("data-reel") || link.getAttribute("data-door");
+                    const targetHref = link.getAttribute("href");
+
+                    // 1. Immediately trigger the revolver to the target state
+                    setReelState(targetKey);
+
+                    // 2. Add active class for immediate tactile feedback
+                    document.querySelectorAll(".gateway-link").forEach(l => l.classList.remove("is-selected"));
+                    link.classList.add("is-selected");
+
+                    // 3. Initiate graceful exit dissolve once the descriptor locks into position
+                    setTimeout(() => {
+                        const card = document.querySelector(".gateway-card");
+                        const footer = document.querySelector(".gateway-footer");
+                        if (card) card.classList.add("is-exiting");
+                        if (footer) footer.classList.add("is-exiting");
+                    }, EXIT_FADE_DELAY_MS);
+
+                    // 4. Navigate as exit transition completes
+                    setTimeout(() => {
+                        window.location.href = targetHref;
+                    }, NAVIGATION_DELAY_MS);
+                });
+
+                // Wire hover listeners with a 100ms grace period on mouseleave to avoid flicker
                 linksContainer.addEventListener("mouseover", (event) => {
+                    if (isNavigating) return;
                     const link = event.target.closest("a[data-reel], a[data-door]");
                     if (link) {
                         const targetKey = link.getAttribute("data-reel") || link.getAttribute("data-door");
@@ -98,6 +141,7 @@
                 });
 
                 linksContainer.addEventListener("mouseleave", () => {
+                    if (isNavigating) return;
                     leaveTimer = setTimeout(() => {
                         setReelState("resting");
                     }, 100);
@@ -107,6 +151,30 @@
             // Preview query param for headless verification (?state=professional, ?state=kitchen, ?state=resting)
             const urlParams = new URLSearchParams(window.location.search);
             const previewState = urlParams.get("state");
+
+            function resetGatewayState() {
+                isNavigating = false;
+                const card = document.querySelector(".gateway-card");
+                const footer = document.querySelector(".gateway-footer");
+                if (card) card.classList.remove("is-exiting");
+                if (footer) footer.classList.remove("is-exiting");
+                document.querySelectorAll(".gateway-link").forEach(l => l.classList.remove("is-selected"));
+                if (!previewState) {
+                    setReelState("resting");
+                }
+            }
+
+            // Restore clean resting state on browser Back button (BFCache) or tab reactivate
+            window.addEventListener("pageshow", () => {
+                resetGatewayState();
+            });
+
+            document.addEventListener("visibilitychange", () => {
+                if (document.visibilityState === "visible") {
+                    resetGatewayState();
+                }
+            });
+
             if (previewState && (previewState === "professional" || previewState === "kitchen" || previewState === "resting")) {
                 setReelState(previewState);
             }
@@ -122,18 +190,18 @@
             <h1 class="gateway-title" id="gateway-title">
                 <span class="gateway-static" id="gateway-static">
                     <span class="gateway-intro" id="gateway-intro">hi, i'm <span class="gateway-name-accent">bilal</span>,</span>
-                    <span class="gateway-article" id="gateway-article">the</span>
                 </span>
                 <span class="gateway-reel" id="gateway-reel" data-state="resting" aria-hidden="true">
-                    <span class="reel-baseline-anchor">scientist</span>
+                    <span class="reel-baseline-anchor">the scientist</span>
                     <span class="reel-track" id="reel-track">
-                        <span class="reel-item reel-runner" id="reel-item-runner">runner</span>
-                        <span class="reel-item reel-cook" id="reel-item-cook">cook</span>
-                        <span class="reel-item reel-scientist" id="reel-item-scientist">scientist</span>
-                        <span class="reel-item reel-reader" id="reel-item-reader">reader</span>
+                        <span class="reel-item reel-runner" id="reel-item-runner">the runner</span>
+                        <span class="reel-item reel-cook" id="reel-item-cook">the cook</span>
+                        <span class="reel-item reel-scientist" id="reel-item-scientist">the scientist</span>
+                        <span class="reel-item reel-reader" id="reel-item-reader">the reader</span>
                     </span>
                 </span>
             </h1>
+            <div class="gateway-divider-line" aria-hidden="true"></div>
             <nav class="gateway-links" id="gateway-links">
                 <a href="professional/" class="gateway-link gateway-link-professional" data-reel="professional" data-door="professional">professional</a>
                 <span class="gateway-divider">/</span>

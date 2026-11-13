@@ -23,17 +23,17 @@ const GATEWAY_CONFIG = {
         }
     ],
 
-    // Faded flat reel (descriptor stack) beside "hi, i'm bilal, the".
+    // Faded flat reel (descriptor stack) beneath "hi, i'm bilal,".
     // In resting state, all options are visible in faded grey, with the midline
-    // between "cook" and "scientist" inline with the sentence baseline.
-    // Hovering "kitchen" slides "cook" into alignment (terracotta).
-    // Hovering "professional" slides "scientist" into alignment (slate grey).
+    // between "the cook" and "the scientist" centered on the second line.
+    // Hovering "kitchen" slides "the cook" into alignment (terracotta).
+    // Hovering "professional" slides "the scientist" into alignment (slate grey).
     reel: {
         items: [
-            { id: "runner", label: "runner", atmospheric: true },
-            { id: "cook", label: "cook", target: "kitchen", color: "#b83b14" },
-            { id: "scientist", label: "scientist", target: "professional", color: "#4b5563" },
-            { id: "reader", label: "reader", atmospheric: true }
+            { id: "runner", label: "the runner", atmospheric: true },
+            { id: "cook", label: "the cook", target: "kitchen", color: "#b83b14" },
+            { id: "scientist", label: "the scientist", target: "professional", color: "#4b5563" },
+            { id: "reader", label: "the reader", atmospheric: true }
         ],
         // Colors for each interactive target
         colors: {
@@ -45,11 +45,11 @@ const GATEWAY_CONFIG = {
     // Backward compatibility for existing door references
     door: {
         professional: {
-            text: ", the scientist",
+            text: "the scientist",
             color: "#4b5563"
         },
         kitchen: {
-            text: ", the cook",
+            text: "the cook",
             color: "#b83b14"
         }
     }
