@@ -1,0 +1,390 @@
+/* =========================================================================
+   RECIPE SIDE-BY-SIDE VIEW STYLESHEET (recipe-side-by-side.css)
+   =========================================================================
+   Styles for the classic side-by-side recipe layout (#menu):
+   - Two-column menu grid: Ingredients on the left, steps on the right
+   - Synchronized vertical scroll containers for long ingredient lists & steps
+   - Paginated step cards with scroll-snapping
+   - Floating circular scroll-down arrow button
+   - Interactive collapsible section toggles in the menu view
+   - Responsive breakpoints (desktop 2-column -> mobile stacked single-column)
+   ========================================================================= */
+
+/* -------------------------------------------------------------------------
+   1. THE MENU SECTION & COLUMN GRID
+   ------------------------------------------------------------------------- */
+
+/* Second page: holds the menu grids and layout margins */
+.menu-section {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    /* Ensures the section is tall enough to scroll fully into view on all screens */
+    background-color: var(--bg-main);
+    position: relative;
+    z-index: 1;
+    padding-top: 80px;
+    padding-bottom: 120px;
+    /* Generous bottom spacing for footer and to guarantee smooth full scroll */
+    justify-content: space-between;
+    flex-shrink: 0;
+    /* Prevent flex shrinking to respect min-height */
+    scroll-snap-align: start;
+    /* Enable snap alignment */
+    scroll-margin-top: 60px;
+    /* Offset for sticky 60px navbar */
+}
+
+.menu-title {
+    font-family: var(--font-serif);
+    font-size: 3rem;
+    font-weight: 500;
+    line-height: 1.1;
+    color: var(--text-title);
+    letter-spacing: -1px;
+    text-transform: lowercase;
+    margin-bottom: 48px;
+}
+
+/* 2-column responsive grid layout */
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+    align-items: start;
+    margin-bottom: auto;
+    /* Push the footer to the bottom of the section */
+}
+
+.menu-column {
+    min-width: 0;
+}
+
+.column-title {
+    font-family: var(--font-serif);
+    font-size: 1.6rem;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--text-subtitle);
+    letter-spacing: -0.5px;
+    text-transform: lowercase;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 12px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.urdu-title {
+    font-family: 'Noto Nastaliq Urdu', 'Urdu Typesetting', 'Jameel Noori Nastaleeq', 'Geeza Pro', Tahoma, sans-serif;
+    font-size: 1.6rem;
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--color-urdu);
+}
+
+/* -------------------------------------------------------------------------
+   2. RECIPE ITEMS & ANIMATIONS
+   ------------------------------------------------------------------------- */
+
+.recipe-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    color: var(--link-color);
+    font-size: 1.05rem;
+    transition: var(--transition-smooth);
+    margin-bottom: 6px;
+    position: relative;
+    padding-bottom: 3px;
+}
+
+/* Tactile qalam ink brush stroke underline on recipe links */
+.recipe-link::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 7px;
+    background: linear-gradient(90deg, var(--link-color) 0%, var(--link-hover) 90%);
+    -webkit-mask-image: var(--ink-brush-mask);
+    mask-image: var(--ink-brush-mask);
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    transform: scaleX(0) scaleY(0.75);
+    transform-origin: left center;
+    opacity: 0;
+    pointer-events: none;
+    transition: transform var(--ink-duration, 420ms) var(--ink-easing, cubic-bezier(0.22, 1, 0.36, 1)), opacity 0.2s ease;
+}
+
+.recipe-link:hover,
+.recipe-link:focus-visible {
+    color: var(--link-hover);
+}
+
+.recipe-link:hover::after,
+.recipe-link:focus-visible::after {
+    transform: scaleX(1) scaleY(1);
+    opacity: 0.94;
+    background: linear-gradient(90deg, var(--link-hover) 0%, var(--link-color) 100%);
+    animation: qalam-stroke-draw var(--ink-duration, 420ms) var(--ink-easing, cubic-bezier(0.22, 1, 0.36, 1)) forwards;
+}
+
+.recipe-link:active::after {
+    transform: scaleX(1.02) scaleY(var(--ink-press-scale-y, 0.85));
+}
+
+.recipe-link svg {
+    width: 13px;
+    height: 13px;
+    stroke-width: 2.5px;
+    color: var(--text-muted);
+    transition: var(--transition-smooth);
+}
+
+.recipe-link:hover svg {
+    color: var(--link-hover);
+    transform: translate(2px, -2px);
+}
+
+.recipe-description {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    color: var(--text-body);
+    line-height: 1.5;
+    margin-bottom: 24px;
+}
+
+/* -------------------------------------------------------------------------
+   3. DUAL-COLUMN DESKTOP SCROLLING CONTAINERS
+   ------------------------------------------------------------------------- */
+
+/* Outer wrapper: position relative is required so our floating arrow button 
+   can be absolutely positioned relative to this container's boundaries. */
+.steps-scroll-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+/* Main vertical scroll panel */
+.steps-scroll-container {
+    display: flex;
+    flex-direction: column;
+    /* Aligns step cards vertically */
+    gap: 16px;
+    /* Gap between step cards */
+    overflow-y: auto;
+    /* Enable vertical scrolling when cards overflow */
+    overflow-x: hidden;
+    /* Hide horizontal overflow */
+
+    /* scroll-snap-type: enables custom vertical pagination snapping. 
+       "y mandatory" forces the browser to snap perfectly to step cards when scrolling. */
+    scroll-snap-type: y mandatory;
+    scrollbar-width: none;
+    /* Hides standard scrollbar on Firefox for cleaner UI */
+    padding-bottom: 24px;
+    /* Spacing at bottom to avoid card shadow cuts and button overlay */
+    scroll-behavior: smooth;
+    /* Smooth scroll slide transitions when clicking buttons */
+    width: 100%;
+    max-height: max(420px, calc(100vh - 340px));
+    height: auto;
+}
+
+/* Hide standard scrollbars on Chrome, Safari, and Edge browser engines */
+.steps-scroll-container::-webkit-scrollbar {
+    display: none;
+}
+
+/* Ingredients list container scrolling on desktop */
+#ingredients-list-container {
+    max-height: max(420px, calc(100vh - 340px));
+    height: auto;
+    overflow-y: auto;
+    /* Enable scroll */
+    overflow-x: hidden;
+    scrollbar-width: none;
+    /* Hide Firefox scrollbar */
+    padding-bottom: 24px;
+}
+
+#ingredients-list-container::-webkit-scrollbar {
+    display: none;
+    /* Hide Chrome/Safari scrollbar */
+}
+
+/* -------------------------------------------------------------------------
+   4. INDIVIDUAL STEP CARDS
+   ------------------------------------------------------------------------- */
+
+.step-card {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    /* Stacks step number and text description vertically */
+    gap: 16px;
+    transition: transform var(--transition-smooth), border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+    box-sizing: border-box;
+    scroll-snap-align: start;
+    /* Snaps the card to the top of the scroll viewport */
+}
+
+/* Border and shadow highlighting on card hover */
+.step-card:hover {
+    border-color: var(--text-subtitle);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
+}
+
+.step-card-num {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-subtitle);
+    letter-spacing: 1px;
+}
+
+.step-card .recipe-description {
+    margin-bottom: 0;
+}
+
+/* -------------------------------------------------------------------------
+   5. FLOATING SCROLL DOWN BUTTON
+   ------------------------------------------------------------------------- */
+
+.scroll-down-btn {
+    position: absolute;
+    bottom: -22px;
+    /* Overlaps the bottom boundary */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--bg-main);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-subtitle);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform var(--transition-smooth), background-color var(--transition-smooth), border-color var(--transition-smooth);
+    z-index: 5;
+}
+
+.scroll-down-btn.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.scroll-down-btn:hover {
+    background-color: var(--border-color);
+    transform: translateX(-50%) scale(1.05);
+}
+
+.scroll-down-btn svg {
+    width: 18px;
+    height: 18px;
+    transition: transform var(--transition-smooth);
+}
+
+.scroll-down-btn.at-end svg {
+    transform: rotate(180deg);
+    /* Points up to loop back */
+}
+
+/* -------------------------------------------------------------------------
+   6. COLLAPSIBLE INTERACTIONS IN MENU VIEW
+   ------------------------------------------------------------------------- */
+
+#menu .recipe-section-title {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+    transition: color var(--transition-smooth);
+}
+
+#menu .recipe-section-title:focus-visible {
+    outline: 2px solid var(--link-hover);
+    outline-offset: 4px;
+    border-radius: 4px;
+}
+
+#menu .recipe-section-title:hover {
+    color: var(--link-hover);
+}
+
+#menu .recipe-section-title:hover .collapse-icon {
+    color: var(--link-hover);
+}
+
+/* -------------------------------------------------------------------------
+   7. SIDE-BY-SIDE RESPONSIVENESS OVERRIDES
+   ------------------------------------------------------------------------- */
+
+@media (max-width: 1024px) {
+    .menu-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 32px;
+    }
+
+    .menu-section {
+        padding-top: 60px;
+    }
+}
+
+@media (max-width: 900px) {
+    /* Reset Side-by-Side vertical card scroll for mobile/tablet */
+    .steps-scroll-container,
+    #ingredients-list-container {
+        height: auto;
+        overflow-y: visible;
+        scroll-snap-type: none;
+        padding-bottom: 0;
+    }
+
+    .scroll-down-btn {
+        display: none !important;
+        /* Hide vertical scroll button on mobile */
+    }
+
+    .step-card {
+        width: 100% !important;
+        flex: none !important;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .menu-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .menu-title {
+        font-size: 2.5rem;
+        margin-bottom: 32px;
+    }
+
+    .step-card {
+        padding: 16px;
+    }
+}

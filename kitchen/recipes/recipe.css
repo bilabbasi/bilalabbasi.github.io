@@ -1,10 +1,27 @@
 /* =========================================================================
-   RECIPE WEBSITE STYLING SHEET
+   RECIPE WEBSITE MASTER STYLESHEET (recipe.css)
    =========================================================================
-   This file imports the main index.css styles and styles recipe pages.
-   Color variables (--text-subtitle, --link-color, --link-hover, --color-pop)
-   are dynamically driven by KITCHEN_CONFIG.theme in config.js. */
+   This file bundles the modular stylesheets located in kitchen/recipes/css/:
+     1. css/recipe-base.css          (Invariants, navbar, layout, hero, typography)
+     2. css/recipe-side-by-side.css  (Dual-column scrolling, cards, scroll-down btn)
+     3. css/recipe-step-by-step.css  (Centered ingredients, split visual slides)
+     4. css/recipe-progress-bar.css  (Urdu Qalam vertical progress bar & ink blots)
+   
+   Direct parallel <link> tags in HTML <head> are preferred over @import.
+   ========================================================================= */
 
+/* =========================================================================
+   RECIPE BASE STYLESHEET (recipe-base.css)
+   =========================================================================
+   Shared foundational styles for all recipe pages:
+   - Dynamic design tokens and badge invariants
+   - Sticky navbar recipe breadcrumbs
+   - Layout & smooth scrolling overrides
+   - Hero landing section & layout mode selectors (side-by-side / step-by-step)
+   - Recipe typography & calligraphic ink brush links
+   - Collapsible section foundation
+   - Customs / About section layout
+   ========================================================================= */
 
 /* Accent Pop Badge */
 .pop-tag,
@@ -283,7 +300,376 @@ body {
 }
 
 /* -------------------------------------------------------------------------
-   3. THE MENU SECTION & COLUMN GRID
+   3. RECIPE VIEW INDICATORS & TOGGLES (LAYOUT MODE BUTTONS)
+   ------------------------------------------------------------------------- 
+   These classes style the "side by side" and "step by step" layout select
+   buttons situated at the bottom of the Hero landing page. */
+
+/* Container wrapping both buttons horizontally */
+.recipe-indicators {
+    display: flex;
+    /* Lines up indicators side-by-side */
+    justify-content: center;
+    /* Centers indicators horizontally */
+    gap: 48px;
+    /* Spacing between indicators */
+    margin-top: auto;
+    /* Pushes container to the very bottom of screen */
+    padding-top: 20px;
+    width: 100%;
+}
+
+/* Individual layout selection indicator */
+.recipe-indicators .scroll-indicator {
+    margin-top: 0;
+    padding-top: 0;
+    transition: opacity var(--transition-smooth), transform var(--transition-smooth);
+}
+
+/* Slight lift effect on hover */
+.recipe-indicators .scroll-indicator:hover {
+    transform: translateY(-2px);
+    /* Moves indicator up by 2px */
+    opacity: 1;
+}
+
+/* Highlight style when this view mode is currently active */
+.recipe-indicators .scroll-indicator.active {
+    opacity: 1;
+}
+
+/* Style active button text color and make it bold */
+.recipe-indicators .scroll-indicator.active .scroll-text {
+    color: var(--text-subtitle);
+    font-weight: 600;
+}
+
+.recipe-indicators .scroll-indicator.active .scroll-text::after {
+    transform: scaleX(1) scaleY(1);
+    opacity: 0.9;
+    background: linear-gradient(90deg, var(--link-color) 0%, var(--link-hover) 100%);
+    animation: qalam-stroke-draw var(--ink-duration, 420ms) var(--ink-easing, cubic-bezier(0.22, 1, 0.36, 1)) forwards;
+}
+
+.recipe-indicators .scroll-indicator:not(.active):hover .scroll-text::after {
+    transform: scaleX(1) scaleY(0.95);
+    opacity: 0.38;
+    animation: qalam-stroke-draw var(--ink-duration, 420ms) var(--ink-easing, cubic-bezier(0.22, 1, 0.36, 1)) forwards;
+}
+
+.recipe-indicators .scroll-indicator:active .scroll-text::after {
+    transform: scaleX(1.02) scaleY(var(--ink-press-scale-y, 0.85));
+}
+
+/* Bounces the scroll arrow indicator when active to draw attention */
+.recipe-indicators .scroll-indicator.active .scroll-arrow {
+    color: var(--text-subtitle);
+    animation: bounce-indicator 2s infinite;
+}
+
+/* Fade down inactive buttons to keep visual focus on active indicator */
+.recipe-indicators .scroll-indicator:not(.active) {
+    opacity: 0.5;
+}
+
+/* Stop bouncing arrows on inactive button indicators */
+.recipe-indicators .scroll-indicator:not(.active) .scroll-arrow {
+    animation: none;
+}
+
+.recipe-indicators .scroll-indicator:not(.active):hover {
+    opacity: 0.8;
+}
+
+/* -------------------------------------------------------------------------
+   4. RECIPE TYPOGRAPHY & INTERACTIVE LINKS
+   ------------------------------------------------------------------------- */
+
+/* Inline hyperlinks inside recipe descriptions and step instructions */
+.recipe-description a,
+.step-text a,
+.step-section-item a {
+    position: relative;
+    display: inline-block;
+    color: var(--link-color);
+    text-decoration: none;
+    font-weight: 500;
+    padding-bottom: 1px;
+    transition: color var(--transition-smooth);
+}
+
+.recipe-description a::after,
+.step-text a::after,
+.step-section-item a::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(90deg, var(--link-color) 0%, var(--link-hover) 100%);
+    -webkit-mask-image: var(--ink-brush-mask);
+    mask-image: var(--ink-brush-mask);
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    transform: scaleX(1) scaleY(0.9);
+    transform-origin: left center;
+    opacity: 0.82;
+    pointer-events: none;
+    transition: transform var(--ink-duration, 420ms) var(--ink-easing, cubic-bezier(0.22, 1, 0.36, 1)), opacity 0.2s ease;
+}
+
+.recipe-description a:hover,
+.recipe-description a:focus-visible,
+.step-text a:hover,
+.step-text a:focus-visible,
+.step-section-item a:hover,
+.step-section-item a:focus-visible {
+    color: var(--link-hover);
+}
+
+.recipe-description a:hover::after,
+.recipe-description a:focus-visible::after,
+.step-text a:hover::after,
+.step-text a:focus-visible::after,
+.step-section-item a:hover::after,
+.step-section-item a:focus-visible::after {
+    opacity: 0.96;
+    background: linear-gradient(90deg, var(--link-hover) 0%, var(--link-color) 100%);
+    animation: qalam-stroke-draw var(--ink-duration, 420ms) var(--ink-easing, cubic-bezier(0.22, 1, 0.36, 1)) forwards;
+}
+
+/* -------------------------------------------------------------------------
+   5. RECIPE SECTIONAL SEPARATOR (YAML-driven sections baseline)
+   ------------------------------------------------------------------------- */
+.recipe-section {
+    margin-bottom: 32px;
+}
+
+.recipe-section-title {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-subtitle);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 16px;
+    border-bottom: 1px dashed var(--border-color);
+    padding-bottom: 8px;
+}
+
+/* Collapsible sections baseline */
+.collapse-icon {
+    width: 14px;
+    height: 14px;
+    transition: transform var(--transition-smooth);
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+/* Rotation of icon when collapsed */
+.recipe-section.collapsed .collapse-icon {
+    transform: rotate(-90deg);
+}
+
+/* Collapsing animation for content */
+.recipe-section-content {
+    max-height: 1200px;
+    /* Large enough to hold all items in a section */
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, margin-bottom 0.4s ease;
+    opacity: 1;
+}
+
+.recipe-section.collapsed .recipe-section-content {
+    max-height: 0;
+    opacity: 0;
+    margin-bottom: 0;
+    pointer-events: none;
+}
+
+/* -------------------------------------------------------------------------
+   6. CUSTOMS / ABOUT SECTION & DUAL-SCRIPT HEADINGS
+   ------------------------------------------------------------------------- */
+
+.about-title {
+    font-family: var(--font-serif);
+    font-size: 3rem;
+    font-weight: 500;
+    line-height: 1.1;
+    color: var(--text-title);
+    letter-spacing: -1px;
+    text-transform: lowercase;
+    margin-bottom: 48px;
+}
+
+.about-section {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: var(--bg-main);
+    position: relative;
+    z-index: 1;
+    padding-top: 80px;
+    padding-bottom: 120px;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+}
+
+.about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: start;
+    margin-bottom: auto;
+}
+
+.about-img {
+    width: 85%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+}
+
+.split-title-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 18px;
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--border-color, #e7e5e4);
+}
+
+.split-title-header .about-title {
+    font-family: var(--font-serif);
+    font-size: 4rem;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--text-title);
+    letter-spacing: -1.5px;
+    text-transform: lowercase;
+    margin: 0;
+}
+
+.split-title-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.split-title-urdu {
+    font-family: 'Noto Nastaliq Urdu', 'Urdu Typesetting', 'Jameel Noori Nastaleeq', 'Geeza Pro', Tahoma, sans-serif;
+    font-size: 2.65rem;
+    font-weight: 500;
+    line-height: 1.6;
+    padding: 0 0.1em;
+    margin-bottom: 14px;
+    color: var(--color-urdu, #b83b14);
+    background: none;
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    -webkit-text-fill-color: initial;
+    user-select: none;
+}
+
+.split-title-roman {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.05rem;
+    font-weight: 400;
+    color: var(--text-muted, #78716c);
+    letter-spacing: 0.02em;
+}
+
+.about-section#about {
+    min-height: calc(100vh - 110px);
+    padding-top: 10px;
+    padding-bottom: 20px;
+    justify-content: flex-start;
+}
+
+.about-section#about .split-title-header {
+    max-width: 780px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+}
+
+.about-section#about .about-text {
+    max-width: 780px;
+    font-size: 1.05rem;
+    line-height: 1.4;
+}
+
+.about-section#about .about-text p {
+    margin: 0 0 0.45em 0;
+}
+
+/* -------------------------------------------------------------------------
+   7. BASE RESPONSIVENESS OVERRIDES
+   ------------------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+    .hero-section {
+        min-height: auto;
+    }
+}
+
+@media (max-width: 600px) {
+    .recipe-indicators {
+        gap: 24px;
+    }
+
+    .scroll-indicator {
+        padding-top: 10px;
+        margin-bottom: 20px;
+    }
+
+    .split-title-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+        padding-bottom: 20px;
+        margin-bottom: 24px;
+    }
+
+    .split-title-header .about-title {
+        font-size: 2.6rem;
+    }
+
+    .split-title-right {
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .split-title-urdu {
+        font-size: 1.8rem;
+        line-height: 1.5;
+        margin-bottom: 8px;
+        align-self: flex-start;
+    }
+
+    .split-title-roman {
+        font-size: 0.95rem;
+    }
+}
+
+/* =========================================================================
+   RECIPE SIDE-BY-SIDE VIEW STYLESHEET (recipe-side-by-side.css)
+   =========================================================================
+   Styles for the classic side-by-side recipe layout (#menu):
+   - Two-column menu grid: Ingredients on the left, steps on the right
+   - Synchronized vertical scroll containers for long ingredient lists & steps
+   - Paginated step cards with scroll-snapping
+   - Floating circular scroll-down arrow button
+   - Interactive collapsible section toggles in the menu view
+   - Responsive breakpoints (desktop 2-column -> mobile stacked single-column)
+   ========================================================================= */
+
+/* -------------------------------------------------------------------------
+   1. THE MENU SECTION & COLUMN GRID
    ------------------------------------------------------------------------- */
 
 /* Second page: holds the menu grids and layout margins */
@@ -318,7 +704,7 @@ body {
     margin-bottom: 48px;
 }
 
-/* 4-column responsive grid layout */
+/* 2-column responsive grid layout */
 .menu-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -357,7 +743,7 @@ body {
 }
 
 /* -------------------------------------------------------------------------
-   4. RECIPE ITEMS & ANIMATIONS
+   2. RECIPE ITEMS & ANIMATIONS
    ------------------------------------------------------------------------- */
 
 .recipe-link {
@@ -436,189 +822,8 @@ body {
 }
 
 /* -------------------------------------------------------------------------
-   5. RESPONSIVENESS OVERRIDES
+   3. DUAL-COLUMN DESKTOP SCROLLING CONTAINERS
    ------------------------------------------------------------------------- */
-
-@media (max-width: 1024px) {
-    .menu-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 32px;
-    }
-
-    .menu-section {
-        padding-top: 60px;
-    }
-}
-
-@media (max-width: 900px) {
-    .hero-section {
-        min-height: auto;
-    }
-}
-
-@media (max-width: 600px) {
-    .menu-grid {
-        grid-template-columns: 1fr;
-        gap: 24px;
-    }
-
-    .menu-title {
-        font-size: 2.5rem;
-        margin-bottom: 32px;
-    }
-
-    .scroll-indicator {
-        padding-top: 10px;
-        margin-bottom: 20px;
-    }
-}
-
-/* -------------------------------------------------------------------------
-   6. RECIPE VIEW INDICATORS & TOGGLES (LAYOUT MODE BUTTONS)
-   ------------------------------------------------------------------------- 
-   These classes style the "side by side" and "step by step" layout select
-   buttons situated at the bottom of the Hero landing page. */
-
-/* Container wrapping both buttons horizontally */
-.recipe-indicators {
-    display: flex;
-    /* Lines up indicators side-by-side */
-    justify-content: center;
-    /* Centers indicators horizontally */
-    gap: 48px;
-    /* Spacing between indicators */
-    margin-top: auto;
-    /* Pushes container to the very bottom of screen */
-    padding-top: 20px;
-    width: 100%;
-}
-
-/* Individual layout selection indicator */
-.recipe-indicators .scroll-indicator {
-    margin-top: 0;
-    padding-top: 0;
-    /* transition: applies animation styles smoothly when hovering or active */
-    transition: opacity var(--transition-smooth), transform var(--transition-smooth);
-}
-
-/* Slight lift effect on hover */
-.recipe-indicators .scroll-indicator:hover {
-    transform: translateY(-2px);
-    /* Moves indicator up by 2px */
-    opacity: 1;
-}
-
-/* Highlight style when this view mode is currently active */
-.recipe-indicators .scroll-indicator.active {
-    opacity: 1;
-}
-
-/* Style active button text color and make it bold */
-.recipe-indicators .scroll-indicator.active .scroll-text {
-    color: var(--text-subtitle);
-    font-weight: 600;
-}
-
-.recipe-indicators .scroll-indicator.active .scroll-text::after {
-    transform: scaleX(1) scaleY(1);
-    opacity: 0.9;
-    background: linear-gradient(90deg, var(--link-color) 0%, var(--link-hover) 100%);
-    animation: qalam-stroke-draw var(--ink-duration, 420ms) var(--ink-easing, cubic-bezier(0.22, 1, 0.36, 1)) forwards;
-}
-
-.recipe-indicators .scroll-indicator:not(.active):hover .scroll-text::after {
-    transform: scaleX(1) scaleY(0.95);
-    opacity: 0.38;
-    animation: qalam-stroke-draw var(--ink-duration, 420ms) var(--ink-easing, cubic-bezier(0.22, 1, 0.36, 1)) forwards;
-}
-
-.recipe-indicators .scroll-indicator:active .scroll-text::after {
-    transform: scaleX(1.02) scaleY(var(--ink-press-scale-y, 0.85));
-}
-
-/* Inline hyperlinks inside recipe descriptions and step instructions */
-.recipe-description a,
-.step-text a,
-.step-section-item a {
-    position: relative;
-    display: inline-block;
-    color: var(--link-color);
-    text-decoration: none;
-    font-weight: 500;
-    padding-bottom: 1px;
-    transition: color var(--transition-smooth);
-}
-
-.recipe-description a::after,
-.step-text a::after,
-.step-section-item a::after {
-    content: '';
-    position: absolute;
-    bottom: -3px;
-    left: 0;
-    width: 100%;
-    height: 6px;
-    background: linear-gradient(90deg, var(--link-color) 0%, var(--link-hover) 100%);
-    -webkit-mask-image: var(--ink-brush-mask);
-    mask-image: var(--ink-brush-mask);
-    -webkit-mask-size: 100% 100%;
-    mask-size: 100% 100%;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    transform: scaleX(1) scaleY(0.9);
-    transform-origin: left center;
-    opacity: 0.82;
-    pointer-events: none;
-    transition: transform var(--ink-duration, 420ms) var(--ink-easing, cubic-bezier(0.22, 1, 0.36, 1)), opacity 0.2s ease;
-}
-
-.recipe-description a:hover,
-.recipe-description a:focus-visible,
-.step-text a:hover,
-.step-text a:focus-visible,
-.step-section-item a:hover,
-.step-section-item a:focus-visible {
-    color: var(--link-hover);
-}
-
-.recipe-description a:hover::after,
-.recipe-description a:focus-visible::after,
-.step-text a:hover::after,
-.step-text a:focus-visible::after,
-.step-section-item a:hover::after,
-.step-section-item a:focus-visible::after {
-    opacity: 0.96;
-    background: linear-gradient(90deg, var(--link-hover) 0%, var(--link-color) 100%);
-    animation: qalam-stroke-draw var(--ink-duration, 420ms) var(--ink-easing, cubic-bezier(0.22, 1, 0.36, 1)) forwards;
-}
-
-/* Bounces the scroll arrow indicator when active to draw attention */
-.recipe-indicators .scroll-indicator.active .scroll-arrow {
-    color: var(--text-subtitle);
-    animation: bounce-indicator 2s infinite;
-    /* Starts bounce loop */
-}
-
-/* Fade down inactive buttons to keep visual focus on active indicator */
-.recipe-indicators .scroll-indicator:not(.active) {
-    opacity: 0.5;
-}
-
-/* Stop bouncing arrows on inactive button indicators */
-.recipe-indicators .scroll-indicator:not(.active) .scroll-arrow {
-    animation: none;
-}
-
-.recipe-indicators .scroll-indicator:not(.active):hover {
-    opacity: 0.8;
-}
-
-
-/* -------------------------------------------------------------------------
-   7. HORIZONTAL STEPS SCROLLING (Side-by-Side View)
-   ------------------------------------------------------------------------- 
-   These classes style the step cards in side-by-side mode, turning them into 
-   paginated vertical decks that page scroll horizontally. */
 
 /* Outer wrapper: position relative is required so our floating arrow button 
    can be absolutely positioned relative to this container's boundaries. */
@@ -675,7 +880,10 @@ body {
     /* Hide Chrome/Safari scrollbar */
 }
 
-/* Individual Step Card */
+/* -------------------------------------------------------------------------
+   4. INDIVIDUAL STEP CARDS
+   ------------------------------------------------------------------------- */
+
 .step-card {
     width: 100%;
     background: rgba(0, 0, 0, 0.02);
@@ -711,7 +919,10 @@ body {
     margin-bottom: 0;
 }
 
-/* Scroll Down Button */
+/* -------------------------------------------------------------------------
+   5. FLOATING SCROLL DOWN BUTTON
+   ------------------------------------------------------------------------- */
+
 .scroll-down-btn {
     position: absolute;
     bottom: -22px;
@@ -756,9 +967,100 @@ body {
     /* Points up to loop back */
 }
 
+/* -------------------------------------------------------------------------
+   6. COLLAPSIBLE INTERACTIONS IN MENU VIEW
+   ------------------------------------------------------------------------- */
+
+#menu .recipe-section-title {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+    transition: color var(--transition-smooth);
+}
+
+#menu .recipe-section-title:focus-visible {
+    outline: 2px solid var(--link-hover);
+    outline-offset: 4px;
+    border-radius: 4px;
+}
+
+#menu .recipe-section-title:hover {
+    color: var(--link-hover);
+}
+
+#menu .recipe-section-title:hover .collapse-icon {
+    color: var(--link-hover);
+}
 
 /* -------------------------------------------------------------------------
-   8. STEP-BY-STEP SCROLL-DOWN LAYOUT
+   7. SIDE-BY-SIDE RESPONSIVENESS OVERRIDES
+   ------------------------------------------------------------------------- */
+
+@media (max-width: 1024px) {
+    .menu-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 32px;
+    }
+
+    .menu-section {
+        padding-top: 60px;
+    }
+}
+
+@media (max-width: 900px) {
+    /* Reset Side-by-Side vertical card scroll for mobile/tablet */
+    .steps-scroll-container,
+    #ingredients-list-container {
+        height: auto;
+        overflow-y: visible;
+        scroll-snap-type: none;
+        padding-bottom: 0;
+    }
+
+    .scroll-down-btn {
+        display: none !important;
+        /* Hide vertical scroll button on mobile */
+    }
+
+    .step-card {
+        width: 100% !important;
+        flex: none !important;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .menu-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .menu-title {
+        font-size: 2.5rem;
+        margin-bottom: 32px;
+    }
+
+    .step-card {
+        padding: 16px;
+    }
+}
+
+/* =========================================================================
+   RECIPE STEP-BY-STEP VIEW STYLESHEET (recipe-step-by-step.css)
+   =========================================================================
+   Styles for the cinematic step-by-step presentation layout (#step-by-step):
+   - Full-screen "mise en place" centered ingredients slide
+   - Split 2-column container:
+     - Left column: sticky culinary illustration with smooth cross-fading layers
+     - Right column: scroll-snapped step instruction slides
+   - Step headings, ordered lists, and typography
+   - Responsive adaptations (sticky top visual header with scrollable cards below on mobile)
+   ========================================================================= */
+
+/* -------------------------------------------------------------------------
+   1. MAIN STEP-BY-STEP SECTION CONTAINER
    ------------------------------------------------------------------------- */
 
 .step-by-step-section {
@@ -771,7 +1073,10 @@ body {
     position: relative;
 }
 
-/* Centered Ingredients Page */
+/* -------------------------------------------------------------------------
+   2. CENTERED INGREDIENTS PAGE ("MISE EN PLACE")
+   ------------------------------------------------------------------------- */
+
 .ingredients-centered-page {
     height: 100vh;
     display: flex;
@@ -787,8 +1092,331 @@ body {
     box-sizing: border-box;
 }
 
+.centered-ingredients-content {
+    max-width: 1100px;
+    /* Wide container to allow columns to span side-by-side */
+    width: 100%;
+}
+
+.ingredients-centered-title {
+    font-family: var(--font-serif);
+    font-size: 3rem;
+    color: var(--text-title);
+    text-transform: lowercase;
+    margin-bottom: 32px;
+    letter-spacing: -1px;
+}
+
+.ingredients-centered-list {
+    font-family: var(--font-sans);
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text-body);
+    display: flex;
+    /* Use flex layout to align section columns */
+    flex-direction: row;
+    flex-wrap: wrap;
+    /* Allow columns to wrap if screen is too narrow */
+    justify-content: center;
+    /* Center the columns horizontally under the title */
+    gap: 60px;
+    /* Spacing between columns */
+    text-align: left;
+    /* Left align text inside the columns */
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Style columns inside the centered list */
+.ingredients-centered-list .recipe-section {
+    min-width: 260px;
+    /* Set ideal width range for columns */
+    max-width: 320px;
+    margin-bottom: 24px;
+}
+
+/* Override card styles inside the full-screen list for clean aesthetics */
+.ingredients-centered-list .menu-item {
+    border: none;
+    background: none;
+    box-shadow: none;
+    padding: 4px 0;
+    margin: 0;
+    width: auto;
+    transform: none !important;
+}
+
+.ingredients-centered-list .recipe-description {
+    margin-bottom: 0;
+    font-size: 1rem;
+}
+
+.ingredients-centered-list .recipe-section-title {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-subtitle);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px dashed var(--border-color);
+    padding-bottom: 6px;
+}
+
+/* Hide collapse icon in the step-by-step centered ingredients page */
+.ingredients-centered-list .collapse-icon {
+    display: none;
+}
+
+/* Ensure ingredients are always fully expanded in the step-by-step centered page */
+.ingredients-centered-list .recipe-section-content {
+    max-height: none !important;
+    opacity: 1 !important;
+    overflow: visible !important;
+}
+
+/* -------------------------------------------------------------------------
+   3. SPLIT PRESENTATION CONTAINER
+   ------------------------------------------------------------------------- */
+
+.split-steps-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    position: relative;
+    width: 100%;
+    margin-bottom: auto;
+}
+
+/* Sticky Visual Left Column */
+.visual-sticky-column {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.sticky-sketch-container {
+    width: 80%;
+    height: 70vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sketch-layers {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.sketch-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+    filter: contrast(1.02);
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    user-select: none;
+    pointer-events: none;
+}
+
+.sketch-layer.active {
+    opacity: 1;
+    /* Fully visible when active */
+}
+
+/* Scrolling Right Steps Column */
+.steps-scrolling-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.step-slide {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 160px 0 20px;
+    scroll-snap-align: start;
+    max-width: 480px;
+}
+
+.step-slide .step-number {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-subtitle);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+}
+
+.step-slide .step-text {
+    font-family: var(--font-sans);
+    font-size: 1.15rem;
+    line-height: 1.65;
+    color: var(--text-body);
+}
+
+.step-slide .step-section-heading {
+    font-family: var(--font-serif);
+    font-size: 2.2rem;
+    font-weight: 500;
+    color: var(--text-title);
+    margin-top: 0;
+    margin-bottom: 24px;
+    text-transform: lowercase;
+}
+
+.step-slide .step-section-list {
+    font-family: var(--font-sans);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--text-body);
+    padding-left: 20px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.step-slide .step-section-item {
+    margin-bottom: 0;
+}
+
+.step-slide .step-section-item::marker {
+    color: var(--text-subtitle);
+    font-weight: 600;
+}
+
+/* -------------------------------------------------------------------------
+   4. STEP-BY-STEP RESPONSIVENESS OVERRIDES
+   ------------------------------------------------------------------------- */
+
+@media (max-width: 1024px) {
+    .split-steps-container {
+        gap: 40px;
+    }
+
+    .sticky-sketch-container {
+        width: 90%;
+    }
+}
+
+@media (max-width: 900px) {
+    /* Adjust Step-by-Step for Mobile: Stack sticky image on top, scroll steps below */
+    .split-steps-container {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .ingredients-centered-page {
+        height: auto;
+        min-height: 100vh;
+        padding: 40px 24px;
+        justify-content: flex-start;
+    }
+
+    .ingredients-centered-list {
+        flex-direction: column;
+        /* Stack vertically on mobile */
+        align-items: center;
+        /* Center the flex columns */
+        text-align: center;
+    }
+
+    .ingredients-centered-list .recipe-section {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .ingredients-centered-list .recipe-section-title {
+        text-align: center;
+    }
+
+    .visual-sticky-column {
+        position: sticky;
+        top: 0;
+        height: 40vh;
+        z-index: 10;
+        background-color: var(--bg-main);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .sticky-sketch-container {
+        height: 35vh;
+        width: 100%;
+    }
+
+    .steps-scrolling-column {
+        padding: 0 24px;
+        align-items: center;
+    }
+
+    .step-slide {
+        height: 50vh;
+        max-width: 100%;
+        padding: 40px 0;
+        text-align: center;
+        justify-content: flex-start;
+    }
+
+    .step-slide:first-child {
+        padding-top: 60px;
+    }
+}
+
+@media (max-width: 600px) {
+    .ingredients-centered-title {
+        font-size: 2.2rem;
+        margin-bottom: 24px;
+    }
+
+    .ingredients-centered-list {
+        font-size: 1rem;
+        line-height: 1.8;
+    }
+
+    .step-slide .step-text {
+        font-size: 1rem;
+    }
+
+    .step-slide .step-section-heading {
+        font-size: 1.8rem;
+        margin-bottom: 16px;
+    }
+
+    .step-slide .step-section-list {
+        font-size: 0.95rem;
+        gap: 12px;
+    }
+}
+
 /* =========================================================================
-   URDU QALAM VERTICAL PROGRESS BAR (Step-by-Step View)
+   URDU QALAM VERTICAL PROGRESS BAR (recipe-progress-bar.css)
+   =========================================================================
+   Stationary vertical milestone track for step-by-step recipe navigation:
+   - Fixed viewport positioning on the right margin
+   - Authentic procedural Qalam ink stroke SVG track (matching navbar underline)
+   - Organic ink blot milestone nodes with circular background buffer halos
+   - Responsive hover milestone tooltip tabs (Inter typography, no step numbers)
+   - Mobile optimizations (compact 140px track, hidden text tooltips)
+
+   COLOR CUSTOMIZATION NOTE:
+   The progress bar inherits the High Chroma theme variables injected by
+   config.js:
+     - Completed / Passed: var(--link-color, #7c2d12)
+     - Active / Wet Bloom:  var(--link-hover, #ea580c)
+     - Incomplete:          #94a3b8 / #cbd5e1
    ========================================================================= */
 
 .qalam-progress-container {
@@ -1065,569 +1693,4 @@ body {
     .qalam-progress-tooltip {
         display: none !important;
     }
-}
-
-.centered-ingredients-content {
-    max-width: 1100px;
-    /* Wide container to allow columns to span side-by-side */
-    width: 100%;
-}
-
-.ingredients-centered-title {
-    font-family: var(--font-serif);
-    font-size: 3rem;
-    color: var(--text-title);
-    text-transform: lowercase;
-    margin-bottom: 32px;
-    letter-spacing: -1px;
-}
-
-.ingredients-centered-list {
-    font-family: var(--font-sans);
-    font-size: 1.1rem;
-    line-height: 1.8;
-    color: var(--text-body);
-    display: flex;
-    /* Use flex layout to align section columns */
-    flex-direction: row;
-    flex-wrap: wrap;
-    /* Allow columns to wrap if screen is too narrow */
-    justify-content: center;
-    /* Center the columns horizontally under the title */
-    gap: 60px;
-    /* Spacing between columns */
-    text-align: left;
-    /* Left align text inside the columns */
-    margin: 0 auto;
-    width: 100%;
-}
-
-/* Style columns inside the centered list */
-.ingredients-centered-list .recipe-section {
-    min-width: 260px;
-    /* Set ideal width range for columns */
-    max-width: 320px;
-    margin-bottom: 24px;
-}
-
-/* Override card styles inside the full-screen list for clean aesthetics */
-.ingredients-centered-list .menu-item {
-    border: none;
-    background: none;
-    box-shadow: none;
-    padding: 4px 0;
-    margin: 0;
-    width: auto;
-    transform: none !important;
-}
-
-.ingredients-centered-list .recipe-description {
-    margin-bottom: 0;
-    font-size: 1rem;
-}
-
-.ingredients-centered-list .recipe-section-title {
-    margin-top: 0;
-    margin-bottom: 12px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--text-subtitle);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    border-bottom: 1px dashed var(--border-color);
-    padding-bottom: 6px;
-}
-
-/* Split Steps Container */
-.split-steps-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
-    position: relative;
-    width: 100%;
-    margin-bottom: auto;
-}
-
-/* Sticky Visual Left Column */
-.visual-sticky-column {
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
-.sticky-sketch-container {
-    width: 80%;
-    height: 70vh;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.sketch-layers {
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-
-.sketch-layer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    mix-blend-mode: multiply;
-    filter: contrast(1.02);
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-    user-select: none;
-    pointer-events: none;
-}
-
-.sketch-layer.active {
-    opacity: 1;
-    /* Fully visible when active */
-}
-
-/* Scrolling Right Steps Column */
-.steps-scrolling-column {
-    display: flex;
-    flex-direction: column;
-}
-
-.step-slide {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 0 160px 0 20px;
-    scroll-snap-align: start;
-    max-width: 480px;
-}
-
-.step-slide .step-number {
-    font-family: var(--font-sans);
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-subtitle);
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 16px;
-}
-
-.step-slide .step-text {
-    font-family: var(--font-sans);
-    font-size: 1.15rem;
-    line-height: 1.65;
-    color: var(--text-body);
-}
-
-.step-slide .step-section-heading {
-    font-family: var(--font-serif);
-    font-size: 2.2rem;
-    font-weight: 500;
-    color: var(--text-title);
-    margin-top: 0;
-    margin-bottom: 24px;
-    text-transform: lowercase;
-}
-
-.step-slide .step-section-list {
-    font-family: var(--font-sans);
-    font-size: 1.1rem;
-    line-height: 1.6;
-    color: var(--text-body);
-    padding-left: 20px;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.step-slide .step-section-item {
-    margin-bottom: 0;
-}
-
-.step-slide .step-section-item::marker {
-    color: var(--text-subtitle);
-    font-weight: 600;
-}
-
-/* -------------------------------------------------------------------------
-   9. RESPONSIVENESS OVERRIDES FOR NEW VIEWS
-   ------------------------------------------------------------------------- */
-
-@media (max-width: 1024px) {
-    .split-steps-container {
-        gap: 40px;
-    }
-
-    .sticky-sketch-container {
-        width: 90%;
-    }
-}
-
-@media (max-width: 900px) {
-
-    /* Adjust Step-by-Step for Mobile: Stack sticky image on top, scroll steps below */
-    .split-steps-container {
-        grid-template-columns: 1fr;
-        gap: 0;
-    }
-
-    .ingredients-centered-page {
-        height: auto;
-        min-height: 100vh;
-        padding: 40px 24px;
-        justify-content: flex-start;
-    }
-
-    .ingredients-centered-list {
-        flex-direction: column;
-        /* Stack vertically on mobile */
-        align-items: center;
-        /* Center the flex columns */
-        text-align: center;
-    }
-
-    .ingredients-centered-list .recipe-section {
-        min-width: 0;
-        max-width: 100%;
-    }
-
-    .ingredients-centered-list .recipe-section-title {
-        text-align: center;
-    }
-
-    .visual-sticky-column {
-        position: sticky;
-        top: 0;
-        height: 40vh;
-        z-index: 10;
-        background-color: var(--bg-main);
-        border-bottom: 1px solid var(--border-color);
-    }
-
-    .sticky-sketch-container {
-        height: 35vh;
-        width: 100%;
-    }
-
-    .steps-scrolling-column {
-        padding: 0 24px;
-        align-items: center;
-    }
-
-    .step-slide {
-        height: 50vh;
-        max-width: 100%;
-        padding: 40px 0;
-        text-align: center;
-        justify-content: flex-start;
-    }
-
-    .step-slide:first-child {
-        padding-top: 60px;
-    }
-
-    /* Reset Side-by-Side vertical card scroll for mobile/tablet */
-    .steps-scroll-container,
-    #ingredients-list-container {
-        height: auto;
-        overflow-y: visible;
-        scroll-snap-type: none;
-        padding-bottom: 0;
-    }
-
-    .scroll-down-btn {
-        display: none !important;
-        /* Hide vertical scroll button on mobile */
-    }
-
-    .step-card {
-        width: 100% !important;
-        flex: none !important;
-        max-width: 100%;
-    }
-}
-
-@media (max-width: 600px) {
-    .recipe-indicators {
-        gap: 24px;
-    }
-
-    .step-card {
-        padding: 16px;
-    }
-
-    .ingredients-centered-title {
-        font-size: 2.2rem;
-        margin-bottom: 24px;
-    }
-
-    .ingredients-centered-list {
-        font-size: 1rem;
-        line-height: 1.8;
-    }
-
-    .step-slide .step-text {
-        font-size: 1rem;
-    }
-
-    .step-slide .step-section-heading {
-        font-size: 1.8rem;
-        margin-bottom: 16px;
-    }
-
-    .step-slide .step-section-list {
-        font-size: 0.95rem;
-        gap: 12px;
-    }
-}
-
-
-/* ABOUT */
-/* 2-column responsive grid layout */
-
-
-/* Split Title Header (Option 2: Semantic Pairing) */
-.split-title-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    padding-bottom: 18px;
-    margin-bottom: 32px;
-    border-bottom: 1px solid var(--border-color, #e7e5e4);
-}
-
-.split-title-header .about-title {
-    font-family: var(--font-serif);
-    font-size: 4rem;
-    font-weight: 500;
-    line-height: 1;
-    color: var(--text-title);
-    letter-spacing: -1.5px;
-    text-transform: lowercase;
-    margin: 0;
-}
-
-.split-title-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 6px;
-}
-
-.split-title-urdu {
-    font-family: 'Noto Nastaliq Urdu', 'Urdu Typesetting', 'Jameel Noori Nastaleeq', 'Geeza Pro', Tahoma, sans-serif;
-    font-size: 2.65rem;
-    font-weight: 500;
-    line-height: 1.6;
-    padding: 0 0.1em;
-    margin-bottom: 14px;
-    color: var(--color-urdu, #b83b14);
-    background: none;
-    -webkit-background-clip: border-box;
-    background-clip: border-box;
-    -webkit-text-fill-color: initial;
-    user-select: none;
-}
-
-.split-title-roman {
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-size: 1.05rem;
-    font-weight: 400;
-    color: var(--text-muted, #78716c);
-    letter-spacing: 0.02em;
-}
-
-/* Constrain customs page header and essay reading measure, ensuring single-screen fit */
-.about-section#about {
-    min-height: calc(100vh - 110px);
-    padding-top: 10px;
-    padding-bottom: 20px;
-    justify-content: flex-start;
-}
-
-.about-section#about .split-title-header {
-    max-width: 780px;
-    margin-bottom: 18px;
-    padding-bottom: 14px;
-}
-
-.about-section#about .about-text {
-    max-width: 780px;
-    font-size: 1.05rem;
-    line-height: 1.4;
-}
-
-.about-section#about .about-text p {
-    margin: 0 0 0.45em 0;
-}
-
-@media (max-width: 600px) {
-    .split-title-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 14px;
-        padding-bottom: 20px;
-        margin-bottom: 24px;
-    }
-
-    .split-title-header .about-title {
-        font-size: 2.6rem;
-    }
-
-    .split-title-right {
-        align-items: flex-start;
-        gap: 4px;
-    }
-
-    .split-title-urdu {
-        font-size: 1.8rem;
-        line-height: 1.5;
-        margin-bottom: 8px;
-        align-self: flex-start;
-    }
-
-    .split-title-roman {
-        font-size: 0.95rem;
-    }
-}
-
-.about-title {
-    font-family: var(--font-serif);
-    font-size: 3rem;
-    font-weight: 500;
-    line-height: 1.1;
-    color: var(--text-title);
-    letter-spacing: -1px;
-    text-transform: lowercase;
-    margin-bottom: 48px;
-}
-
-.about-section {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    /* Ensures the section is tall enough to scroll fully into view on all screens */
-    background-color: var(--bg-main);
-    position: relative;
-    z-index: 1;
-    padding-top: 80px;
-    padding-bottom: 120px;
-    /* Generous bottom spacing for footer and to guarantee smooth full scroll */
-    flex-shrink: 0;
-    /* Prevent flex shrinking to respect min-height */
-    scroll-snap-align: start;
-    /* Enable snap alignment */
-}
-
-.about-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
-    align-items: start;
-    margin-bottom: auto;
-}
-
-.about-img {
-    width: 85%;
-    /* Forces the image to take up exactly the width of the column container */
-    height: auto;
-    /* Tells the browser to scale the height proportionally so it doesn't stretch */
-    display: block;
-    /* Removes any default inline margins or white space beneath the image */
-    border-radius: 8px;
-    /* Optional: adds nice rounded corners if you want it to look premium */
-}
-
-/* -------------------------------------------------------------------------
-   10. RECIPE SECTIONAL SEPARATOR (YAML-driven sections)
-   ------------------------------------------------------------------------- */
-.recipe-section {
-    margin-bottom: 32px;
-}
-
-#menu .recipe-section-title {
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    user-select: none;
-    transition: color var(--transition-smooth);
-}
-
-#menu .recipe-section-title:focus-visible {
-    outline: 2px solid var(--link-hover);
-    outline-offset: 4px;
-    border-radius: 4px;
-}
-
-#menu .recipe-section-title:hover {
-    color: var(--link-hover);
-}
-
-.recipe-section-title {
-    font-family: var(--font-sans);
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--text-subtitle);
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    margin-bottom: 16px;
-    border-bottom: 1px dashed var(--border-color);
-    padding-bottom: 8px;
-}
-
-/* Collapsible sections styles */
-.collapse-icon {
-    width: 14px;
-    height: 14px;
-    transition: transform var(--transition-smooth);
-    color: var(--text-muted);
-    flex-shrink: 0;
-}
-
-#menu .recipe-section-title:hover .collapse-icon {
-    color: var(--link-hover);
-}
-
-/* Rotation of icon when collapsed */
-.recipe-section.collapsed .collapse-icon {
-    transform: rotate(-90deg);
-}
-
-/* Collapsing animation for content */
-.recipe-section-content {
-    max-height: 1200px;
-    /* Large enough to hold all items in a section */
-    overflow: hidden;
-    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, margin-bottom 0.4s ease;
-    opacity: 1;
-}
-
-.recipe-section.collapsed .recipe-section-content {
-    max-height: 0;
-    opacity: 0;
-    margin-bottom: 0;
-    pointer-events: none;
-}
-
-/* Hide collapse icon in the step-by-step centered ingredients page */
-.ingredients-centered-list .collapse-icon {
-    display: none;
-}
-
-/* Ensure ingredients are always fully expanded in the step-by-step centered page */
-.ingredients-centered-list .recipe-section-content {
-    max-height: none !important;
-    opacity: 1 !important;
-    overflow: visible !important;
 }

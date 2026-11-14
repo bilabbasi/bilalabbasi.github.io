@@ -284,7 +284,7 @@ const NAVIGATION_CONFIG = {
 
             // Check for presence of kitchen or recipe stylesheets in document
             if (typeof document !== "undefined" && document.querySelector) {
-                if (document.querySelector('link[href*="kitchen.css"], link[href*="recipe.css"]')) {
+                if (document.querySelector('link[href*="kitchen.css"], link[href*="recipe.css"], link[href*="recipe-"]')) {
                     return true;
                 }
             }

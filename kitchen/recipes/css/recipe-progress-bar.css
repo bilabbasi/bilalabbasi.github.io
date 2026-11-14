@@ -1,0 +1,293 @@
+/* =========================================================================
+   URDU QALAM VERTICAL PROGRESS BAR (recipe-progress-bar.css)
+   =========================================================================
+   Stationary vertical milestone track for step-by-step recipe navigation:
+   - Fixed viewport positioning on the right margin
+   - Authentic procedural Qalam ink stroke SVG track (matching navbar underline)
+   - Organic ink blot milestone nodes with circular background buffer halos
+   - Responsive hover milestone tooltip tabs (Inter typography, no step numbers)
+   - Mobile optimizations (compact 140px track, hidden text tooltips)
+
+   COLOR CUSTOMIZATION NOTE:
+   The progress bar inherits the High Chroma theme variables injected by
+   config.js:
+     - Completed / Passed: var(--link-color, #7c2d12)
+     - Active / Wet Bloom:  var(--link-hover, #ea580c)
+     - Incomplete:          #94a3b8 / #cbd5e1
+   ========================================================================= */
+
+.qalam-progress-container {
+    position: fixed !important;
+    right: 32px;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    height: 180px;
+    width: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000 !important;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0.3s ease;
+}
+
+.qalam-progress-container.is-visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.qalam-progress-track {
+    position: relative;
+    width: 18px;
+    height: 100%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Authentic Qalam Ink Stroke Track (Same procedural SVG as nav underline) */
+.qalam-track-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    mix-blend-mode: multiply;
+    filter: url(#nav-ink-filter);
+    opacity: 0.95;
+}
+
+/* Incomplete Track (Greyed-out naturalistic ink wash) */
+.qalam-stroke-grey .nav-ink-bleed-path {
+    fill: #cbd5e1;
+    opacity: 0.32;
+}
+
+.qalam-stroke-grey .nav-ink-wash-path {
+    fill: #94a3b8;
+    opacity: 0.45;
+}
+
+.qalam-stroke-grey .nav-ink-core-path {
+    fill: #94a3b8;
+    opacity: 0.75;
+}
+
+.qalam-stroke-grey .nav-ink-bristles-path {
+    fill: none;
+    stroke: #94a3b8;
+    stroke-width: 0.65;
+    opacity: 0.35;
+}
+
+.qalam-stroke-grey .nav-ink-dry-path {
+    fill: none;
+    stroke: var(--bg-main, #ffffff);
+    stroke-width: 0.45;
+    opacity: 0.25;
+}
+
+/* Completed Track (Terracotta ink stroke - exact match with nav underline) */
+.qalam-stroke-active .nav-ink-bleed-path {
+    fill: var(--link-hover, #ea580c);
+    opacity: 0.36;
+}
+
+.qalam-stroke-active .nav-ink-wash-path {
+    fill: var(--link-color, #7c2d12);
+    opacity: 0.48;
+}
+
+.qalam-stroke-active .nav-ink-core-path {
+    fill: var(--link-color, #7c2d12);
+    opacity: 0.94;
+}
+
+.qalam-stroke-active .nav-ink-bristles-path {
+    fill: none;
+    stroke: var(--link-color, #7c2d12);
+    stroke-width: 0.65;
+    stroke-linecap: round;
+    opacity: 0.45;
+    vector-effect: non-scaling-stroke;
+}
+
+.qalam-stroke-active .nav-ink-dry-path {
+    fill: none;
+    stroke: var(--bg-main, #ffffff);
+    stroke-width: 0.45;
+    stroke-linecap: round;
+    opacity: 0.28;
+    vector-effect: non-scaling-stroke;
+}
+
+/* Step Markers Container */
+.qalam-progress-markers {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* Organic Ink Blot Marker */
+.qalam-step-marker {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    cursor: pointer;
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 10;
+}
+
+/* Background Halo / Gap Buffer: Prevents progress lines from touching the node */
+.qalam-marker-halo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background-color: var(--bg-main, #fafaf9);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.qalam-step-marker .ink-blot-svg {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    z-index: 2;
+}
+
+/* Incomplete Step Blot: Outlined with slightly thicker bold, not black, not intrusive */
+.qalam-step-marker .ink-blot-bleed {
+    display: none;
+    opacity: 0;
+}
+
+.qalam-step-marker .ink-blot-core {
+    fill: #fafaf9;
+    stroke: #94a3b8;
+    stroke-width: 1.8px;
+    transition: fill 0.25s ease, stroke 0.25s ease, stroke-width 0.25s ease;
+}
+
+.qalam-step-marker:hover {
+    transform: translate(-50%, -50%) scale(1.25);
+}
+
+.qalam-step-marker:hover .ink-blot-core {
+    stroke: var(--link-hover, #ea580c);
+    stroke-width: 2px;
+}
+
+/* Passed / Completed Step Blot: Filled with terracotta ink, seamless without black outline */
+.qalam-step-marker.is-passed .ink-blot-bleed {
+    display: block;
+    fill: var(--link-color, #7c2d12);
+    opacity: 0.22;
+}
+
+.qalam-step-marker.is-passed .ink-blot-core {
+    fill: var(--link-color, #7c2d12);
+    stroke: var(--link-color, #7c2d12);
+    stroke-width: 1px;
+}
+
+/* Active / Current Step Blot: Fresh wet ink bloom, bold terracotta without black outline */
+.qalam-step-marker.is-active {
+    transform: translate(-50%, -50%) scale(1.35);
+}
+
+.qalam-step-marker.is-active .ink-blot-bleed {
+    display: block;
+    fill: var(--link-hover, #ea580c);
+    opacity: 0.35;
+    transform: scale(1.25);
+    transform-origin: center;
+}
+
+.qalam-step-marker.is-active .ink-blot-core {
+    fill: var(--link-hover, #ea580c);
+    stroke: var(--link-hover, #ea580c);
+    stroke-width: 1.4px;
+}
+
+/* Floating step milestone tab */
+.qalam-progress-tooltip {
+    position: absolute;
+    right: calc(100% + 14px);
+    transform: translateY(-50%);
+    background: rgba(250, 250, 249, 0.98);
+    color: var(--text-subtitle, #7c2d12);
+    font-family: var(--font-sans, "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+    font-size: 0.88rem;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0.01em;
+    text-transform: lowercase;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(124, 45, 18, 0.16);
+    box-shadow: 0 3px 12px rgba(124, 45, 18, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 1010;
+}
+
+.qalam-progress-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: -5px;
+    transform: translateY(-50%) rotate(45deg);
+    width: 8px;
+    height: 8px;
+    background: #fafaf9;
+    border-top: 1px solid rgba(124, 45, 18, 0.16);
+    border-right: 1px solid rgba(124, 45, 18, 0.16);
+}
+
+.qalam-progress-tooltip.is-visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Mobile responsive constraints */
+@media (max-width: 900px) {
+    .qalam-progress-container {
+        right: 12px;
+        height: 140px;
+        width: 22px;
+    }
+
+    .qalam-step-marker {
+        width: 14px;
+        height: 14px;
+    }
+
+    .qalam-progress-tooltip {
+        display: none !important;
+    }
+}
