@@ -155,6 +155,34 @@
                         <div class="sticky-sketch-container">
                             <div class="sketch-layers" id="sketch-layers"></div>
                         </div>
+                        <div class="mobile-qalam-progress-track" id="mobile-qalam-progress-track" aria-label="Step progress" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                            <svg class="qalam-track-svg" viewBox="0 0 240 16" preserveAspectRatio="none" focusable="false" aria-hidden="true">
+                                <defs>
+                                    <clipPath id="mobile-qalam-clip">
+                                        <rect id="mobile-qalam-clip-rect" x="-5" y="-10" width="0" height="40" />
+                                    </clipPath>
+                                </defs>
+                                <!-- Incomplete Grey Calligraphic Wash Track -->
+                                <g class="qalam-stroke-grey">
+                                    <path class="nav-ink-bleed-path" d="M 0.8,9.3 C 5,4.9 22,3.8 60,4.4 C 108,5.0 156,5.8 200,5.4 C 219,5.3 233,6.2 239.6,7.5 C 232,9.3 214,10.1 190,10.0 C 144,9.8 96,11.2 48,11.5 C 18,11.7 5,10.9 0.8,9.3 Z" />
+                                    <path class="nav-ink-wash-path" d="M 1.2,9.2 C 6,5.4 22,4.4 60,4.9 C 108,5.4 156,6.1 200,5.8 C 218,5.7 232,6.5 239.2,7.5 C 231,8.9 214,9.6 192,9.5 C 146,9.3 98,10.6 50,10.9 C 20,11.1 6,10.5 1.2,9.2 Z" />
+                                    <path class="nav-ink-core-path" d="M 1.8,9.1 C 7,5.8 24,4.8 62,5.2 C 108,5.7 154,6.4 196,6.1 C 214,6.0 228,6.7 236.5,7.6 C 226,8.7 208,9.2 188,9.1 C 144,8.9 98,10.2 52,10.5 C 22,10.7 8,10.2 1.8,9.1 Z" />
+                                    <path class="nav-ink-bristles-path" d="M 182,5.9 C 204,5.7 224,6.2 239.4,7.1 M 176,9.3 C 200,9.5 220,9.0 237.8,8.2 M 14,10.4 C 42,10.9 78,10.6 114,9.9" />
+                                    <path class="nav-ink-dry-path" d="M 164,7.4 C 190,7.2 214,7.4 234,7.6" />
+                                </g>
+                                <!-- Foreground Active Terracotta Qalam Stroke (Clipped to scroll progress) -->
+                                <g clip-path="url(#mobile-qalam-clip)">
+                                    <g class="qalam-stroke-active">
+                                        <path class="nav-ink-bleed-path" d="M 0.8,9.3 C 5,4.9 22,3.8 60,4.4 C 108,5.0 156,5.8 200,5.4 C 219,5.3 233,6.2 239.6,7.5 C 232,9.3 214,10.1 190,10.0 C 144,9.8 96,11.2 48,11.5 C 18,11.7 5,10.9 0.8,9.3 Z" />
+                                        <path class="nav-ink-wash-path" d="M 1.2,9.2 C 6,5.4 22,4.4 60,4.9 C 108,5.4 156,6.1 200,5.8 C 218,5.7 232,6.5 239.2,7.5 C 231,8.9 214,9.6 192,9.5 C 146,9.3 98,10.6 50,10.9 C 20,11.1 6,10.5 1.2,9.2 Z" />
+                                        <path class="nav-ink-core-path" d="M 1.8,9.1 C 7,5.8 24,4.8 62,5.2 C 108,5.7 154,6.4 196,6.1 C 214,6.0 228,6.7 236.5,7.6 C 226,8.7 208,9.2 188,9.1 C 144,8.9 98,10.2 52,10.5 C 22,10.7 8,10.2 1.8,9.1 Z" />
+                                        <path class="nav-ink-bristles-path" d="M 182,5.9 C 204,5.7 224,6.2 239.4,7.1 M 176,9.3 C 200,9.5 220,9.0 237.8,8.2 M 14,10.4 C 42,10.9 78,10.6 114,9.9" />
+                                        <path class="nav-ink-dry-path" d="M 164,7.4 C 190,7.2 214,7.4 234,7.6" />
+                                    </g>
+                                </g>
+                            </svg>
+                            <div class="mobile-qalam-progress-markers" id="mobile-qalam-progress-markers"></div>
+                        </div>
                     </div>
 
                     <!-- Scrolling Steps Column -->
@@ -513,11 +541,15 @@
     function setupQalamProgressBar() {
         const container = document.getElementById("qalam-progress-container");
         const markersContainer = document.getElementById("qalam-progress-markers");
+        const mobileMarkersContainer = document.getElementById("mobile-qalam-progress-markers");
         const track = container ? container.querySelector(".qalam-progress-track") : null;
         const tooltip = document.getElementById("qalam-progress-tooltip");
         if (!container || !markersContainer || !track) return;
 
         markersContainer.innerHTML = "";
+        if (mobileMarkersContainer) {
+            mobileMarkersContainer.innerHTML = "";
+        }
         progressSlides = [
             document.getElementById("step-page-ingredients"),
             ...Array.from(document.querySelectorAll("#steps-scrolling-column .step-slide"))
@@ -582,6 +614,32 @@
                 slide.scrollIntoView({ behavior: "smooth" });
             });
             markersContainer.appendChild(marker);
+
+            if (mobileMarkersContainer) {
+                const mMarker = document.createElement("div");
+                mMarker.className = "mobile-qalam-marker";
+                mMarker.setAttribute("data-step-index", idx);
+                mMarker.setAttribute("data-title", title);
+                mMarker.setAttribute("aria-label", title);
+                mMarker.setAttribute("role", "button");
+                mMarker.innerHTML = `
+                    <div class="qalam-marker-halo" aria-hidden="true"></div>
+                    <svg class="ink-blot-svg" viewBox="0 0 20 20" focusable="false" aria-hidden="true">
+                        <path class="ink-blot-bleed" d="${blot.bleed}" />
+                        <path class="ink-blot-core" d="${blot.core}" />
+                    </svg>
+                `;
+                mMarker.style.left = `${pct}%`;
+                mMarker.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    slide.scrollIntoView({ behavior: "smooth" });
+                });
+                mMarker.addEventListener("touchend", (e) => {
+                    e.stopPropagation();
+                    slide.scrollIntoView({ behavior: "smooth" });
+                });
+                mobileMarkersContainer.appendChild(mMarker);
+            }
         });
 
         if (!track.dataset.listenerAdded) {
@@ -614,7 +672,12 @@
         }
 
         const rect = stepSection.getBoundingClientRect();
-        const isInView = rect.top < window.innerHeight * 0.75 && rect.bottom > 120;
+        const hero = document.querySelector(".hero-section");
+        // On mobile and desktop, strictly only show the progress bar once the hero section
+        // has scrolled out of view beneath the fixed 60px navbar (hero bottom <= 62px),
+        // meaning mise en place is fully in place occupying the screen.
+        const isMiseEnPlaceFullyInPlace = hero ? (hero.getBoundingClientRect().bottom <= 62) : (rect.top <= 62);
+        const isInView = isMiseEnPlaceFullyInPlace && rect.bottom > 120;
 
         if (!isInView) {
             container.classList.remove("is-visible");
@@ -629,7 +692,8 @@
             return;
         }
 
-        const targetY = window.innerHeight * 0.5;
+        const isMobile = window.innerWidth <= 900;
+        const targetY = isMobile ? window.innerHeight * 0.72 : window.innerHeight * 0.5;
         let closestIdx = 0;
         let closestDist = Infinity;
 
@@ -662,6 +726,33 @@
             clipRect.setAttribute("height", clipHeight.toFixed(1));
         }
 
+        const mobileClip = document.getElementById("mobile-qalam-clip-rect");
+        if (mobileClip) {
+            const clipW = Math.max(0, Math.min(250, ratio * 250));
+            mobileClip.setAttribute("width", clipW.toFixed(1));
+        }
+
+        const mobileTrack = document.getElementById("mobile-qalam-progress-track");
+        if (mobileTrack) {
+            mobileTrack.setAttribute("aria-valuenow", Math.round(ratio * 100));
+            if (!mobileTrack.dataset.listenerAdded) {
+                mobileTrack.dataset.listenerAdded = "true";
+                const handleScrub = (clientX) => {
+                    const bRect = mobileTrack.getBoundingClientRect();
+                    const clickX = clientX - bRect.left;
+                    const clickRatio = Math.max(0, Math.min(1, clickX / bRect.width));
+                    const targetIdx = Math.round(clickRatio * (progressSlides.length - 1));
+                    if (progressSlides[targetIdx]) {
+                        progressSlides[targetIdx].scrollIntoView({ behavior: "smooth" });
+                    }
+                };
+                mobileTrack.addEventListener("click", (e) => handleScrub(e.clientX));
+                mobileTrack.addEventListener("touchmove", (e) => {
+                    if (e.touches && e.touches[0]) handleScrub(e.touches[0].clientX);
+                }, { passive: true });
+            }
+        }
+
         if (markersContainer) {
             const markers = markersContainer.querySelectorAll(".qalam-step-marker");
             markers.forEach((m, idx) => {
@@ -677,6 +768,23 @@
                 }
             });
             lastHighlightedIdx = closestIdx;
+        }
+
+        const mobileMarkersContainer = document.getElementById("mobile-qalam-progress-markers");
+        if (mobileMarkersContainer) {
+            const mMarkers = mobileMarkersContainer.querySelectorAll(".mobile-qalam-marker");
+            mMarkers.forEach((m, idx) => {
+                if (idx < closestIdx) {
+                    m.classList.add("is-passed");
+                    m.classList.remove("is-active");
+                } else if (idx === closestIdx) {
+                    m.classList.remove("is-passed");
+                    m.classList.add("is-active");
+                } else {
+                    m.classList.remove("is-passed");
+                    m.classList.remove("is-active");
+                }
+            });
         }
     }
 

@@ -275,11 +275,167 @@
 }
 
 /* Mobile responsive constraints */
+/* Mobile Horizontal Urdu Qalam Step Progress Line */
+.mobile-qalam-progress-track {
+    display: none;
+}
+
 @media (max-width: 900px) {
+    #qalam-progress-container,
     .qalam-progress-container {
-        right: 12px;
-        height: 140px;
-        width: 22px;
+        display: none !important;
+    }
+
+    .mobile-qalam-progress-track {
+        display: block;
+        position: relative;
+        width: calc(100% - 48px);
+        height: 7px;
+        flex-shrink: 0;
+        margin: 4px auto 6px auto;
+        z-index: 45;
+        cursor: pointer;
+        pointer-events: auto;
+    }
+
+    /* Generous touch target for comfortable mobile scrub & tap */
+    .mobile-qalam-progress-track::before {
+        content: "";
+        position: absolute;
+        top: -14px;
+        bottom: -14px;
+        left: -12px;
+        right: -12px;
+    }
+
+    .mobile-qalam-progress-track .qalam-track-svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+        overflow: visible;
+        mix-blend-mode: multiply;
+        filter: url(#nav-ink-filter);
+        opacity: 0.92;
+    }
+
+    /* Subtle inactive Qalam ink wash */
+    .mobile-qalam-progress-track .qalam-stroke-grey .nav-ink-bleed-path {
+        fill: #cbd5e1;
+        opacity: 0.18;
+    }
+
+    .mobile-qalam-progress-track .qalam-stroke-grey .nav-ink-wash-path {
+        fill: #94a3b8;
+        opacity: 0.25;
+    }
+
+    .mobile-qalam-progress-track .qalam-stroke-grey .nav-ink-core-path {
+        fill: #94a3b8;
+        opacity: 0.45;
+    }
+
+    /* Subtle active terracotta pigment */
+    .mobile-qalam-progress-track .qalam-stroke-active .nav-ink-core-path {
+        opacity: 0.88;
+    }
+
+    /* Mobile Ink Blot Milestones (Compact & Tappable) */
+    .mobile-qalam-progress-markers {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 10;
+    }
+
+    .mobile-qalam-marker {
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 8px;
+        height: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: auto;
+        cursor: pointer;
+        transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+        z-index: 10;
+    }
+
+    /* Generous tap target for mobile touchscreens (32px x 32px) */
+    .mobile-qalam-marker::before {
+        content: "";
+        position: absolute;
+        top: -12px;
+        bottom: -12px;
+        left: -12px;
+        right: -12px;
+    }
+
+    .mobile-qalam-marker .qalam-marker-halo {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background-color: var(--bg-main, #fafaf9);
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .mobile-qalam-marker .ink-blot-svg {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+        z-index: 2;
+    }
+
+    .mobile-qalam-marker .ink-blot-bleed {
+        display: none;
+        opacity: 0;
+    }
+
+    .mobile-qalam-marker .ink-blot-core {
+        fill: var(--bg-main, #fafaf9);
+        stroke: #94a3b8;
+        stroke-width: 1.2px;
+        transition: fill 0.25s ease, stroke 0.25s ease, stroke-width 0.25s ease;
+    }
+
+    .mobile-qalam-marker.is-passed .ink-blot-bleed {
+        display: block;
+        fill: var(--link-color, #7c2d12);
+        opacity: 0.22;
+    }
+
+    .mobile-qalam-marker.is-passed .ink-blot-core {
+        fill: var(--link-color, #7c2d12);
+        stroke: var(--link-color, #7c2d12);
+        stroke-width: 1px;
+    }
+
+    .mobile-qalam-marker.is-active {
+        transform: translate(-50%, -50%) scale(1.2);
+    }
+
+    .mobile-qalam-marker.is-active .ink-blot-bleed {
+        display: block;
+        fill: var(--link-hover, #ea580c);
+        opacity: 0.28;
+        transform: scale(1.2);
+        transform-origin: center;
+    }
+
+    .mobile-qalam-marker.is-active .ink-blot-core {
+        fill: var(--link-hover, #ea580c);
+        stroke: var(--link-hover, #ea580c);
+        stroke-width: 1.3px;
     }
 
     .qalam-step-marker {
