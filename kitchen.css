@@ -85,6 +85,18 @@
 .navbar {
     --ink-color: var(--link-color);
     --ink-bleed-color: var(--link-hover);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.navbar.is-scrolled {
+    border-bottom-color: rgba(0, 0, 0, 0.05);
 }
 
 .nav-indicator-ghost .nav-ink-core-path {
@@ -314,6 +326,9 @@ body {
     flex-direction: column;
     min-height: 100vh;
     /* Ensures the section is tall enough to scroll fully into view on all screens */
+    background-color: var(--bg-main);
+    position: relative;
+    z-index: 1;
     padding-top: 80px;
     padding-bottom: 120px;
     /* Generous bottom spacing for footer and to guarantee smooth full scroll */
@@ -322,6 +337,8 @@ body {
     /* Prevent flex shrinking to respect min-height */
     scroll-snap-align: start;
     /* Enable snap alignment */
+    scroll-margin-top: 60px;
+    /* Offset for sticky 60px navbar */
 }
 
 .menu-title {

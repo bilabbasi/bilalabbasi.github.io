@@ -194,6 +194,11 @@
         // If data-back is specified, render a back-link navbar (e.g. recipe templates)
         const backUrl = header.getAttribute("data-back");
         if (backUrl) {
+            const recipeTitle = header.getAttribute("data-recipe-title");
+            if (recipeTitle) {
+                renderRecipeNavbar(header, recipeTitle, backUrl);
+                return;
+            }
             const backLabel = header.getAttribute("data-back-label") || "← the kitchen";
             header.innerHTML = `
             <nav class="nav-container" aria-label="Breadcrumb">
@@ -327,7 +332,11 @@
      * and a 150ms wet-ink pigment deposition bloom via the Web Animations API.
      */
     function updateIndicator(navLinks, targetLink, animate = true) {
-        if (!navLinks || !targetLink) return;
+        if (!navLinks) return;
+        if (!targetLink) {
+            targetLink = navLinks.querySelector(".nav-item a.active") || navLinks.querySelector(".nav-item a");
+        }
+        if (!targetLink) return;
         const indicator = ensureIndicator(navLinks);
         if (!indicator) return;
 
@@ -1100,6 +1109,18 @@
             initNavbars();
         }
 
+        // Sticky scrolled shadow/border toggle
+        window.addEventListener("scroll", () => {
+            const navbar = document.querySelector("header.navbar");
+            if (navbar) {
+                if (window.scrollY > 20) {
+                    navbar.classList.add("is-scrolled");
+                } else {
+                    navbar.classList.remove("is-scrolled");
+                }
+            }
+        }, { passive: true });
+
         // Support seamless browser Back/Forward navigation for tabbed headers
         window.addEventListener("popstate", () => {
             const header = document.querySelector("header.navbar");
@@ -1118,6 +1139,118 @@
         });
     }
 
+    /**
+     * Renders stationary recipe navbar: "← the kitchen | <recipe_name>"
+     * with <recipe_name> active and underlined by the Urdu qalam indicator.
+     */
+    function renderRecipeNavbar(header, recipeTitle, backUrl) {
+        if (!header) header = document.querySelector("header.navbar[data-back]") || document.querySelector("header.navbar");
+        if (!header) return;
+
+        const effectiveBackUrl = backUrl || header.getAttribute("data-back") || "../../";
+        const backLabel = header.getAttribute("data-back-label") || "← the kitchen";
+        const title = (recipeTitle || header.getAttribute("data-recipe-title") || "the recipe").toLowerCase();
+
+        header.setAttribute("data-recipe-title", title);
+        header.setAttribute("data-recipe-nav-mode", "breadcrumb");
+
+        ensureInkFilterDefs();
+
+        header.innerHTML = `
+        <nav class="nav-container" aria-label="Breadcrumb">
+            <ul class="nav-links has-indicator" role="tablist">
+                <li class="nav-item" role="presentation"><a href="${effectiveBackUrl}" id="kitchen-tab" role="tab">${backLabel}</a></li>
+                <li class="nav-divider" aria-hidden="true">|</li>
+                <li class="nav-item" role="presentation"><a href="#me" class="recipe-top-link active" id="recipe-top-tab" role="tab" aria-selected="true" aria-current="page">${title}</a></li>
+                <span class="nav-indicator" aria-hidden="true"></span>
+            </ul>
+        </nav>`.trim();
+
+        const topLink = header.querySelector("#recipe-top-tab");
+        if (topLink) {
+            topLink.addEventListener("click", (e) => {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+        }
+
+        const navLinks = header.querySelector(".nav-links");
+        if (navLinks) {
+            ensureIndicator(navLinks);
+            attachContinuousNav(header);
+            const positionActive = () => {
+                const activeLink = navLinks.querySelector("#recipe-top-tab") || navLinks.querySelector(".active");
+                if (activeLink) {
+                    updateIndicator(navLinks, activeLink, false);
+                }
+            };
+            positionActive();
+            requestAnimationFrame(positionActive);
+            setTimeout(positionActive, 40);
+            setTimeout(positionActive, 120);
+        }
+    }
+
+    function setRecipeNavbarMode(header, isModeActive, recipeTitle, backUrl) {
+        renderRecipeNavbar(header, recipeTitle, backUrl);
+    }
+
+    /**
+     * Renders stationary recipe navbar: "← the kitchen | <recipe_name>"
+     * with <recipe_name> active and underlined by the Urdu qalam indicator.
+     */
+    function renderRecipeNavbar(header, recipeTitle, backUrl) {
+        if (!header) header = document.querySelector("header.navbar[data-back]") || document.querySelector("header.navbar");
+        if (!header) return;
+
+        const effectiveBackUrl = backUrl || header.getAttribute("data-back") || "../../";
+        const backLabel = header.getAttribute("data-back-label") || "← the kitchen";
+        const title = (recipeTitle || header.getAttribute("data-recipe-title") || "the recipe").toLowerCase();
+
+        header.setAttribute("data-recipe-title", title);
+        header.setAttribute("data-recipe-nav-mode", "breadcrumb");
+
+        ensureInkFilterDefs();
+
+        header.innerHTML = `
+        <nav class="nav-container" aria-label="Breadcrumb">
+            <ul class="nav-links has-indicator" role="tablist">
+                <li class="nav-item" role="presentation"><a href="${effectiveBackUrl}" id="kitchen-tab" role="tab">${backLabel}</a></li>
+                <li class="nav-divider" aria-hidden="true">|</li>
+                <li class="nav-item" role="presentation"><a href="#me" class="recipe-top-link active" id="recipe-top-tab" role="tab" aria-selected="true" aria-current="page">${title}</a></li>
+                <span class="nav-indicator" aria-hidden="true"></span>
+            </ul>
+        </nav>`.trim();
+
+        const topLink = header.querySelector("#recipe-top-tab");
+        if (topLink) {
+            topLink.addEventListener("click", (e) => {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+        }
+
+        const navLinks = header.querySelector(".nav-links");
+        if (navLinks) {
+            ensureIndicator(navLinks);
+            attachContinuousNav(header);
+            const positionActive = () => {
+                const activeLink = navLinks.querySelector("#recipe-top-tab") || navLinks.querySelector(".active");
+                if (activeLink) {
+                    updateIndicator(navLinks, activeLink, false);
+                }
+            };
+            positionActive();
+            requestAnimationFrame(positionActive);
+            setTimeout(positionActive, 40);
+            setTimeout(positionActive, 120);
+        }
+    }
+
+    function setRecipeNavbarMode(header, isModeActive, recipeTitle, backUrl) {
+        renderRecipeNavbar(header, recipeTitle, backUrl);
+    }
+
     // Expose globally for dynamic or manual access
     if (typeof window !== "undefined") {
         window.initKitchenDashboard = initKitchenDashboard;
@@ -1126,6 +1259,9 @@
         window.initActivePageContent = initActivePageContent;
         window.renderSiteNavbar = renderNavbar;
         window.initSiteNavbars = initNavbars;
+        window.renderRecipeNavbar = renderRecipeNavbar;
+        window.setRecipeNavbarMode = setRecipeNavbarMode;
+        window.ensureInkFilterDefs = ensureInkFilterDefs;
         window.updateNavIndicator = updateIndicator;
         window.updateNavGhostIndicator = updateGhostIndicator;
         window.setNavPressedState = setPressedState;
