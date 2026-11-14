@@ -264,6 +264,7 @@
 }
 
 @media (max-width: 900px) {
+
     /* Adjust Step-by-Step for Mobile: Stack sticky image on top, scroll steps below */
     .split-steps-container {
         grid-template-columns: 1fr;

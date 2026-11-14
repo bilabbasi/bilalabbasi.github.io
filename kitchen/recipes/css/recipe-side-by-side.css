@@ -352,6 +352,7 @@
 }
 
 @media (max-width: 900px) {
+
     /* Reset Side-by-Side vertical card scroll for mobile/tablet */
     .steps-scroll-container,
     #ingredients-list-container {

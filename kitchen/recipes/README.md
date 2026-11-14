@@ -10,7 +10,6 @@ Every recipe is organized into its own self-contained directory under `kitchen/r
 
 ```text
 kitchen/recipes/
-├── recipe.css             # Unified bundle stylesheet
 ├── css/                   # Modular recipe stylesheets
 │   ├── recipe-base.css         # Invariants, navbar, layout, hero, typography
 │   ├── recipe-side-by-side.css # Dual-column scrolling, cards, scroll-down btn
