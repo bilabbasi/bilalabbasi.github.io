@@ -4,6 +4,42 @@
  */
 
 (function () {
+    let currentRecipeTitle = "";
+    let progressSlides = [];
+    let lastHighlightedIdx = -1;
+    let isHoveringMarker = false;
+    let milestoneHideTimer = null;
+
+    // Helper function to dynamically load nav.js if not already present
+    function ensureNavComponent() {
+        const navbarEl = document.querySelector("header.navbar");
+        if (typeof window.renderRecipeNavbar !== "undefined") {
+            if (typeof window.ensureInkFilterDefs === "function") {
+                window.ensureInkFilterDefs();
+            }
+            if (navbarEl && currentRecipeTitle) {
+                window.renderRecipeNavbar(navbarEl, currentRecipeTitle, "../../");
+            }
+            return;
+        }
+        if (document.querySelector('script[data-nav-loader]')) {
+            return;
+        }
+        const s = document.createElement("script");
+        s.setAttribute("data-nav-loader", "true");
+        s.src = "../../../nav.js";
+        s.defer = true;
+        s.onload = () => {
+            if (typeof window.ensureInkFilterDefs === "function") {
+                window.ensureInkFilterDefs();
+            }
+            const nb = document.querySelector("header.navbar");
+            if (nb && currentRecipeTitle && typeof window.renderRecipeNavbar === "function") {
+                window.renderRecipeNavbar(nb, currentRecipeTitle, "../../");
+            }
+        };
+        document.head.appendChild(s);
+    }
     // 1. Build the base HTML markup if not already present
     function ensureBaseMarkup() {
         const root = document.getElementById("recipe-root") || document.body;
@@ -11,12 +47,22 @@
             return; // Already present
         }
 
+        let initialMode = 'side-by-side';
+        try {
+            if (window.location.hash === '#step-by-step' || sessionStorage.getItem('recipe_view_mode') === 'step-by-step') {
+                initialMode = 'step-by-step';
+            }
+        } catch (e) {}
+        const isStepMode = initialMode === 'step-by-step';
+
         const markup = `
         <div class="app-wrapper">
-            <header class="navbar">
-                <ul class="nav-links">
-                    <li class="nav-item"><a href="../../" class="active" id="kitchen-tab">← the kitchen</a></li>
-                </ul>
+            <header class="navbar" data-back="../../" data-back-label="← the kitchen">
+                <nav class="nav-container" aria-label="Main Navigation">
+                    <ul class="nav-links">
+                        <li class="nav-item"><a href="../../" class="active" id="kitchen-tab">← the kitchen</a></li>
+                    </ul>
+                </nav>
             </header>
 
             <!-- Hero Section (First Page) -->
@@ -45,13 +91,13 @@
 
                 <!-- Scroll indicators pointing to the recipe layouts below -->
                 <div class="recipe-indicators">
-                    <div class="scroll-indicator" id="indicator-side-by-side" onclick="selectRecipeMode('side-by-side')">
+                    <div class="scroll-indicator ${!isStepMode ? 'active' : ''}" id="indicator-side-by-side" onclick="selectRecipeMode('side-by-side')">
                         <span class="scroll-text">side by side</span>
                         <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
                     </div>
-                    <div class="scroll-indicator" id="indicator-step-by-step" onclick="selectRecipeMode('step-by-step')">
+                    <div class="scroll-indicator ${isStepMode ? 'active' : ''}" id="indicator-step-by-step" onclick="selectRecipeMode('step-by-step')">
                         <span class="scroll-text">step by step</span>
                         <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="6 9 12 15 18 9"></polyline>
@@ -61,7 +107,7 @@
             </section>
 
             <!-- Menu Section (Second Page / Side-by-Side View) -->
-            <section class="menu-section" id="menu">
+            <section class="menu-section" id="menu" style="${isStepMode ? 'display: none;' : ''}">
                 <h2 class="menu-title">the recipe</h2>
 
                 <div class="menu-grid">
@@ -93,7 +139,7 @@
             </section>
 
             <!-- Step-by-Step Section (Alternative View / Page-per-Step Scroll View) -->
-            <section class="step-by-step-section" id="step-by-step" style="display: none;">
+            <section class="step-by-step-section" id="step-by-step" style="${isStepMode ? 'display: block;' : 'display: none;'}">
                 <!-- Centered Ingredients Page -->
                 <div class="step-page ingredients-centered-page" id="step-page-ingredients" data-step="0">
                     <div class="centered-ingredients-content">
@@ -123,6 +169,49 @@
         </div>
         `;
         root.innerHTML = markup;
+
+        // Ensure stationary progress bar is attached directly to document.body outside scrolling wrappers
+        let progressContainer = document.getElementById("qalam-progress-container");
+        if (!progressContainer) {
+            progressContainer = document.createElement("aside");
+            progressContainer.className = "qalam-progress-container";
+            progressContainer.id = "qalam-progress-container";
+            progressContainer.setAttribute("aria-label", "Step progress");
+            progressContainer.innerHTML = `
+                <div class="qalam-progress-tooltip" id="qalam-progress-tooltip"></div>
+                <div class="qalam-progress-track">
+                    <svg class="qalam-track-svg" viewBox="0 0 16 240" preserveAspectRatio="none" focusable="false" aria-hidden="true">
+                        <defs>
+                            <clipPath id="progress-ink-clip">
+                                <rect id="progress-clip-rect" x="-50" y="0" width="100" height="0" />
+                            </clipPath>
+                        </defs>
+                        <!-- Incomplete Track (Greyed-out procedural qalam stroke) -->
+                        <g class="qalam-stroke-grey" transform="matrix(0 1 -1 0 16 0)">
+                            <path class="nav-ink-bleed-path" d="M 0.8,9.3 C 5,4.9 22,3.8 60,4.4 C 108,5.0 156,5.8 200,5.4 C 219,5.3 233,6.2 239.6,7.5 C 232,9.3 214,10.1 190,10.0 C 144,9.8 96,11.2 48,11.5 C 18,11.7 5,10.9 0.8,9.3 Z" />
+                            <path class="nav-ink-wash-path" d="M 1.2,9.2 C 6,5.4 22,4.4 60,4.9 C 108,5.4 156,6.1 200,5.8 C 218,5.7 232,6.5 239.2,7.5 C 231,8.9 214,9.6 192,9.5 C 146,9.3 98,10.6 50,10.9 C 20,11.1 6,10.5 1.2,9.2 Z" />
+                            <path class="nav-ink-core-path" d="M 1.8,9.1 C 7,5.8 24,4.8 62,5.2 C 108,5.7 154,6.4 196,6.1 C 214,6.0 228,6.7 236.5,7.6 C 226,8.7 208,9.2 188,9.1 C 144,8.9 98,10.2 52,10.5 C 22,10.7 8,10.2 1.8,9.1 Z" />
+                            <path class="nav-ink-bristles-path" d="M 182,5.9 C 204,5.7 224,6.2 239.4,7.1 M 176,9.3 C 200,9.5 220,9.0 237.8,8.2 M 14,10.4 C 42,10.9 78,10.6 114,9.9" />
+                            <path class="nav-ink-dry-path" d="M 164,7.4 C 190,7.2 214,7.4 234,7.6" />
+                        </g>
+                        <!-- Foreground Active Track (Terracotta procedural qalam stroke, clipped to progress) -->
+                        <g clip-path="url(#progress-ink-clip)">
+                            <g class="qalam-stroke-active" transform="matrix(0 1 -1 0 16 0)">
+                                <path class="nav-ink-bleed-path" d="M 0.8,9.3 C 5,4.9 22,3.8 60,4.4 C 108,5.0 156,5.8 200,5.4 C 219,5.3 233,6.2 239.6,7.5 C 232,9.3 214,10.1 190,10.0 C 144,9.8 96,11.2 48,11.5 C 18,11.7 5,10.9 0.8,9.3 Z" />
+                                <path class="nav-ink-wash-path" d="M 1.2,9.2 C 6,5.4 22,4.4 60,4.9 C 108,5.4 156,6.1 200,5.8 C 218,5.7 232,6.5 239.2,7.5 C 231,8.9 214,9.6 192,9.5 C 146,9.3 98,10.6 50,10.9 C 20,11.1 6,10.5 1.2,9.2 Z" />
+                                <path class="nav-ink-core-path" d="M 1.8,9.1 C 7,5.8 24,4.8 62,5.2 C 108,5.7 154,6.4 196,6.1 C 214,6.0 228,6.7 236.5,7.6 C 226,8.7 208,9.2 188,9.1 C 144,8.9 98,10.2 52,10.5 C 22,10.7 8,10.2 1.8,9.1 Z" />
+                                <path class="nav-ink-bristles-path" d="M 182,5.9 C 204,5.7 224,6.2 239.4,7.1 M 176,9.3 C 200,9.5 220,9.0 237.8,8.2 M 14,10.4 C 42,10.9 78,10.6 114,9.9" />
+                                <path class="nav-ink-dry-path" d="M 164,7.4 C 190,7.2 214,7.4 234,7.6" />
+                            </g>
+                        </g>
+                    </svg>
+                    <div class="qalam-progress-markers" id="qalam-progress-markers"></div>
+                </div>
+            `;
+            document.body.appendChild(progressContainer);
+        } else if (progressContainer.parentElement !== document.body) {
+            document.body.appendChild(progressContainer);
+        }
     }
 
     // Helper function to normalize and resolve image paths
@@ -151,6 +240,16 @@
 
     // Render Recipe Content
     function renderRecipe(recipe) {
+        currentRecipeTitle = (recipe.title || "the recipe").toLowerCase();
+        const navbarEl = document.querySelector("header.navbar");
+        if (navbarEl) {
+            navbarEl.setAttribute("data-recipe-title", currentRecipeTitle);
+            if (typeof window.renderRecipeNavbar === "function") {
+                window.renderRecipeNavbar(navbarEl, currentRecipeTitle, "../../");
+            }
+        }
+        ensureNavComponent();
+
         // 1. Update Title and Headers
         document.title = (recipe.title || "Recipe") + " — the kitchen";
         const titleEl = document.getElementById("main-title");
@@ -303,7 +402,7 @@
     }
 
     // View mode toggling
-    window.selectRecipeMode = function (mode) {
+    window.selectRecipeMode = function (mode, shouldScroll = true) {
         const sideBySideSection = document.getElementById('menu');
         const stepByStepSection = document.getElementById('step-by-step');
         const indSide = document.getElementById('indicator-side-by-side');
@@ -318,8 +417,19 @@
             if (indSide) indSide.classList.add('active');
             if (indStep) indStep.classList.remove('active');
 
-            sideBySideSection.scrollIntoView({ behavior: 'smooth' });
+            try {
+                sessionStorage.setItem('recipe_view_mode', 'side-by-side');
+                if (window.location.hash === '#step-by-step') {
+                    history.replaceState(null, '', window.location.pathname + window.location.search + '#side-by-side');
+                }
+            } catch (e) {}
+
+            if (shouldScroll) {
+                sideBySideSection.scrollIntoView({ behavior: 'smooth' });
+            }
             setTimeout(updateScrollButtonVisibility, 300);
+            setTimeout(updateRecipeNavbarState, 100);
+            updateQalamProgress();
         } else if (mode === 'step-by-step') {
             sideBySideSection.style.display = 'none';
             stepByStepSection.style.display = 'block';
@@ -327,8 +437,19 @@
             if (indSide) indSide.classList.remove('active');
             if (indStep) indStep.classList.add('active');
 
+            try {
+                sessionStorage.setItem('recipe_view_mode', 'step-by-step');
+                if (window.location.hash !== '#step-by-step') {
+                    history.replaceState(null, '', window.location.pathname + window.location.search + '#step-by-step');
+                }
+            } catch (e) {}
+
             populateCenteredIngredients();
-            stepByStepSection.scrollIntoView({ behavior: 'smooth' });
+            if (shouldScroll) {
+                stepByStepSection.scrollIntoView({ behavior: 'smooth' });
+            }
+            setTimeout(updateRecipeNavbarState, 100);
+            updateQalamProgress();
         }
     };
 
@@ -349,6 +470,213 @@
             } else {
                 scrollStepsBtn.classList.remove('visible');
             }
+        }
+    }
+
+    /* =====================================================================
+       RECIPE NAVBAR BREADCRUMB & SCROLL STATE
+       ===================================================================== */
+    function updateRecipeNavbarState() {
+        const navbar = document.querySelector("header.navbar");
+        if (!navbar) return;
+
+        const hero = document.querySelector(".hero-section");
+        const isPastHero = hero ? (hero.getBoundingClientRect().bottom < window.innerHeight * 0.65) : (window.scrollY > 150);
+
+        if (typeof window.setRecipeNavbarMode === "function") {
+            window.setRecipeNavbarMode(navbar, isPastHero, currentRecipeTitle, "../../");
+        }
+    }
+
+    /* =====================================================================
+       URDU QALAM VERTICAL PROGRESS BAR (Step-by-Step View)
+       ===================================================================== */
+    const INK_BLOT_PATHS = [
+        {
+            core: "M 10,4.2 C 13.5,4.0 16.2,6.5 15.8,10.1 C 15.4,13.8 12.8,16.0 9.2,15.7 C 5.6,15.4 3.8,12.8 4.2,9.2 C 4.6,5.6 6.8,4.4 10,4.2 Z",
+            bleed: "M 10,2.5 C 14.8,2.2 18.2,5.5 17.7,10.3 C 17.2,15.2 13.7,18.0 8.8,17.6 C 4.0,17.2 1.8,13.8 2.3,9.0 C 2.8,4.2 5.5,2.7 10,2.5 Z"
+        },
+        {
+            core: "M 10.2,4.4 C 14.0,3.8 16.4,6.8 15.7,10.6 C 15.0,14.2 12.0,16.2 8.4,15.5 C 4.8,14.8 3.5,12.0 4.2,8.4 C 4.9,4.8 6.8,4.8 10.2,4.4 Z",
+            bleed: "M 10.3,2.6 C 15.2,2.0 18.5,6.0 17.6,10.8 C 16.7,15.5 12.8,18.2 7.8,17.3 C 2.9,16.4 1.5,12.8 2.4,7.9 C 3.3,3.0 5.8,3.1 10.3,2.6 Z"
+        },
+        {
+            core: "M 9.8,4.3 C 13.6,4.3 16.1,6.6 15.9,10.2 C 15.7,13.8 13.1,16.1 9.5,15.8 C 5.8,15.5 3.7,13.0 4.0,9.4 C 4.3,5.8 6.4,4.3 9.8,4.3 Z",
+            bleed: "M 9.8,2.4 C 14.7,2.4 18.1,5.5 17.8,10.4 C 17.5,15.3 14.0,18.2 9.0,17.8 C 4.1,17.4 1.7,14.1 2.1,9.2 C 2.5,4.3 5.3,2.4 9.8,2.4 Z"
+        },
+        {
+            core: "M 10.1,4.0 C 13.8,4.2 16.0,6.7 15.6,10.3 C 15.2,13.9 12.5,16.0 8.9,15.7 C 5.3,15.4 3.7,12.7 4.1,9.1 C 4.5,5.5 6.7,3.8 10.1,4.0 Z",
+            bleed: "M 10.2,2.2 C 15.1,2.5 18.0,5.8 17.5,10.6 C 17.0,15.4 13.6,18.0 8.7,17.6 C 3.8,17.2 1.9,13.7 2.4,8.9 C 2.9,4.1 5.7,2.0 10.2,2.2 Z"
+        }
+    ];
+
+    function setupQalamProgressBar() {
+        const container = document.getElementById("qalam-progress-container");
+        const markersContainer = document.getElementById("qalam-progress-markers");
+        const track = container ? container.querySelector(".qalam-progress-track") : null;
+        const tooltip = document.getElementById("qalam-progress-tooltip");
+        if (!container || !markersContainer || !track) return;
+
+        markersContainer.innerHTML = "";
+        progressSlides = [
+            document.getElementById("step-page-ingredients"),
+            ...Array.from(document.querySelectorAll("#steps-scrolling-column .step-slide"))
+        ].filter(Boolean);
+
+        const total = progressSlides.length;
+        if (total === 0) return;
+
+        progressSlides.forEach((slide, idx) => {
+            const marker = document.createElement("div");
+            marker.className = "qalam-step-marker";
+            marker.setAttribute("data-step-index", idx);
+
+            const blot = INK_BLOT_PATHS[idx % INK_BLOT_PATHS.length];
+            marker.innerHTML = `
+                <div class="qalam-marker-halo" aria-hidden="true"></div>
+                <svg class="ink-blot-svg" viewBox="0 0 20 20" focusable="false" aria-hidden="true">
+                    <path class="ink-blot-bleed" d="${blot.bleed}" />
+                    <path class="ink-blot-core" d="${blot.core}" />
+                </svg>
+            `;
+
+            let title = "";
+            if (idx === 0) {
+                title = "mise en place";
+            } else {
+                const headingEl = slide.querySelector(".step-section-heading");
+                if (headingEl) {
+                    title = headingEl.textContent.trim().toLowerCase();
+                } else {
+                    const numberEl = slide.querySelector(".step-number");
+                    if (numberEl) {
+                        const raw = numberEl.textContent.trim().toLowerCase();
+                        title = raw.replace(/^step\s*\d*[\.\:]*\s*/i, "").trim() || raw;
+                    } else {
+                        title = "step";
+                    }
+                }
+            }
+            marker.setAttribute("data-title", title);
+            marker.setAttribute("title", title);
+
+            const pct = total > 1 ? (idx / (total - 1)) * 100 : 50;
+            marker.style.top = `${pct}%`;
+
+            if (tooltip) {
+                marker.addEventListener("mouseenter", () => {
+                    isHoveringMarker = true;
+                    if (milestoneHideTimer) clearTimeout(milestoneHideTimer);
+                    tooltip.textContent = title;
+                    tooltip.style.top = `${pct}%`;
+                    tooltip.classList.add("is-visible");
+                });
+                marker.addEventListener("mouseleave", () => {
+                    isHoveringMarker = false;
+                    tooltip.classList.remove("is-visible");
+                });
+            }
+
+            marker.addEventListener("click", (e) => {
+                e.stopPropagation();
+                slide.scrollIntoView({ behavior: "smooth" });
+            });
+            markersContainer.appendChild(marker);
+        });
+
+        if (!track.dataset.listenerAdded) {
+            track.dataset.listenerAdded = "true";
+            track.addEventListener("click", (e) => {
+                if (e.target.closest(".qalam-step-marker")) return;
+                const rect = track.getBoundingClientRect();
+                const clickY = e.clientY - rect.top;
+                const ratio = Math.max(0, Math.min(1, clickY / rect.height));
+                const targetIdx = Math.round(ratio * (progressSlides.length - 1));
+                if (progressSlides[targetIdx]) {
+                    progressSlides[targetIdx].scrollIntoView({ behavior: "smooth" });
+                }
+            });
+        }
+
+        updateQalamProgress();
+    }
+
+    function updateQalamProgress() {
+        const stepSection = document.getElementById("step-by-step");
+        const container = document.getElementById("qalam-progress-container");
+        const clipRect = document.getElementById("progress-clip-rect");
+        const markersContainer = document.getElementById("qalam-progress-markers");
+        if (!stepSection || !container || progressSlides.length === 0) return;
+
+        if (stepSection.style.display === "none") {
+            container.classList.remove("is-visible");
+            return;
+        }
+
+        const rect = stepSection.getBoundingClientRect();
+        const isInView = rect.top < window.innerHeight * 0.75 && rect.bottom > 120;
+
+        if (!isInView) {
+            container.classList.remove("is-visible");
+            return;
+        }
+
+        container.classList.add("is-visible");
+
+        const total = progressSlides.length;
+        if (total <= 1) {
+            if (clipRect) clipRect.setAttribute("height", "240");
+            return;
+        }
+
+        const targetY = window.innerHeight * 0.5;
+        let closestIdx = 0;
+        let closestDist = Infinity;
+
+        progressSlides.forEach((slide, idx) => {
+            const r = slide.getBoundingClientRect();
+            const slideCenter = r.top + r.height / 2;
+            const dist = Math.abs(slideCenter - targetY);
+            if (dist < closestDist) {
+                closestDist = dist;
+                closestIdx = idx;
+            }
+        });
+
+        const firstSlide = progressSlides[0];
+        const lastSlide = progressSlides[total - 1];
+        const firstCenter = firstSlide.getBoundingClientRect().top + window.scrollY + firstSlide.offsetHeight / 2;
+        const lastCenter = lastSlide.getBoundingClientRect().top + window.scrollY + lastSlide.offsetHeight / 2;
+        const totalDist = lastCenter - firstCenter;
+
+        let ratio = 0;
+        if (totalDist > 0) {
+            const currentDist = (window.scrollY + targetY) - firstCenter;
+            ratio = Math.max(0, Math.min(1, currentDist / totalDist));
+        } else {
+            ratio = closestIdx / (total - 1);
+        }
+
+        if (clipRect) {
+            const clipHeight = Math.max(0, Math.min(240, ratio * 240));
+            clipRect.setAttribute("height", clipHeight.toFixed(1));
+        }
+
+        if (markersContainer) {
+            const markers = markersContainer.querySelectorAll(".qalam-step-marker");
+            markers.forEach((m, idx) => {
+                if (idx < closestIdx) {
+                    m.classList.add("is-passed");
+                    m.classList.remove("is-active");
+                } else if (idx === closestIdx) {
+                    m.classList.remove("is-passed");
+                    m.classList.add("is-active");
+                } else {
+                    m.classList.remove("is-passed");
+                    m.classList.remove("is-active");
+                }
+            });
+            lastHighlightedIdx = closestIdx;
         }
     }
 
@@ -380,11 +708,29 @@
 
         updateScrollButtonVisibility();
 
-        if (window.location.hash === '#step-by-step') {
-            window.selectRecipeMode('step-by-step');
+        let initialMode = 'side-by-side';
+        try {
+            if (window.location.hash === '#step-by-step' || sessionStorage.getItem('recipe_view_mode') === 'step-by-step') {
+                initialMode = 'step-by-step';
+            }
+        } catch (e) {}
+
+        if (initialMode === 'step-by-step') {
+            window.selectRecipeMode('step-by-step', false);
         } else {
             const indSide = document.getElementById('indicator-side-by-side');
             if (indSide) indSide.classList.add('active');
+        }
+
+        if (!window.recipeModeListenerAdded) {
+            window.recipeModeListenerAdded = true;
+            window.addEventListener('hashchange', () => {
+                if (window.location.hash === '#step-by-step') {
+                    window.selectRecipeMode('step-by-step', true);
+                } else if (window.location.hash === '#side-by-side' || window.location.hash === '#menu') {
+                    window.selectRecipeMode('side-by-side', true);
+                }
+            });
         }
 
         // Collapsible recipe sections
@@ -400,6 +746,9 @@
                 }
             });
         });
+
+        // Urdu Qalam Progress Bar
+        setupQalamProgressBar();
 
         // IntersectionObserver for step-by-step slides
         if (stepObserver) {
@@ -438,6 +787,15 @@
 
                 if (activeStep !== null) {
                     updateStickyLayers(activeStep);
+
+                    const markers = document.querySelectorAll(".qalam-step-marker");
+                    markers.forEach((m, idx) => {
+                        if (idx === activeStep) {
+                            m.classList.add("is-active");
+                        } else {
+                            m.classList.remove("is-active");
+                        }
+                    });
                 }
             } else {
                 updateStickyLayers(0);
@@ -475,11 +833,21 @@
         });
     }
 
-    window.addEventListener('resize', updateScrollButtonVisibility);
+    window.addEventListener('resize', () => {
+        updateScrollButtonVisibility();
+        updateRecipeNavbarState();
+        updateQalamProgress();
+    }, { passive: true });
+
+    window.addEventListener('scroll', () => {
+        updateRecipeNavbarState();
+        updateQalamProgress();
+    }, { passive: true });
 
     // Main initialization on DOM load
     document.addEventListener("DOMContentLoaded", () => {
         ensureBaseMarkup();
+        ensureNavComponent();
 
         // Update tab label from global config
         if (typeof KITCHEN_CONFIG !== 'undefined') {

@@ -7,7 +7,8 @@
 
 
 /* Accent Pop Badge */
-.pop-tag, .badge-pop {
+.pop-tag,
+.badge-pop {
     background-color: var(--color-pop);
     color: #ffffff;
     font-size: 0.7rem;
@@ -30,14 +31,17 @@
         transform: scaleX(0.06) scaleY(0.74);
         opacity: 0.25;
     }
+
     52% {
         transform: scaleX(1.045) scaleY(0.84);
         opacity: 0.92;
     }
+
     82% {
         transform: scaleX(0.982) scaleY(1.14);
         opacity: 1;
     }
+
     100% {
         transform: scaleX(1) scaleY(1);
         opacity: 0.94;
@@ -47,6 +51,46 @@
 .navbar {
     --ink-color: var(--link-color);
     --ink-bleed-color: var(--link-hover);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.navbar.is-scrolled {
+    border-bottom-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Breadcrumb nav styling */
+.nav-item a.recipe-top-link {
+    font-weight: 500;
+    color: var(--text-subtitle);
+    cursor: pointer;
+    border-bottom: 1.5px solid transparent;
+    transition: color var(--transition-smooth), border-color var(--transition-smooth);
+}
+
+.nav-item a.recipe-top-link:hover {
+    color: var(--link-hover);
+}
+
+.nav-item a.recipe-top-link.active {
+    font-weight: 600;
+    color: var(--text-subtitle);
+}
+
+.nav-divider {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    font-weight: 300;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 4px;
 }
 
 .nav-item a.active {
@@ -115,6 +159,8 @@ body {
     height: auto !important;
     min-height: 100vh;
     padding-bottom: 0 !important;
+    animation: none !important;
+    transform: none !important;
     /* Let sections manage their own layout bottom margins */
 }
 
@@ -135,11 +181,13 @@ body {
     /* Prevent flex shrinking to respect min-height */
     scroll-snap-align: start;
     /* Enable snap alignment */
-    scroll-margin-top: 100px; /* Offset the snap alignment to the top of the viewport */
+    scroll-margin-top: 100px;
+    /* Offset the snap alignment to the top of the viewport */
 }
 
 .hero-section .sketch-img {
-    max-height: calc(100vh - 235px);  /* Dynamically constrained to fit perfectly within the initial viewport */
+    max-height: calc(100vh - 235px);
+    /* Dynamically constrained to fit perfectly within the initial viewport */
 }
 
 .hero-section .scroll-indicator {
@@ -244,6 +292,9 @@ body {
     flex-direction: column;
     min-height: 100vh;
     /* Ensures the section is tall enough to scroll fully into view on all screens */
+    background-color: var(--bg-main);
+    position: relative;
+    z-index: 1;
     padding-top: 80px;
     padding-bottom: 120px;
     /* Generous bottom spacing for footer and to guarantee smooth full scroll */
@@ -252,6 +303,8 @@ body {
     /* Prevent flex shrinking to respect min-height */
     scroll-snap-align: start;
     /* Enable snap alignment */
+    scroll-margin-top: 60px;
+    /* Offset for sticky 60px navbar */
 }
 
 .menu-title {
@@ -419,6 +472,7 @@ body {
         margin-bottom: 20px;
     }
 }
+
 /* -------------------------------------------------------------------------
    6. RECIPE VIEW INDICATORS & TOGGLES (LAYOUT MODE BUTTONS)
    ------------------------------------------------------------------------- 
@@ -427,10 +481,14 @@ body {
 
 /* Container wrapping both buttons horizontally */
 .recipe-indicators {
-    display: flex;             /* Lines up indicators side-by-side */
-    justify-content: center;   /* Centers indicators horizontally */
-    gap: 48px;                 /* Spacing between indicators */
-    margin-top: auto;          /* Pushes container to the very bottom of screen */
+    display: flex;
+    /* Lines up indicators side-by-side */
+    justify-content: center;
+    /* Centers indicators horizontally */
+    gap: 48px;
+    /* Spacing between indicators */
+    margin-top: auto;
+    /* Pushes container to the very bottom of screen */
     padding-top: 20px;
     width: 100%;
 }
@@ -445,7 +503,8 @@ body {
 
 /* Slight lift effect on hover */
 .recipe-indicators .scroll-indicator:hover {
-    transform: translateY(-2px); /* Moves indicator up by 2px */
+    transform: translateY(-2px);
+    /* Moves indicator up by 2px */
     opacity: 1;
 }
 
@@ -536,7 +595,8 @@ body {
 /* Bounces the scroll arrow indicator when active to draw attention */
 .recipe-indicators .scroll-indicator.active .scroll-arrow {
     color: var(--text-subtitle);
-    animation: bounce-indicator 2s infinite; /* Starts bounce loop */
+    animation: bounce-indicator 2s infinite;
+    /* Starts bounce loop */
 }
 
 /* Fade down inactive buttons to keep visual focus on active indicator */
@@ -546,7 +606,7 @@ body {
 
 /* Stop bouncing arrows on inactive button indicators */
 .recipe-indicators .scroll-indicator:not(.active) .scroll-arrow {
-    animation: none; 
+    animation: none;
 }
 
 .recipe-indicators .scroll-indicator:not(.active):hover {
@@ -570,17 +630,24 @@ body {
 /* Main vertical scroll panel */
 .steps-scroll-container {
     display: flex;
-    flex-direction: column;     /* Aligns step cards vertically */
-    gap: 16px;                  /* Gap between step cards */
-    overflow-y: auto;           /* Enable vertical scrolling when cards overflow */
-    overflow-x: hidden;         /* Hide horizontal overflow */
-    
+    flex-direction: column;
+    /* Aligns step cards vertically */
+    gap: 16px;
+    /* Gap between step cards */
+    overflow-y: auto;
+    /* Enable vertical scrolling when cards overflow */
+    overflow-x: hidden;
+    /* Hide horizontal overflow */
+
     /* scroll-snap-type: enables custom vertical pagination snapping. 
        "y mandatory" forces the browser to snap perfectly to step cards when scrolling. */
     scroll-snap-type: y mandatory;
-    scrollbar-width: none;      /* Hides standard scrollbar on Firefox for cleaner UI */
-    padding-bottom: 24px;       /* Spacing at bottom to avoid card shadow cuts and button overlay */
-    scroll-behavior: smooth;    /* Smooth scroll slide transitions when clicking buttons */
+    scrollbar-width: none;
+    /* Hides standard scrollbar on Firefox for cleaner UI */
+    padding-bottom: 24px;
+    /* Spacing at bottom to avoid card shadow cuts and button overlay */
+    scroll-behavior: smooth;
+    /* Smooth scroll slide transitions when clicking buttons */
     width: 100%;
     max-height: max(420px, calc(100vh - 340px));
     height: auto;
@@ -588,21 +655,24 @@ body {
 
 /* Hide standard scrollbars on Chrome, Safari, and Edge browser engines */
 .steps-scroll-container::-webkit-scrollbar {
-    display: none; 
+    display: none;
 }
 
 /* Ingredients list container scrolling on desktop */
 #ingredients-list-container {
     max-height: max(420px, calc(100vh - 340px));
     height: auto;
-    overflow-y: auto;           /* Enable scroll */
+    overflow-y: auto;
+    /* Enable scroll */
     overflow-x: hidden;
-    scrollbar-width: none;      /* Hide Firefox scrollbar */
+    scrollbar-width: none;
+    /* Hide Firefox scrollbar */
     padding-bottom: 24px;
 }
 
 #ingredients-list-container::-webkit-scrollbar {
-    display: none;              /* Hide Chrome/Safari scrollbar */
+    display: none;
+    /* Hide Chrome/Safari scrollbar */
 }
 
 /* Individual Step Card */
@@ -613,11 +683,13 @@ body {
     border-radius: 12px;
     padding: 24px;
     display: flex;
-    flex-direction: column;     /* Stacks step number and text description vertically */
+    flex-direction: column;
+    /* Stacks step number and text description vertically */
     gap: 16px;
     transition: transform var(--transition-smooth), border-color var(--transition-smooth), box-shadow var(--transition-smooth);
     box-sizing: border-box;
-    scroll-snap-align: start;   /* Snaps the card to the top of the scroll viewport */
+    scroll-snap-align: start;
+    /* Snaps the card to the top of the scroll viewport */
 }
 
 /* Border and shadow highlighting on card hover */
@@ -642,7 +714,8 @@ body {
 /* Scroll Down Button */
 .scroll-down-btn {
     position: absolute;
-    bottom: -22px;              /* Overlaps the bottom boundary */
+    bottom: -22px;
+    /* Overlaps the bottom boundary */
     left: 50%;
     transform: translateX(-50%);
     width: 44px;
@@ -679,7 +752,8 @@ body {
 }
 
 .scroll-down-btn.at-end svg {
-    transform: rotate(180deg); /* Points up to loop back */
+    transform: rotate(180deg);
+    /* Points up to loop back */
 }
 
 
@@ -692,25 +766,310 @@ body {
     flex-direction: column;
     min-height: 100vh;
     scroll-snap-align: start;
+    scroll-margin-top: 60px;
     background-color: var(--bg-main);
+    position: relative;
 }
 
 /* Centered Ingredients Page */
 .ingredients-centered-page {
     height: 100vh;
     display: flex;
-    flex-direction: column;    /* Stack title and list vertically */
+    flex-direction: column;
+    /* Stack title and list vertically */
     align-items: center;
     justify-content: center;
     scroll-snap-align: start;
+    scroll-margin-top: 60px;
     padding: 40px 60px;
     text-align: center;
     background-color: var(--bg-main);
     box-sizing: border-box;
 }
 
+/* =========================================================================
+   URDU QALAM VERTICAL PROGRESS BAR (Step-by-Step View)
+   ========================================================================= */
+
+.qalam-progress-container {
+    position: fixed !important;
+    right: 32px;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    height: 180px;
+    width: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000 !important;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0.3s ease;
+}
+
+.qalam-progress-container.is-visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.qalam-progress-track {
+    position: relative;
+    width: 18px;
+    height: 100%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Authentic Qalam Ink Stroke Track (Same procedural SVG as nav underline) */
+.qalam-track-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    mix-blend-mode: multiply;
+    filter: url(#nav-ink-filter);
+    opacity: 0.95;
+}
+
+/* Incomplete Track (Greyed-out naturalistic ink wash) */
+.qalam-stroke-grey .nav-ink-bleed-path {
+    fill: #cbd5e1;
+    opacity: 0.32;
+}
+
+.qalam-stroke-grey .nav-ink-wash-path {
+    fill: #94a3b8;
+    opacity: 0.45;
+}
+
+.qalam-stroke-grey .nav-ink-core-path {
+    fill: #94a3b8;
+    opacity: 0.75;
+}
+
+.qalam-stroke-grey .nav-ink-bristles-path {
+    fill: none;
+    stroke: #94a3b8;
+    stroke-width: 0.65;
+    opacity: 0.35;
+}
+
+.qalam-stroke-grey .nav-ink-dry-path {
+    fill: none;
+    stroke: var(--bg-main, #ffffff);
+    stroke-width: 0.45;
+    opacity: 0.25;
+}
+
+/* Completed Track (Terracotta ink stroke - exact match with nav underline) */
+.qalam-stroke-active .nav-ink-bleed-path {
+    fill: var(--link-hover, #ea580c);
+    opacity: 0.36;
+}
+
+.qalam-stroke-active .nav-ink-wash-path {
+    fill: var(--link-color, #7c2d12);
+    opacity: 0.48;
+}
+
+.qalam-stroke-active .nav-ink-core-path {
+    fill: var(--link-color, #7c2d12);
+    opacity: 0.94;
+}
+
+.qalam-stroke-active .nav-ink-bristles-path {
+    fill: none;
+    stroke: var(--link-color, #7c2d12);
+    stroke-width: 0.65;
+    stroke-linecap: round;
+    opacity: 0.45;
+    vector-effect: non-scaling-stroke;
+}
+
+.qalam-stroke-active .nav-ink-dry-path {
+    fill: none;
+    stroke: var(--bg-main, #ffffff);
+    stroke-width: 0.45;
+    stroke-linecap: round;
+    opacity: 0.28;
+    vector-effect: non-scaling-stroke;
+}
+
+/* Step Markers Container */
+.qalam-progress-markers {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* Organic Ink Blot Marker */
+.qalam-step-marker {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    cursor: pointer;
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 10;
+}
+
+/* Background Halo / Gap Buffer: Prevents progress lines from touching the node */
+.qalam-marker-halo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background-color: var(--bg-main, #fafaf9);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.qalam-step-marker .ink-blot-svg {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    z-index: 2;
+}
+
+/* Incomplete Step Blot: Outlined with slightly thicker bold, not black, not intrusive */
+.qalam-step-marker .ink-blot-bleed {
+    display: none;
+    opacity: 0;
+}
+
+.qalam-step-marker .ink-blot-core {
+    fill: #fafaf9;
+    stroke: #94a3b8;
+    stroke-width: 1.8px;
+    transition: fill 0.25s ease, stroke 0.25s ease, stroke-width 0.25s ease;
+}
+
+.qalam-step-marker:hover {
+    transform: translate(-50%, -50%) scale(1.25);
+}
+
+.qalam-step-marker:hover .ink-blot-core {
+    stroke: var(--link-hover, #ea580c);
+    stroke-width: 2px;
+}
+
+/* Passed / Completed Step Blot: Filled with terracotta ink, seamless without black outline */
+.qalam-step-marker.is-passed .ink-blot-bleed {
+    display: block;
+    fill: var(--link-color, #7c2d12);
+    opacity: 0.22;
+}
+
+.qalam-step-marker.is-passed .ink-blot-core {
+    fill: var(--link-color, #7c2d12);
+    stroke: var(--link-color, #7c2d12);
+    stroke-width: 1px;
+}
+
+/* Active / Current Step Blot: Fresh wet ink bloom, bold terracotta without black outline */
+.qalam-step-marker.is-active {
+    transform: translate(-50%, -50%) scale(1.35);
+}
+
+.qalam-step-marker.is-active .ink-blot-bleed {
+    display: block;
+    fill: var(--link-hover, #ea580c);
+    opacity: 0.35;
+    transform: scale(1.25);
+    transform-origin: center;
+}
+
+.qalam-step-marker.is-active .ink-blot-core {
+    fill: var(--link-hover, #ea580c);
+    stroke: var(--link-hover, #ea580c);
+    stroke-width: 1.4px;
+}
+
+/* Floating step milestone tab */
+.qalam-progress-tooltip {
+    position: absolute;
+    right: calc(100% + 14px);
+    transform: translateY(-50%);
+    background: rgba(250, 250, 249, 0.98);
+    color: var(--text-subtitle, #7c2d12);
+    font-family: var(--font-sans, "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+    font-size: 0.88rem;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0.01em;
+    text-transform: lowercase;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(124, 45, 18, 0.16);
+    box-shadow: 0 3px 12px rgba(124, 45, 18, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 1010;
+}
+
+.qalam-progress-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: -5px;
+    transform: translateY(-50%) rotate(45deg);
+    width: 8px;
+    height: 8px;
+    background: #fafaf9;
+    border-top: 1px solid rgba(124, 45, 18, 0.16);
+    border-right: 1px solid rgba(124, 45, 18, 0.16);
+}
+
+.qalam-progress-tooltip.is-visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Mobile responsive constraints */
+@media (max-width: 900px) {
+    .qalam-progress-container {
+        right: 12px;
+        height: 140px;
+        width: 22px;
+    }
+
+    .qalam-step-marker {
+        width: 14px;
+        height: 14px;
+    }
+
+    .qalam-progress-tooltip {
+        display: none !important;
+    }
+}
+
 .centered-ingredients-content {
-    max-width: 1100px;         /* Wide container to allow columns to span side-by-side */
+    max-width: 1100px;
+    /* Wide container to allow columns to span side-by-side */
     width: 100%;
 }
 
@@ -728,19 +1087,25 @@ body {
     font-size: 1.1rem;
     line-height: 1.8;
     color: var(--text-body);
-    display: flex;             /* Use flex layout to align section columns */
+    display: flex;
+    /* Use flex layout to align section columns */
     flex-direction: row;
-    flex-wrap: wrap;           /* Allow columns to wrap if screen is too narrow */
-    justify-content: center;   /* Center the columns horizontally under the title */
-    gap: 60px;                 /* Spacing between columns */
-    text-align: left;          /* Left align text inside the columns */
+    flex-wrap: wrap;
+    /* Allow columns to wrap if screen is too narrow */
+    justify-content: center;
+    /* Center the columns horizontally under the title */
+    gap: 60px;
+    /* Spacing between columns */
+    text-align: left;
+    /* Left align text inside the columns */
     margin: 0 auto;
     width: 100%;
 }
 
 /* Style columns inside the centered list */
 .ingredients-centered-list .recipe-section {
-    min-width: 260px;          /* Set ideal width range for columns */
+    min-width: 260px;
+    /* Set ideal width range for columns */
     max-width: 320px;
     margin-bottom: 24px;
 }
@@ -825,7 +1190,8 @@ body {
 }
 
 .sketch-layer.active {
-    opacity: 1; /* Fully visible when active */
+    opacity: 1;
+    /* Fully visible when active */
 }
 
 /* Scrolling Right Steps Column */
@@ -839,9 +1205,9 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 0 40px;
+    padding: 0 160px 0 20px;
     scroll-snap-align: start;
-    max-width: 500px;
+    max-width: 480px;
 }
 
 .step-slide .step-number {
@@ -900,41 +1266,44 @@ body {
     .split-steps-container {
         gap: 40px;
     }
-    
+
     .sticky-sketch-container {
         width: 90%;
     }
 }
 
 @media (max-width: 900px) {
+
     /* Adjust Step-by-Step for Mobile: Stack sticky image on top, scroll steps below */
     .split-steps-container {
         grid-template-columns: 1fr;
         gap: 0;
     }
-    
+
     .ingredients-centered-page {
         height: auto;
         min-height: 100vh;
         padding: 40px 24px;
         justify-content: flex-start;
     }
-    
+
     .ingredients-centered-list {
-        flex-direction: column; /* Stack vertically on mobile */
-        align-items: center;    /* Center the flex columns */
+        flex-direction: column;
+        /* Stack vertically on mobile */
+        align-items: center;
+        /* Center the flex columns */
         text-align: center;
     }
-    
+
     .ingredients-centered-list .recipe-section {
         min-width: 0;
         max-width: 100%;
     }
-    
+
     .ingredients-centered-list .recipe-section-title {
         text-align: center;
     }
-    
+
     .visual-sticky-column {
         position: sticky;
         top: 0;
@@ -943,17 +1312,17 @@ body {
         background-color: var(--bg-main);
         border-bottom: 1px solid var(--border-color);
     }
-    
+
     .sticky-sketch-container {
         height: 35vh;
         width: 100%;
     }
-    
+
     .steps-scrolling-column {
         padding: 0 24px;
         align-items: center;
     }
-    
+
     .step-slide {
         height: 50vh;
         max-width: 100%;
@@ -961,11 +1330,11 @@ body {
         text-align: center;
         justify-content: flex-start;
     }
-    
+
     .step-slide:first-child {
         padding-top: 60px;
     }
-    
+
     /* Reset Side-by-Side vertical card scroll for mobile/tablet */
     .steps-scroll-container,
     #ingredients-list-container {
@@ -974,11 +1343,12 @@ body {
         scroll-snap-type: none;
         padding-bottom: 0;
     }
-    
+
     .scroll-down-btn {
-        display: none !important; /* Hide vertical scroll button on mobile */
+        display: none !important;
+        /* Hide vertical scroll button on mobile */
     }
-    
+
     .step-card {
         width: 100% !important;
         flex: none !important;
@@ -990,30 +1360,30 @@ body {
     .recipe-indicators {
         gap: 24px;
     }
-    
+
     .step-card {
         padding: 16px;
     }
-    
+
     .ingredients-centered-title {
         font-size: 2.2rem;
         margin-bottom: 24px;
     }
-    
+
     .ingredients-centered-list {
         font-size: 1rem;
         line-height: 1.8;
     }
-    
+
     .step-slide .step-text {
         font-size: 1rem;
     }
-    
+
     .step-slide .step-section-heading {
         font-size: 1.8rem;
         margin-bottom: 16px;
     }
-    
+
     .step-slide .step-section-list {
         font-size: 0.95rem;
         gap: 12px;
@@ -1147,6 +1517,9 @@ body {
     flex-direction: column;
     min-height: 100vh;
     /* Ensures the section is tall enough to scroll fully into view on all screens */
+    background-color: var(--bg-main);
+    position: relative;
+    z-index: 1;
     padding-top: 80px;
     padding-bottom: 120px;
     /* Generous bottom spacing for footer and to guarantee smooth full scroll */
@@ -1233,7 +1606,8 @@ body {
 
 /* Collapsing animation for content */
 .recipe-section-content {
-    max-height: 1200px; /* Large enough to hold all items in a section */
+    max-height: 1200px;
+    /* Large enough to hold all items in a section */
     overflow: hidden;
     transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, margin-bottom 0.4s ease;
     opacity: 1;
