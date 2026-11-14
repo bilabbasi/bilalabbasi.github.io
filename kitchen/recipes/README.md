@@ -10,7 +10,11 @@ Every recipe is organized into its own self-contained directory under `kitchen/r
 
 ```text
 kitchen/recipes/
-├── recipe.css             # Shared recipe stylesheet
+├── css/                   # Modular recipe stylesheets
+│   ├── recipe-base.css         # Invariants, navbar, layout, hero, typography
+│   ├── recipe-side-by-side.css # Dual-column scrolling, cards, scroll-down btn
+│   ├── recipe-step-by-step.css # Centered ingredients, split visual slides
+│   └── recipe-progress-bar.css # Urdu Qalam vertical progress bar & ink blots
 ├── recipe-engine.js       # Shared rendering engine and layout interactions
 ├── yellowdaal/
 │   ├── index.html         # Shell loader (~25 lines)
@@ -42,7 +46,10 @@ kitchen/recipes/
          <meta name="description" content="A one-sentence description of the dish.">
          <meta name="author" content="Bilal Abbasi">
          <link rel="stylesheet" href="../../../index.css">
-         <link rel="stylesheet" href="../recipe.css">
+         <link rel="stylesheet" href="../css/recipe-base.css">
+         <link rel="stylesheet" href="../css/recipe-side-by-side.css">
+         <link rel="stylesheet" href="../css/recipe-step-by-step.css">
+         <link rel="stylesheet" href="../css/recipe-progress-bar.css">
          <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
          <script src="../../../config.js"></script>
          <script src="recipe.js"></script>

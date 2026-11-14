@@ -1,0 +1,658 @@
+/* =========================================================================
+   RECIPE BASE STYLESHEET (recipe-base.css)
+   =========================================================================
+   Shared foundational styles for all recipe pages:
+   - Dynamic design tokens and badge invariants
+   - Sticky navbar recipe breadcrumbs
+   - Layout & smooth scrolling overrides
+   - Hero landing section & layout mode selectors (side-by-side / step-by-step)
+   - Recipe typography & calligraphic ink brush links
+   - Collapsible section foundation
+   - Customs / About section layout
+   ========================================================================= */
+
+/* Accent Pop Badge */
+.pop-tag,
+.badge-pop {
+    background-color: var(--color-pop);
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    letter-spacing: 0.04em;
+    display: inline-flex;
+    align-items: center;
+    line-height: 1.2;
+}
+
+/* Style the active navigation link for the kitchen theme */
+:root {
+    --ink-brush-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 16' preserveAspectRatio='none'%3E%3Cdefs%3E%3Cfilter id='f' x='-10%25' y='-40%25' width='120%25' height='180%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.05 0.2' numOctaves='3' seed='7' result='n'/%3E%3CfeDisplacementMap in='SourceGraphic' in2='n' scale='1.8' xChannelSelector='R' yChannelSelector='G'/%3E%3C/filter%3E%3C/defs%3E%3Cg filter='url(%23f)'%3E%3Cpath fill='black' fill-opacity='0.34' d='M 0.8,9.3 C 5,4.9 22,3.8 60,4.4 C 108,5.0 156,5.8 200,5.4 C 219,5.3 233,6.2 239.6,7.5 C 232,9.3 214,10.1 190,10.0 C 144,9.8 96,11.2 48,11.5 C 18,11.7 5,10.9 0.8,9.3 Z'/%3E%3Cpath fill='black' fill-opacity='0.52' d='M 1.2,9.2 C 6,5.4 22,4.4 60,4.9 C 108,5.4 156,6.1 200,5.8 C 218,5.7 232,6.5 239.2,7.5 C 231,8.9 214,9.6 192,9.5 C 146,9.3 98,10.6 50,10.9 C 20,11.1 6,10.5 1.2,9.2 Z'/%3E%3Cpath fill='black' fill-opacity='0.94' d='M 1.8,9.1 C 7,5.8 24,4.8 62,5.2 C 108,5.7 154,6.4 196,6.1 C 214,6.0 228,6.7 236.5,7.6 C 226,8.7 208,9.2 188,9.1 C 144,8.9 98,10.2 52,10.5 C 22,10.7 8,10.2 1.8,9.1 Z'/%3E%3Cpath fill='none' stroke='black' stroke-width='0.65' stroke-linecap='round' stroke-opacity='0.48' d='M 182,5.9 C 204,5.7 224,6.2 239.4,7.1 M 176,9.3 C 200,9.5 220,9.0 237.8,8.2 M 14,10.4 C 42,10.9 78,10.6 114,9.9'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+@keyframes qalam-stroke-draw {
+    0% {
+        transform: scaleX(0.06) scaleY(0.74);
+        opacity: 0.25;
+    }
+
+    52% {
+        transform: scaleX(1.045) scaleY(0.84);
+        opacity: 0.92;
+    }
+
+    82% {
+        transform: scaleX(0.982) scaleY(1.14);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scaleX(1) scaleY(1);
+        opacity: 0.94;
+    }
+}
+
+.navbar {
+    --ink-color: var(--link-color);
+    --ink-bleed-color: var(--link-hover);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.navbar.is-scrolled {
+    border-bottom-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Breadcrumb nav styling */
+.nav-item a.recipe-top-link {
+    font-weight: 500;
+    color: var(--text-subtitle);
+    cursor: pointer;
+    border-bottom: 1.5px solid transparent;
+    transition: color var(--transition-smooth), border-color var(--transition-smooth);
+}
+
+.nav-item a.recipe-top-link:hover {
+    color: var(--link-hover);
+}
+
+.nav-item a.recipe-top-link.active {
+    font-weight: 600;
+    color: var(--text-subtitle);
+}
+
+.nav-divider {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    font-weight: 300;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 4px;
+}
+
+.nav-item a.active {
+    font-weight: 600;
+    color: var(--text-subtitle) !important;
+    border-bottom-color: transparent !important;
+}
+
+.nav-item a.active::after {
+    content: '';
+    position: absolute;
+    bottom: -4.5px;
+    left: 0;
+    width: 100%;
+    height: 7.5px;
+    background: linear-gradient(90deg, var(--link-color) 0%, var(--link-color) 65%, var(--link-hover) 100%);
+    -webkit-mask-image: var(--ink-brush-mask);
+    mask-image: var(--ink-brush-mask);
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    transform-origin: left center;
+    opacity: 0.92;
+    pointer-events: none;
+    transition: transform var(--ink-duration, 420ms) var(--ink-easing, cubic-bezier(0.22, 1, 0.36, 1)), opacity 0.2s ease;
+}
+
+.nav-links.has-indicator .nav-item a.active::after {
+    display: none;
+}
+
+.nav-item a:hover {
+    color: var(--link-hover);
+    border-bottom-color: transparent !important;
+}
+
+.nav-item a.active:hover::after {
+    background: linear-gradient(90deg, var(--link-hover) 0%, var(--link-color) 100%);
+    animation: qalam-stroke-draw var(--ink-duration, 420ms) var(--ink-easing, cubic-bezier(0.22, 1, 0.36, 1)) forwards;
+}
+
+.nav-item a.active:active::after {
+    transform: scaleY(var(--ink-press-scale-y, 0.85)) scaleX(1.025);
+}
+
+/* -------------------------------------------------------------------------
+   1. LAYOUT & SMOOTH SCROLLING OVERRIDES
+   ------------------------------------------------------------------------- */
+
+html {
+    overflow-y: auto !important;
+    height: auto !important;
+    scroll-behavior: smooth;
+    scroll-snap-type: y proximity;
+    /* Snap to sections cleanly when scrolling near them */
+}
+
+body {
+    overflow: visible !important;
+    height: auto !important;
+}
+
+/* Extend wrapper height limit to accommodate the menu section */
+.app-wrapper {
+    height: auto !important;
+    min-height: 100vh;
+    padding-bottom: 0 !important;
+    animation: none !important;
+    transform: none !important;
+    /* Let sections manage their own layout bottom margins */
+}
+
+/* -------------------------------------------------------------------------
+   2. HERO LANDING SECTION & SCROLL INDICATOR
+   ------------------------------------------------------------------------- */
+
+/* Wraps the initial bio and sketch into a full-viewport page */
+.hero-section {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 100px);
+    /* Fills screen minus wrapper top padding (40px) and navbar height (60px) */
+    padding-bottom: 20px;
+    /* Adds bottom padding to match professional wrapper bottom padding */
+    justify-content: space-between;
+    flex-shrink: 0;
+    /* Prevent flex shrinking to respect min-height */
+    scroll-snap-align: start;
+    /* Enable snap alignment */
+    scroll-margin-top: 100px;
+    /* Offset the snap alignment to the top of the viewport */
+}
+
+.hero-section .sketch-img {
+    max-height: calc(100vh - 235px);
+    /* Dynamically constrained to fit perfectly within the initial viewport */
+}
+
+.hero-section .scroll-indicator {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+/* Elegant bouncing scroll guide */
+.scroll-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 10px;
+    cursor: pointer;
+    user-select: none;
+    transition: opacity var(--transition-smooth);
+}
+
+.scroll-indicator:hover {
+    opacity: 0.8;
+}
+
+.scroll-text {
+    position: relative;
+    display: inline-block;
+    font-size: 0.85rem;
+    font-family: var(--font-sans);
+    text-transform: lowercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    font-weight: 500;
+    padding-bottom: 3px;
+    transition: color var(--transition-smooth);
+}
+
+.scroll-text::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(90deg, var(--link-color) 0%, var(--link-hover) 100%);
+    -webkit-mask-image: var(--ink-brush-mask);
+    mask-image: var(--ink-brush-mask);
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    transform: scaleX(0) scaleY(0.75);
+    transform-origin: left center;
+    opacity: 0;
+    pointer-events: none;
+    transition: transform var(--ink-duration, 420ms) var(--ink-easing, cubic-bezier(0.22, 1, 0.36, 1)), opacity 0.2s ease;
+}
+
+.scroll-indicator:hover .scroll-text {
+    color: var(--link-color);
+}
+
+.scroll-indicator:hover .scroll-text::after {
+    transform: scaleX(1) scaleY(1);
+    opacity: 0.72;
+    animation: qalam-stroke-draw var(--ink-duration, 420ms) var(--ink-easing, cubic-bezier(0.22, 1, 0.36, 1)) forwards;
+}
+
+.scroll-arrow {
+    width: 20px;
+    height: 20px;
+    color: var(--text-muted);
+    animation: bounce-indicator 2s infinite;
+}
+
+@keyframes bounce-indicator {
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-6px);
+    }
+
+    60% {
+        transform: translateY(-3px);
+    }
+}
+
+/* -------------------------------------------------------------------------
+   3. RECIPE VIEW INDICATORS & TOGGLES (LAYOUT MODE BUTTONS)
+   ------------------------------------------------------------------------- 
+   These classes style the "side by side" and "step by step" layout select
+   buttons situated at the bottom of the Hero landing page. */
+
+/* Container wrapping both buttons horizontally */
+.recipe-indicators {
+    display: flex;
+    /* Lines up indicators side-by-side */
+    justify-content: center;
+    /* Centers indicators horizontally */
+    gap: 48px;
+    /* Spacing between indicators */
+    margin-top: auto;
+    /* Pushes container to the very bottom of screen */
+    padding-top: 20px;
+    width: 100%;
+}
+
+/* Individual layout selection indicator */
+.recipe-indicators .scroll-indicator {
+    margin-top: 0;
+    padding-top: 0;
+    transition: opacity var(--transition-smooth), transform var(--transition-smooth);
+}
+
+/* Slight lift effect on hover */
+.recipe-indicators .scroll-indicator:hover {
+    transform: translateY(-2px);
+    /* Moves indicator up by 2px */
+    opacity: 1;
+}
+
+/* Highlight style when this view mode is currently active */
+.recipe-indicators .scroll-indicator.active {
+    opacity: 1;
+}
+
+/* Style active button text color and make it bold */
+.recipe-indicators .scroll-indicator.active .scroll-text {
+    color: var(--text-subtitle);
+    font-weight: 600;
+}
+
+.recipe-indicators .scroll-indicator.active .scroll-text::after {
+    transform: scaleX(1) scaleY(1);
+    opacity: 0.9;
+    background: linear-gradient(90deg, var(--link-color) 0%, var(--link-hover) 100%);
+    animation: qalam-stroke-draw var(--ink-duration, 420ms) var(--ink-easing, cubic-bezier(0.22, 1, 0.36, 1)) forwards;
+}
+
+.recipe-indicators .scroll-indicator:not(.active):hover .scroll-text::after {
+    transform: scaleX(1) scaleY(0.95);
+    opacity: 0.38;
+    animation: qalam-stroke-draw var(--ink-duration, 420ms) var(--ink-easing, cubic-bezier(0.22, 1, 0.36, 1)) forwards;
+}
+
+.recipe-indicators .scroll-indicator:active .scroll-text::after {
+    transform: scaleX(1.02) scaleY(var(--ink-press-scale-y, 0.85));
+}
+
+/* Bounces the scroll arrow indicator when active to draw attention */
+.recipe-indicators .scroll-indicator.active .scroll-arrow {
+    color: var(--text-subtitle);
+    animation: bounce-indicator 2s infinite;
+}
+
+/* Fade down inactive buttons to keep visual focus on active indicator */
+.recipe-indicators .scroll-indicator:not(.active) {
+    opacity: 0.5;
+}
+
+/* Stop bouncing arrows on inactive button indicators */
+.recipe-indicators .scroll-indicator:not(.active) .scroll-arrow {
+    animation: none;
+}
+
+.recipe-indicators .scroll-indicator:not(.active):hover {
+    opacity: 0.8;
+}
+
+/* -------------------------------------------------------------------------
+   4. RECIPE TYPOGRAPHY & INTERACTIVE LINKS
+   ------------------------------------------------------------------------- */
+
+/* Inline hyperlinks inside recipe descriptions and step instructions */
+.recipe-description a,
+.step-text a,
+.step-section-item a {
+    position: relative;
+    display: inline-block;
+    color: var(--link-color);
+    text-decoration: none;
+    font-weight: 500;
+    padding-bottom: 1px;
+    transition: color var(--transition-smooth);
+}
+
+.recipe-description a::after,
+.step-text a::after,
+.step-section-item a::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(90deg, var(--link-color) 0%, var(--link-hover) 100%);
+    -webkit-mask-image: var(--ink-brush-mask);
+    mask-image: var(--ink-brush-mask);
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    transform: scaleX(1) scaleY(0.9);
+    transform-origin: left center;
+    opacity: 0.82;
+    pointer-events: none;
+    transition: transform var(--ink-duration, 420ms) var(--ink-easing, cubic-bezier(0.22, 1, 0.36, 1)), opacity 0.2s ease;
+}
+
+.recipe-description a:hover,
+.recipe-description a:focus-visible,
+.step-text a:hover,
+.step-text a:focus-visible,
+.step-section-item a:hover,
+.step-section-item a:focus-visible {
+    color: var(--link-hover);
+}
+
+.recipe-description a:hover::after,
+.recipe-description a:focus-visible::after,
+.step-text a:hover::after,
+.step-text a:focus-visible::after,
+.step-section-item a:hover::after,
+.step-section-item a:focus-visible::after {
+    opacity: 0.96;
+    background: linear-gradient(90deg, var(--link-hover) 0%, var(--link-color) 100%);
+    animation: qalam-stroke-draw var(--ink-duration, 420ms) var(--ink-easing, cubic-bezier(0.22, 1, 0.36, 1)) forwards;
+}
+
+/* -------------------------------------------------------------------------
+   5. RECIPE SECTIONAL SEPARATOR (YAML-driven sections baseline)
+   ------------------------------------------------------------------------- */
+.recipe-section {
+    margin-bottom: 32px;
+}
+
+.recipe-section-title {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-subtitle);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 16px;
+    border-bottom: 1px dashed var(--border-color);
+    padding-bottom: 8px;
+}
+
+/* Collapsible sections baseline */
+.collapse-icon {
+    width: 14px;
+    height: 14px;
+    transition: transform var(--transition-smooth);
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+/* Rotation of icon when collapsed */
+.recipe-section.collapsed .collapse-icon {
+    transform: rotate(-90deg);
+}
+
+/* Collapsing animation for content */
+.recipe-section-content {
+    max-height: 1200px;
+    /* Large enough to hold all items in a section */
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, margin-bottom 0.4s ease;
+    opacity: 1;
+}
+
+.recipe-section.collapsed .recipe-section-content {
+    max-height: 0;
+    opacity: 0;
+    margin-bottom: 0;
+    pointer-events: none;
+}
+
+/* -------------------------------------------------------------------------
+   6. CUSTOMS / ABOUT SECTION & DUAL-SCRIPT HEADINGS
+   ------------------------------------------------------------------------- */
+
+.about-title {
+    font-family: var(--font-serif);
+    font-size: 3rem;
+    font-weight: 500;
+    line-height: 1.1;
+    color: var(--text-title);
+    letter-spacing: -1px;
+    text-transform: lowercase;
+    margin-bottom: 48px;
+}
+
+.about-section {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: var(--bg-main);
+    position: relative;
+    z-index: 1;
+    padding-top: 80px;
+    padding-bottom: 120px;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+}
+
+.about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: start;
+    margin-bottom: auto;
+}
+
+.about-img {
+    width: 85%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+}
+
+.split-title-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 18px;
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--border-color, #e7e5e4);
+}
+
+.split-title-header .about-title {
+    font-family: var(--font-serif);
+    font-size: 4rem;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--text-title);
+    letter-spacing: -1.5px;
+    text-transform: lowercase;
+    margin: 0;
+}
+
+.split-title-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.split-title-urdu {
+    font-family: 'Noto Nastaliq Urdu', 'Urdu Typesetting', 'Jameel Noori Nastaleeq', 'Geeza Pro', Tahoma, sans-serif;
+    font-size: 2.65rem;
+    font-weight: 500;
+    line-height: 1.6;
+    padding: 0 0.1em;
+    margin-bottom: 14px;
+    color: var(--color-urdu, #b83b14);
+    background: none;
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    -webkit-text-fill-color: initial;
+    user-select: none;
+}
+
+.split-title-roman {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.05rem;
+    font-weight: 400;
+    color: var(--text-muted, #78716c);
+    letter-spacing: 0.02em;
+}
+
+.about-section#about {
+    min-height: calc(100vh - 110px);
+    padding-top: 10px;
+    padding-bottom: 20px;
+    justify-content: flex-start;
+}
+
+.about-section#about .split-title-header {
+    max-width: 780px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+}
+
+.about-section#about .about-text {
+    max-width: 780px;
+    font-size: 1.05rem;
+    line-height: 1.4;
+}
+
+.about-section#about .about-text p {
+    margin: 0 0 0.45em 0;
+}
+
+/* -------------------------------------------------------------------------
+   7. BASE RESPONSIVENESS OVERRIDES
+   ------------------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+    .hero-section {
+        min-height: auto;
+    }
+
+    header.navbar {
+        position: sticky;
+        top: 0;
+        height: 48px;
+        min-height: 48px;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        background-color: var(--bg-main, #fafaf9);
+        z-index: 100;
+        border-bottom: 1px solid var(--border-color);
+    }
+}
+
+@media (max-width: 600px) {
+    .recipe-indicators {
+        gap: 24px;
+    }
+
+    .scroll-indicator {
+        padding-top: 10px;
+        margin-bottom: 20px;
+    }
+
+    .split-title-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+        padding-bottom: 20px;
+        margin-bottom: 24px;
+    }
+
+    .split-title-header .about-title {
+        font-size: 2.6rem;
+    }
+
+    .split-title-right {
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .split-title-urdu {
+        font-size: 1.8rem;
+        line-height: 1.5;
+        margin-bottom: 8px;
+        align-self: flex-start;
+    }
+
+    .split-title-roman {
+        font-size: 0.95rem;
+    }
+}

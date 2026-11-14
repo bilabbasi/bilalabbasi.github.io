@@ -113,8 +113,8 @@ if (qr) {
 
 console.log(dim + 'Press Ctrl+C to stop the server.\n' + reset);
 
-// Start npx serve
-const serveProcess = spawn('npx', ['--yes', 'serve', '.', '--listen', `tcp://0.0.0.0:${port}`], {
+// Start HTTP static server (binds 0.0.0.0 to match GitHub Pages directory resolution)
+const serveProcess = spawn('python3', ['-m', 'http.server', port, '--bind', '0.0.0.0'], {
     cwd: rootDir,
     stdio: 'inherit'
 });

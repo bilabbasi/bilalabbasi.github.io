@@ -84,10 +84,13 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
 
     const splitHeader = new MockElement('header', '', 'split-title-header');
 
+    const body = new MockElement('body');
+
     const doc = {
         title: 'Initial Title',
         readyState: 'complete',
         fonts: { ready: Promise.resolve() },
+        body: body,
         createElement: (tag) => new MockElement(tag),
         querySelectorAll: (sel) => {
             if (sel === 'header.navbar') return [header];
@@ -440,6 +443,25 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
     const resolvedUrl = new URL(rawSrc, targetBaseUrl).href;
     assert.strictEqual(resolvedUrl, 'http://localhost:3000/assets/kitchen_sketch.png', 'Relative image src must resolve to root assets folder rather than 404ing under /kitchen/assets/');
     console.log('PASS: Image path normalization across depths verified.');
+}
+
+// 12. Test renderRecipeNavbar for stationary "← the kitchen | <recipe_name>"
+{
+    const { context } = createNavTestEnv('/kitchen/recipes/template.html');
+    vm.runInContext(configCode + '\n' + navCode, context);
+
+    const header = context.document.createElement('header');
+    header.className = 'navbar';
+    header.setAttribute('data-back', '../');
+    header.setAttribute('data-back-label', '← the kitchen');
+
+    // Render recipe navbar
+    context.window.renderRecipeNavbar(header, 'Sourdough', '../');
+    assert.strictEqual(header.getAttribute('data-recipe-nav-mode'), 'breadcrumb');
+    assert.ok(header.innerHTML.includes('← the kitchen'), 'Contains "← the kitchen" back link');
+    assert.ok(header.innerHTML.includes('sourdough'), 'Contains recipe title link');
+    assert.ok(header.innerHTML.includes('recipe-top-link active'), 'Recipe title link has recipe-top-link active classes');
+    console.log('PASS: Recipe stationary navbar "← the kitchen | <recipe_name>" verified.');
 }
 
 console.log('ALL NAV TESTS PASSED!');

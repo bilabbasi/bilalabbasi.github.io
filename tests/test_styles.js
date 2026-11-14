@@ -11,7 +11,6 @@ const assert = require('assert');
 const fs = require('fs');
 
 const kitchenCss = fs.readFileSync(__dirname + '/../kitchen.css', 'utf-8');
-const recipeCss = fs.readFileSync(__dirname + '/../kitchen/recipes/recipe.css', 'utf-8');
 
 // -----------------------------------------------------------------------------
 // 1. kitchen.css Invariants
@@ -31,16 +30,33 @@ assert.match(kitchenCss, /\.recipe-link::after\s*\{[^}]*mask-image:\s*var\(--ink
 assert.match(kitchenCss, /\.culture-link::after\s*\{[^}]*mask-image:\s*var\(--ink-brush-mask\)/, 'Culture links should use --ink-brush-mask');
 
 // -----------------------------------------------------------------------------
-// 2. recipe.css Invariants
+// 2. Modular recipe stylesheets (kitchen/recipes/css/) Invariants
 // -----------------------------------------------------------------------------
-assert.doesNotMatch(recipeCss, /:root\s*\{[^}]*--text-subtitle/, 'recipe.css should not hardcode static --text-subtitle in :root');
-assert.match(recipeCss, /var\(--text-subtitle/, 'recipe.css should use var(--text-subtitle)');
-assert.match(recipeCss, /var\(--link-hover/, 'recipe.css should use var(--link-hover)');
-assert.match(recipeCss, /var\(--color-pop\)/, 'recipe.css should use var(--color-pop)');
-assert.match(recipeCss, /var\(--color-urdu/, 'recipe.css should use var(--color-urdu)');
-assert.match(recipeCss, /\.urdu-title\s*\{[^}]*color:\s*var\(--color-urdu\)/, '.urdu-title should use var(--color-urdu) in recipe.css');
+const cssDir = __dirname + '/../kitchen/recipes/css';
+const recipeBaseCss = fs.readFileSync(cssDir + '/recipe-base.css', 'utf-8');
+const recipeSideBySideCss = fs.readFileSync(cssDir + '/recipe-side-by-side.css', 'utf-8');
+const recipeStepByStepCss = fs.readFileSync(cssDir + '/recipe-step-by-step.css', 'utf-8');
+const recipeProgressBarCss = fs.readFileSync(cssDir + '/recipe-progress-bar.css', 'utf-8');
 
-assert.match(recipeCss, /\.recipe-link::after\s*\{[^}]*mask-image:\s*var\(--ink-brush-mask\)/, 'recipe.css links should use --ink-brush-mask');
-assert.match(recipeCss, /\.nav-item a\.active::after\s*\{[^}]*mask-image:\s*var\(--ink-brush-mask\)/, 'Active back-link should use --ink-brush-mask');
+assert.doesNotMatch(recipeBaseCss, /:root\s*\{[^}]*--text-subtitle/, 'recipe-base.css should not hardcode static --text-subtitle in :root');
+assert.match(recipeBaseCss, /var\(--text-subtitle/, 'recipe-base.css should use var(--text-subtitle)');
+assert.match(recipeBaseCss, /var\(--link-hover/, 'recipe-base.css should use var(--link-hover)');
+assert.match(recipeBaseCss, /var\(--color-pop\)/, 'recipe-base.css should use var(--color-pop)');
+assert.match(recipeBaseCss, /--ink-brush-mask/, 'recipe-base.css should define --ink-brush-mask');
+assert.match(recipeBaseCss, /\.recipe-indicators/, 'recipe-base.css should define .recipe-indicators');
+assert.match(recipeBaseCss, /\.nav-item a\.active::after\s*\{[^}]*mask-image:\s*var\(--ink-brush-mask\)/, 'Active back-link should use --ink-brush-mask');
+
+assert.match(recipeSideBySideCss, /var\(--color-urdu/, 'recipe-side-by-side.css should use var(--color-urdu)');
+assert.match(recipeSideBySideCss, /\.urdu-title\s*\{[^}]*color:\s*var\(--color-urdu\)/, '.urdu-title should use var(--color-urdu) in recipe-side-by-side.css');
+assert.match(recipeSideBySideCss, /\.recipe-link::after\s*\{[^}]*mask-image:\s*var\(--ink-brush-mask\)/, 'recipe-side-by-side.css links should use --ink-brush-mask');
+assert.match(recipeSideBySideCss, /\.steps-scroll-container/, 'recipe-side-by-side.css should define .steps-scroll-container');
+assert.match(recipeSideBySideCss, /\.scroll-down-btn/, 'recipe-side-by-side.css should define .scroll-down-btn');
+
+assert.match(recipeStepByStepCss, /\.ingredients-centered-page/, 'recipe-step-by-step.css should define .ingredients-centered-page');
+assert.match(recipeStepByStepCss, /\.visual-sticky-column/, 'recipe-step-by-step.css should define .visual-sticky-column');
+
+assert.match(recipeProgressBarCss, /\.qalam-progress-container/, 'recipe-progress-bar.css should define .qalam-progress-container');
+assert.match(recipeProgressBarCss, /\.qalam-step-marker/, 'recipe-progress-bar.css should define .qalam-step-marker');
+assert.match(recipeProgressBarCss, /\.qalam-marker-halo/, 'recipe-progress-bar.css should define .qalam-marker-halo');
 
 console.log('PASS: test_styles.js passed all checks.');
