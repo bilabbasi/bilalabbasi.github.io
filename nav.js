@@ -705,13 +705,13 @@
             ) : [];
 
             contentNodes.forEach(node => {
-                node.style.transition = "opacity 0.15s ease, transform 0.15s ease";
+                node.style.transition = "opacity 0.15s ease";
                 node.style.opacity = "0";
-                node.style.transform = "translateY(3px)";
             });
 
             // 2. Fetch new page HTML in parallel using canonical absolute URL
             const targetUrl = new URL(href, window.location.href);
+            targetUrl.hash = "";
             if (!targetUrl.pathname.endsWith("/") && !targetUrl.pathname.split("/").pop().includes(".")) {
                 targetUrl.pathname += "/";
             }
@@ -845,7 +845,9 @@
             }
 
             // 9. Reset viewport scroll position
-            window.scrollTo({ top: 0, behavior: "instant" });
+            window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+            if (document.documentElement) document.documentElement.scrollTop = 0;
+            if (document.body) document.body.scrollTop = 0;
 
             // 10. Execute active page content initializers
             initActivePageContent();
@@ -898,9 +900,15 @@
             return; // Normal link click
         }
 
-        // If clicking the already active tab, avoid unnecessary refetches
+        // If clicking the already active tab, smoothly scroll to top and clear any hash
         if (link.classList.contains("nav-home") || link.classList.contains("active") || link.classList.contains("is-active")) {
             e.preventDefault();
+            if (window.scrollY > 0 || window.location.hash) {
+                if (window.location.hash) {
+                    history.pushState(null, "", window.location.pathname);
+                }
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            }
             return;
         }
 
@@ -916,6 +924,9 @@
         }
 
         e.preventDefault();
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        if (document.documentElement) document.documentElement.scrollTop = 0;
+        if (document.body) document.body.scrollTop = 0;
         performPageTransition(href, targetNavId, true);
     }
 
@@ -1230,6 +1241,11 @@
                         html = html.replace(/\b(for them)\b/gi, '<a href="#arrival-picture" class="culture-link">$1</a>');
                     }
                     thisSpaceEl.innerHTML = html;
+                    if (!window.location.hash) {
+                        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+                        if (document.documentElement) document.documentElement.scrollTop = 0;
+                        if (document.body) document.body.scrollTop = 0;
+                    }
                     thisSpaceEl.querySelectorAll('a[href="#arrival-picture"]').forEach(link => {
                         link.classList.add("culture-link");
                         link.addEventListener("click", (e) => {
@@ -1298,8 +1314,13 @@
      */
     function initNavbars() {
         if (typeof document === "undefined") return;
+        if (typeof history !== "undefined" && "scrollRestoration" in history) {
+            history.scrollRestoration = "manual";
+        }
         if (typeof window !== "undefined" && !window.location.hash) {
             window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+            if (document.documentElement) document.documentElement.scrollTop = 0;
+            if (document.body) document.body.scrollTop = 0;
         }
         initActivePageContent();
         const headers = document.querySelectorAll("header.navbar");
@@ -1323,6 +1344,15 @@
         } else {
             initNavbars();
         }
+
+        // Ensure clean scroll-to-top on back/forward cache restores (iOS Safari / Chrome)
+        window.addEventListener("pageshow", () => {
+            if (!window.location.hash) {
+                window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+                if (document.documentElement) document.documentElement.scrollTop = 0;
+                if (document.body) document.body.scrollTop = 0;
+            }
+        });
 
         // Sticky scrolled shadow/border toggle
         window.addEventListener("scroll", () => {
@@ -1349,6 +1379,19 @@
                         { id: "ammi", label: "ammi", path: "kitchen/me/" }
                     ]);
                 const detectedId = detectCurrentId(navConfig);
+                const currentRoute = header.getAttribute("data-current");
+
+                // If on the same page and only hash changed (e.g. back button after clicking "for them")
+                if (detectedId === currentRoute) {
+                    if (!window.location.hash) {
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                    } else if (window.location.hash === "#arrival-picture") {
+                        const target = document.getElementById("arrival-picture");
+                        if (target) target.scrollIntoView({ behavior: "smooth" });
+                    }
+                    return;
+                }
+
                 performPageTransition(window.location.href, detectedId, false);
             }
         });

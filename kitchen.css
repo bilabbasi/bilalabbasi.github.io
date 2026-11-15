@@ -589,17 +589,17 @@ body {
 @media (max-width: 900px) {
     .hero-section {
         min-height: calc(100vh - 48px);
-        scroll-margin-top: 48px;
+        scroll-margin-top: 68px;
     }
 
     .about-section {
-        scroll-margin-top: 52px;
+        scroll-margin-top: 68px;
     }
 
     .menu-section {
         padding-top: 18px;
         padding-bottom: 60px;
-        scroll-margin-top: 48px;
+        scroll-margin-top: 68px;
         min-height: calc(100vh - 48px);
         justify-content: flex-start;
     }
@@ -1302,8 +1302,6 @@ body {
     box-sizing: border-box;
     padding: 32px 0 40px 0;
     flex-shrink: 0;
-    scroll-snap-align: start;
-    scroll-margin-top: 0;
 }
 
 .photo-figure {
