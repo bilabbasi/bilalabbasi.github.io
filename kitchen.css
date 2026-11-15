@@ -362,6 +362,13 @@ body {
     /* Push the footer to the bottom of the section */
 }
 
+.menu-heading {
+    margin: 0;
+    padding: 0;
+    font-size: inherit;
+    font-weight: inherit;
+}
+
 .column-title {
     font-family: var(--font-serif);
     font-size: 1.6rem;
@@ -370,12 +377,35 @@ body {
     color: var(--text-subtitle);
     letter-spacing: -0.5px;
     text-transform: lowercase;
+    border: none;
     border-bottom: 1px solid var(--border-color);
-    padding-bottom: 12px;
-    margin-bottom: 24px;
+    background: none;
+    padding: 0 0 12px 0;
+    margin: 0 0 24px 0;
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: baseline;
+    text-align: left;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: default;
+    box-sizing: border-box;
+}
+
+.column-title-text {
+    flex: 1;
+    text-align: left;
+}
+
+.column-title-right {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.menu-collapse-icon {
+    display: none;
 }
 
 .urdu-title {
@@ -476,25 +506,135 @@ body {
     }
 
     .menu-section {
-        padding-top: 60px;
+        padding-top: 40px;
     }
 }
 
 @media (max-width: 900px) {
     .hero-section {
-        min-height: auto;
+        min-height: calc(100vh - 48px);
+        scroll-margin-top: 48px;
     }
-}
 
-@media (max-width: 600px) {
-    .menu-grid {
-        grid-template-columns: 1fr;
-        gap: 24px;
+    .menu-section {
+        padding-top: 18px;
+        padding-bottom: 60px;
+        scroll-margin-top: 48px;
+        min-height: calc(100vh - 48px);
+        justify-content: flex-start;
     }
 
     .menu-title {
-        font-size: 2.5rem;
-        margin-bottom: 32px;
+        font-size: 2.25rem;
+        margin-top: 0;
+        margin-bottom: 18px;
+        letter-spacing: -0.8px;
+    }
+}
+
+@media (max-width: 768px) {
+    .menu-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .menu-column {
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .menu-column:first-child {
+        border-top: 1px solid var(--border-color);
+    }
+
+    .column-title {
+        border-bottom: none;
+        padding: 16px 0;
+        margin-bottom: 0;
+        cursor: pointer;
+        text-align: left;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        transition: color 0.2s ease;
+    }
+
+    .column-title:focus-visible {
+        outline: 2px solid var(--link-hover);
+        outline-offset: 2px;
+    }
+
+    .column-title-right {
+        align-items: center;
+        gap: 10px;
+    }
+
+    .menu-collapse-icon {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        color: var(--text-muted, #78716c);
+        transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), color 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    /* Collapsed state by default on mobile */
+    .menu-column:not(.is-open) .menu-items {
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        pointer-events: none;
+    }
+
+    /* Expanded state */
+    .menu-column.is-open .column-title {
+        color: var(--text-title);
+    }
+
+    .menu-column.is-open .menu-collapse-icon {
+        transform: rotate(180deg);
+        color: var(--link-hover, #ea580c);
+    }
+
+    .menu-column.is-open .menu-items {
+        max-height: 1000px;
+        opacity: 1;
+        overflow: visible;
+        pointer-events: auto;
+        padding-top: 4px;
+        padding-bottom: 20px;
+        transition: max-height 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
+    }
+
+    .menu-empty-note {
+        font-family: var(--font-sans);
+        font-size: 0.95rem;
+        font-style: italic;
+        color: var(--text-muted, #a8a29e);
+        margin: 6px 0 12px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .menu-section {
+        padding-top: 14px;
+        padding-bottom: 48px;
+        scroll-margin-top: 48px;
+    }
+
+    .menu-title {
+        font-size: 2rem;
+        margin-bottom: 16px;
+    }
+
+    .column-title {
+        font-size: 1.45rem;
+        padding: 14px 0;
+    }
+
+    .urdu-title {
+        font-size: 1.45rem;
     }
 
     .scroll-indicator {

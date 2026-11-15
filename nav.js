@@ -972,10 +972,20 @@
             });
 
             menuGrid.innerHTML = Object.values(categories).map(cat => `
-                <div class="menu-column">
-                    <h3 class="column-title">${cat.title} ${cat.titleUrdu ? `<span class="urdu-title">${cat.titleUrdu}</span>` : ""}</h3>
-                    <div class="menu-items">
-                        ${cat.items.map(item => `
+                <div class="menu-column" data-category="${cat.title}">
+                    <h3 class="menu-heading">
+                        <button class="column-title" type="button" aria-expanded="false" aria-controls="menu-items-${cat.title}">
+                            <span class="column-title-text">${cat.title}</span>
+                            <span class="column-title-right">
+                                ${cat.titleUrdu ? `<span class="urdu-title">${cat.titleUrdu}</span>` : ""}
+                                <svg class="menu-collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </span>
+                        </button>
+                    </h3>
+                    <div class="menu-items" id="menu-items-${cat.title}">
+                        ${cat.items.length > 0 ? cat.items.map(item => `
                             <div class="menu-item">
                                 <a href="${item.url || `recipes/template.html?file=${item.file}`}" class="recipe-link">
                                     <span class="recipe-name">${item.name}</span>
@@ -987,10 +997,22 @@
                                 </a>
                                 <p class="recipe-description">${item.description}</p>
                             </div>
-                        `).join("")}
+                        `).join("") : `<p class="menu-empty-note">ammi’s recipes in preparation</p>`}
                     </div>
                 </div>
             `).join("");
+
+            // Setup collapsible toggle handlers for mobile
+            const columns = menuGrid.querySelectorAll(".menu-column");
+            columns.forEach(col => {
+                const titleBtn = col.querySelector(".column-title");
+                if (titleBtn) {
+                    titleBtn.addEventListener("click", () => {
+                        const isNowOpen = col.classList.toggle("is-open");
+                        titleBtn.setAttribute("aria-expanded", isNowOpen ? "true" : "false");
+                    });
+                }
+            });
         }
     }
 
