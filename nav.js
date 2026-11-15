@@ -169,13 +169,25 @@
     }
 
     /**
+     * Resolves a repo-relative asset path (e.g. "assets/foo.png") relative to fromPath.
+     */
+    function resolveAssetPath(fromPath, assetRel) {
+        const parts = (fromPath || "").replace(/\/$/, "").split("/").filter(Boolean);
+        const upCount = parts.length;
+        const upStr = "../".repeat(upCount);
+        return upStr + assetRel.replace(/^\//, "");
+    }
+
+    /**
      * Fallback to automatically infer the active tab if data-current is not specified.
      */
     function detectCurrentId(items) {
         const pathname = (typeof window !== "undefined" && window.location)
             ? window.location.pathname.replace(/\\/g, "/")
             : "";
-        for (const item of items) {
+        // Sort items by path specificity (longest path first) so sub-paths match before parent paths
+        const sorted = items.slice().sort((a, b) => (b.path || "").length - (a.path || "").length);
+        for (const item of sorted) {
             const cleanPath = item.path.replace(/^\/|\/$/g, "");
             if (pathname.includes("/" + cleanPath + "/") ||
                 pathname.endsWith("/" + cleanPath) ||
@@ -248,7 +260,11 @@
                 label = KITCHEN_CONFIG.name;
             }
 
-            itemsHtml.push(`<li class="nav-item" role="presentation"><a href="${href}"${classAttr}${idAttr} data-nav-id="${item.id}" role="tab" aria-selected="${ariaSelected}"${ariaCurrent}>${label}</a></li>`);
+            // Collapsible items on mobile: items after "the kitchen" and "customs" (e.g. "ammi", and future family spaces)
+            const isCollapsible = (item.id !== "kitchen" && item.id !== "culture");
+            const collapsibleClass = isCollapsible ? " nav-item-collapsible" : "";
+
+            itemsHtml.push(`<li class="nav-item${collapsibleClass}" role="presentation" data-nav-id="${item.id}"><a href="${href}"${classAttr}${idAttr} data-nav-id="${item.id}" role="tab" aria-selected="${ariaSelected}"${ariaCurrent}>${label}</a></li>`);
             if (item.dividerAfter) {
                 itemsHtml.push(`<li class="nav-divider" aria-hidden="true">|</li>`);
             }
@@ -257,12 +273,116 @@
         // Add persistent indicator element
         itemsHtml.push(`<span class="nav-indicator" aria-hidden="true"></span>`);
 
+        // Check if an active page is one of the collapsible sub-pages
+        const isCollapsedActive = navConfig.some(item => item.id === currentId && (item.id !== "kitchen" && item.id !== "culture"));
+        const toggleActiveClass = isCollapsedActive ? " is-subpage-active" : "";
+
+        // Build mobile dropdown items: ONLY items that are NOT in the horizontal bar (i.e. collapsible items)
+        const dropdownItemsHtml = [];
+        navConfig.forEach(item => {
+            const isCollapsible = (item.id !== "kitchen" && item.id !== "culture");
+            if (!isCollapsible) return; // Exclude items already visible in the top nav bar
+
+            const isActive = item.id === currentId;
+            const href = computeRelativePath(fromPath, item.path);
+            let label = item.label;
+            if (item.id === "kitchen" && typeof KITCHEN_CONFIG !== "undefined" && KITCHEN_CONFIG.name) {
+                label = KITCHEN_CONFIG.name;
+            }
+            let urduLabel = item.urdu || (typeof KITCHEN_CONFIG !== "undefined" && KITCHEN_CONFIG.spaces && KITCHEN_CONFIG.spaces[item.id] ? KITCHEN_CONFIG.spaces[item.id].urdu : "");
+            if (!urduLabel) {
+                if (item.id === "kitchen") urduLabel = "باورچی خانہ";
+                else if (item.id === "culture") urduLabel = "رسم و رواج";
+                else if (item.id === "ammi") urduLabel = "امی";
+            }
+            const activeClass = isActive ? " is-active" : "";
+            const ariaCurrent = isActive ? ` aria-current="page"` : "";
+
+            dropdownItemsHtml.push(`
+                <a href="${href}" class="mobile-nav-link${activeClass}" data-mobile-nav-id="${item.id}"${ariaCurrent}>
+                    <span class="mobile-nav-label-en">${label}</span>
+                    <span class="mobile-nav-label-ur">${urduLabel}</span>
+                </a>
+            `.trim());
+        });
+
+        const logoSrc = resolveAssetPath(fromPath, "assets/kitchen_collapsible_menu_logo_2.png");
+
         header.innerHTML = `
             <nav class="nav-container" aria-label="Primary">
                 <ul class="nav-links" role="tablist">
                     ${itemsHtml.join("\n                    ")}
                 </ul>
-            </nav>`.trim();
+                <button class="mobile-nav-toggle${toggleActiveClass}" type="button" aria-expanded="false" aria-controls="mobile-nav-dropdown" aria-label="Toggle navigation menu">
+                    <img class="mobile-toggle-icon" src="${logoSrc}" alt="" aria-hidden="true">
+                    <svg class="mobile-toggle-close" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="3" y1="3" x2="13" y2="13"></line><line x1="13" y1="3" x2="3" y2="13"></line></svg>
+                </button>
+            </nav>
+            <div class="mobile-nav-dropdown" id="mobile-nav-dropdown" aria-hidden="true">
+                <div class="mobile-nav-items">
+                    ${dropdownItemsHtml.join("\n                    ")}
+                </div>
+            </div>
+            <div class="mobile-nav-backdrop" aria-hidden="true"></div>`.trim();
+
+        setupMobileNavToggle(header);
+    }
+
+    /**
+     * Initializes the Apple-style mobile navigation toggle button and dropdown overlay.
+     */
+    function setupMobileNavToggle(header) {
+        if (!header) return;
+        const toggleBtn = header.querySelector ? header.querySelector(".mobile-nav-toggle") : null;
+        const dropdown = header.querySelector ? header.querySelector(".mobile-nav-dropdown") : null;
+        const backdrop = header.querySelector ? header.querySelector(".mobile-nav-backdrop") : null;
+        if (!toggleBtn || !dropdown) return;
+
+        const openMenu = () => {
+            header.classList.add("is-menu-open");
+            toggleBtn.setAttribute("aria-expanded", "true");
+            dropdown.setAttribute("aria-hidden", "false");
+            if (typeof document !== "undefined" && document.addEventListener) {
+                document.addEventListener("keydown", handleKeydown);
+            }
+        };
+
+        const closeMenu = () => {
+            header.classList.remove("is-menu-open");
+            toggleBtn.setAttribute("aria-expanded", "false");
+            dropdown.setAttribute("aria-hidden", "true");
+            if (typeof document !== "undefined" && document.removeEventListener) {
+                document.removeEventListener("keydown", handleKeydown);
+            }
+        };
+
+        const toggleMenu = () => {
+            if (header.classList.contains("is-menu-open")) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
+        };
+
+        const handleKeydown = (e) => {
+            if (e.key === "Escape") {
+                closeMenu();
+                if (toggleBtn.focus) toggleBtn.focus();
+            }
+        };
+
+        if (toggleBtn.addEventListener) {
+            toggleBtn.addEventListener("click", toggleMenu);
+        }
+        if (backdrop && backdrop.addEventListener) {
+            backdrop.addEventListener("click", closeMenu);
+        }
+        const links = dropdown.querySelectorAll ? dropdown.querySelectorAll(".mobile-nav-link") : [];
+        if (links.forEach) {
+            links.forEach(l => {
+                if (l.addEventListener) l.addEventListener("click", closeMenu);
+            });
+        }
     }
 
     /**
@@ -590,69 +710,65 @@
                 node.style.transform = "translateY(3px)";
             });
 
-            // 2. Fetch new page HTML in parallel
-            const response = await fetch(href);
-            if (!response.ok) throw new Error(`HTTP ${response.status} loading ${href}`);
+            // 2. Fetch new page HTML in parallel using canonical absolute URL
+            const targetUrl = new URL(href, window.location.href);
+            if (!targetUrl.pathname.endsWith("/") && !targetUrl.pathname.split("/").pop().includes(".")) {
+                targetUrl.pathname += "/";
+            }
+            const response = await fetch(targetUrl.href);
+            if (!response.ok) throw new Error(`HTTP ${response.status} loading ${targetUrl.href}`);
             const htmlText = await response.text();
 
             const parser = new DOMParser();
             const newDoc = parser.parseFromString(htmlText, "text/html");
 
-            // 3. Wait for exit animation to complete (~140ms)
-            await new Promise(r => setTimeout(r, 140));
-
-            // 4. Update browser history state before mounting nodes so document base URL matches
-            if (pushState && window.history && window.history.pushState) {
-                window.history.pushState({ href, targetNavId }, newDoc.title || "", href);
-            }
-
-            // 5. Update browser tab title
-            if (newDoc.title) {
-                document.title = newDoc.title;
-            }
-
-            // 6. Remove old content nodes
-            contentNodes.forEach(node => node.remove());
-
-            // 7. Extract new content nodes and mount them with entrance animation
+            // 3. Extract and validate new content nodes BEFORE removing old content
             const newWrapper = newDoc.querySelector(".app-wrapper");
-
-            // Normalize relative media paths against target base URL to prevent 404s
-            // across different folder depths (e.g. /kitchen/culture/ -> /kitchen/)
-            const targetBaseUrl = response.url || (typeof window !== "undefined" ? window.location.href : href);
-            if (newWrapper) {
-                newWrapper.querySelectorAll("img[src]").forEach(img => {
-                    const rawSrc = img.getAttribute("src");
-                    if (rawSrc && !rawSrc.startsWith("http://") && !rawSrc.startsWith("https://") && !rawSrc.startsWith("data:") && !rawSrc.startsWith("/")) {
-                        try {
-                            img.src = new URL(rawSrc, targetBaseUrl).href;
-                        } catch (e) {}
-                    }
-                });
-            }
-
             const newContentNodes = newWrapper ? Array.from(newWrapper.children).filter(el =>
                 !el.classList.contains("navbar") && !el.classList.contains("footer")
             ) : [];
 
+            if (!newWrapper || newContentNodes.length === 0) {
+                throw new Error("No content nodes found in target document");
+            }
+
+            // 4. Wait for exit animation to complete (~140ms)
+            await new Promise(r => setTimeout(r, 140));
+
+            // 5. Update browser history state with canonical URL
+            if (pushState && window.history && window.history.pushState) {
+                window.history.pushState({ href: targetUrl.href, targetNavId }, newDoc.title || "", targetUrl.href);
+            }
+
+            // 6. Update browser tab title
+            if (newDoc.title) {
+                document.title = newDoc.title;
+            }
+
+            // 7. Remove old content nodes
+            contentNodes.forEach(node => node.remove());
+
+            // 8. Normalize relative media paths against target base URL to prevent 404s
+            newWrapper.querySelectorAll("img[src]").forEach(img => {
+                const rawSrc = img.getAttribute("src");
+                if (rawSrc && !rawSrc.startsWith("http://") && !rawSrc.startsWith("https://") && !rawSrc.startsWith("data:") && !rawSrc.startsWith("/")) {
+                    try {
+                        img.src = new URL(rawSrc, targetUrl.href).href;
+                    } catch (e) { }
+                }
+            });
+
+            // 9. Mount new content nodes directly visible to guarantee zero blank screens
             const footer = appWrapper ? appWrapper.querySelector(".footer") : null;
             newContentNodes.forEach(newNode => {
                 const importedNode = document.importNode(newNode, true);
-                importedNode.style.opacity = "0";
-                importedNode.style.transform = "translateY(3px)";
-                importedNode.style.transition = "opacity 0.22s ease, transform 0.22s ease";
+                importedNode.style.opacity = "1";
+                importedNode.style.transform = "none";
                 if (footer && appWrapper) {
                     appWrapper.insertBefore(importedNode, footer);
                 } else if (appWrapper) {
                     appWrapper.appendChild(importedNode);
                 }
-
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        importedNode.style.opacity = "1";
-                        importedNode.style.transform = "translateY(0)";
-                    });
-                });
             });
 
             // 8. Update Navbar in-place WITHOUT destroying or recreating the .nav-links DOM!
@@ -693,12 +809,32 @@
                     const fromPath = currentItem ? currentItem.path : "kitchen/";
 
                     navConfig.forEach(item => {
-                        const itemLink = navLinks.querySelector(`[data-nav-id="${item.id}"]`);
+                        const itemLink = navLinks.querySelector(`a[data-nav-id="${item.id}"]`);
                         if (itemLink) {
                             const newRelHref = computeRelativePath(fromPath, item.path);
                             itemLink.setAttribute("href", newRelHref);
                         }
+                        const mobileLink = header.querySelector(`.mobile-nav-link[data-mobile-nav-id="${item.id}"]`);
+                        if (mobileLink) {
+                            const newRelHref = computeRelativePath(fromPath, item.path);
+                            mobileLink.setAttribute("href", newRelHref);
+                        }
                     });
+
+                    const toggleImg = header.querySelector(".mobile-toggle-icon");
+                    if (toggleImg) {
+                        const newLogoSrc = resolveAssetPath(fromPath, "assets/kitchen_collapsible_menu_logo_2.png");
+                        toggleImg.setAttribute("src", newLogoSrc);
+                    }
+                    const toggleBtn = header.querySelector(".mobile-nav-toggle");
+                    if (toggleBtn) {
+                        const isSubpage = (finalTargetId !== "kitchen" && finalTargetId !== "culture");
+                        if (isSubpage) {
+                            toggleBtn.classList.add("is-subpage-active");
+                        } else {
+                            toggleBtn.classList.remove("is-subpage-active");
+                        }
+                    }
 
                     // Ensure continuous indicator smoothly tracks new active tab
                     if (targetActiveLink) {
@@ -730,7 +866,7 @@
      * Dispatches click events on navbar tab links for smooth client-side transitions.
      */
     function onNavbarClick(e) {
-        const link = e.target.closest(".nav-item a");
+        const link = e.target.closest(".nav-item a, .mobile-nav-link");
         if (!link) return;
 
         // Ignore modified clicks (Cmd, Ctrl, Shift, Alt) or secondary clicks
@@ -742,19 +878,28 @@
             setPressedState(navLinks, false);
         }
 
+        // Close mobile dropdown if navigating via mobile link
+        if (header && header.classList.contains("is-menu-open")) {
+            header.classList.remove("is-menu-open");
+            const toggle = header.querySelector(".mobile-nav-toggle");
+            if (toggle) toggle.setAttribute("aria-expanded", "false");
+            const dropdown = header.querySelector(".mobile-nav-dropdown");
+            if (dropdown) dropdown.setAttribute("aria-hidden", "true");
+        }
+
         const href = link.getAttribute("href");
         if (!href || href.startsWith("#") || href.startsWith("http") || href.startsWith("//") || link.target === "_blank") {
             return;
         }
 
-        // Only intercept intra-navbar tab navigation (tabs with data-nav-id)
-        const targetNavId = link.getAttribute("data-nav-id");
+        // Only intercept intra-navbar tab navigation (tabs with data-nav-id or data-mobile-nav-id)
+        const targetNavId = link.getAttribute("data-nav-id") || link.getAttribute("data-mobile-nav-id");
         if (!targetNavId) {
             return; // Normal link click
         }
 
         // If clicking the already active tab, avoid unnecessary refetches
-        if (link.classList.contains("nav-home") || link.classList.contains("active")) {
+        if (link.classList.contains("nav-home") || link.classList.contains("active") || link.classList.contains("is-active")) {
             e.preventDefault();
             return;
         }
@@ -972,10 +1117,20 @@
             });
 
             menuGrid.innerHTML = Object.values(categories).map(cat => `
-                <div class="menu-column">
-                    <h3 class="column-title">${cat.title} ${cat.titleUrdu ? `<span class="urdu-title">${cat.titleUrdu}</span>` : ""}</h3>
-                    <div class="menu-items">
-                        ${cat.items.map(item => `
+                <div class="menu-column" data-category="${cat.title}">
+                    <h3 class="menu-heading">
+                        <button class="column-title" type="button" aria-expanded="false" aria-controls="menu-items-${cat.title}">
+                            <span class="column-title-text">${cat.title}</span>
+                            <span class="column-title-right">
+                                ${cat.titleUrdu ? `<span class="urdu-title">${cat.titleUrdu}</span>` : ""}
+                                <svg class="menu-collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </span>
+                        </button>
+                    </h3>
+                    <div class="menu-items" id="menu-items-${cat.title}">
+                        ${cat.items.length > 0 ? cat.items.map(item => `
                             <div class="menu-item">
                                 <a href="${item.url || `recipes/template.html?file=${item.file}`}" class="recipe-link">
                                     <span class="recipe-name">${item.name}</span>
@@ -987,10 +1142,67 @@
                                 </a>
                                 <p class="recipe-description">${item.description}</p>
                             </div>
-                        `).join("")}
+                        `).join("") : `<p class="menu-empty-note">ammi’s recipes in preparation</p>`}
                     </div>
                 </div>
             `).join("");
+
+            // Setup collapsible toggle handlers for mobile
+            const columns = menuGrid.querySelectorAll(".menu-column");
+            columns.forEach(col => {
+                const titleBtn = col.querySelector(".column-title");
+                if (titleBtn) {
+                    titleBtn.addEventListener("click", () => {
+                        const isNowOpen = col.classList.toggle("is-open");
+                        titleBtn.setAttribute("aria-expanded", isNowOpen ? "true" : "false");
+                    });
+                }
+            });
+        }
+
+        // Floating hover indicator: hide when menu section is in view, show when in hero (mobile only)
+        const menuSection = document.getElementById("menu");
+        const scrollIndicator = document.querySelector(".hero-section .scroll-indicator");
+        if (menuSection && scrollIndicator && typeof IntersectionObserver !== "undefined") {
+            const updateIndicatorVisibility = (entry) => {
+                if (window.innerWidth > 768) {
+                    scrollIndicator.classList.remove("is-hidden");
+                    return;
+                }
+                const scrollY = window.scrollY || window.pageYOffset || 0;
+                if (scrollY < 60) {
+                    scrollIndicator.classList.remove("is-hidden");
+                    return;
+                }
+                const rect = menuSection.getBoundingClientRect();
+                if (rect.top < window.innerHeight * 0.75) {
+                    scrollIndicator.classList.add("is-hidden");
+                } else {
+                    scrollIndicator.classList.remove("is-hidden");
+                }
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => updateIndicatorVisibility(entry));
+            }, {
+                threshold: [0, 0.1, 0.2, 0.5],
+                rootMargin: "0px 0px -80px 0px"
+            });
+            observer.observe(menuSection);
+
+            window.addEventListener("scroll", () => {
+                if (window.innerWidth > 768) return;
+                const scrollY = window.scrollY || window.pageYOffset || 0;
+                if (scrollY < 60) {
+                    scrollIndicator.classList.remove("is-hidden");
+                }
+            }, { passive: true });
+
+            window.addEventListener("resize", () => {
+                if (window.innerWidth > 768) {
+                    scrollIndicator.classList.remove("is-hidden");
+                }
+            }, { passive: true });
         }
     }
 
@@ -1086,6 +1298,9 @@
      */
     function initNavbars() {
         if (typeof document === "undefined") return;
+        if (typeof window !== "undefined" && !window.location.hash) {
+            window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        }
         initActivePageContent();
         const headers = document.querySelectorAll("header.navbar");
         headers.forEach(header => {

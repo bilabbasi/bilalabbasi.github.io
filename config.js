@@ -144,9 +144,9 @@ const KITCHEN_CONFIG = {
 
     // Navigation bar tabs (used by nav.js to auto-render headers across all kitchen pages)
     nav: [
-        { id: "kitchen", label: "the kitchen", path: "kitchen/", focal: true, dividerAfter: true },
-        { id: "culture", label: "customs", path: "kitchen/culture/" },
-        { id: "ammi", label: "ammi", path: "kitchen/me/" }
+        { id: "kitchen", label: "the kitchen", urdu: "باورچی خانہ", path: "kitchen/", focal: true, dividerAfter: true },
+        { id: "culture", label: "customs", urdu: "رسم و رواج", path: "kitchen/culture/" },
+        { id: "ammi", label: "ammi", urdu: "امی", path: "kitchen/me/" }
     ],
 
     // -------------------------------------------------------------------------
@@ -158,6 +158,11 @@ const KITCHEN_CONFIG = {
     // - urduColor: Optional color override for the Urdu text on this specific page.
     //              (Defaults to theme.urdu below if omitted).
     spaces: {
+        kitchen: {
+            title: "the kitchen",
+            urdu: "باورچی خانہ",
+            urduColor: "#b83b14"
+        },
         culture: {
             title: "customs",
             urdu: "رسم و رواج",

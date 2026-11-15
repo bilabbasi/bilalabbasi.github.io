@@ -136,3 +136,8 @@ To maintain absolute visual stability, the elements on the professional landing 
 * Capture screenshots of the modified pages across relevant viewports (desktop and mobile) using headless Chrome or a local browser.
 * Inspect the captured screenshot files directly using `read_file` to evaluate visual balance, typography, alignment, hierarchy, and potential clipping or collision.
 * Never rely solely on unit tests, linters, or code diffs for aesthetic and visual modifications. Visual evidence is strictly required before proposing or finalizing styling changes.
+
+### F. Viewport Isolation Mandate (Desktop vs. Mobile Invariance)
+* **Strict Isolation**: Anytime you make a mobile-specific change, you MUST verify and guarantee that the desktop layout, typography, interactions, and aesthetics remain 100% unchanged.
+* Conversely, anytime you make a desktop-specific change, you MUST verify and guarantee that mobile viewports remain 100% unchanged.
+* **Media Query Scoping**: Never apply mobile-specific layout styles, button graphics, floating overrides, or interaction handlers in top-level CSS without strict media query encapsulation (e.g. `@media (max-width: 768px)`). Always verify both viewports to confirm zero side effects on the other platform.
