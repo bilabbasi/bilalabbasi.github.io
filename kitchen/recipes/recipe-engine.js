@@ -538,6 +538,27 @@
         }
     ];
 
+    function positionQalamProgressBar() {
+        const container = document.getElementById("qalam-progress-container");
+        if (!container) return;
+        if (window.innerWidth <= 900) {
+            container.style.left = "";
+            container.style.right = "";
+            container.style.transform = "";
+            return;
+        }
+        const topTab = document.querySelector("#recipe-top-tab") || document.querySelector(".navbar .nav-links .active");
+        if (topTab) {
+            const tabRect = topTab.getBoundingClientRect();
+            if (tabRect.width > 0) {
+                const centerX = tabRect.left + (tabRect.width / 2);
+                container.style.left = `${centerX.toFixed(1)}px`;
+                container.style.right = "auto";
+                container.style.transform = "translate(-50%, -50%)";
+            }
+        }
+    }
+
     function setupQalamProgressBar() {
         const container = document.getElementById("qalam-progress-container");
         const markersContainer = document.getElementById("qalam-progress-markers");
@@ -656,6 +677,7 @@
             });
         }
 
+        positionQalamProgressBar();
         updateQalamProgress();
     }
 
@@ -685,6 +707,7 @@
         }
 
         container.classList.add("is-visible");
+        positionQalamProgressBar();
 
         const total = progressSlides.length;
         if (total <= 1) {
