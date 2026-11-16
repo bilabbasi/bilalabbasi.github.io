@@ -201,10 +201,24 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
     assert.ok(header.innerHTML.includes('data-nav-id="kitchen"'), 'Should include data-nav-id="kitchen"');
     assert.ok(header.innerHTML.includes('data-nav-id="culture"'), 'Should include data-nav-id="culture"');
     assert.ok(header.innerHTML.includes('data-nav-id="ammi"'), 'Should include data-nav-id="ammi"');
+    assert.ok(header.innerHTML.includes('data-nav-id="abu"'), 'Should include data-nav-id="abu"');
+    assert.ok(header.innerHTML.includes('data-nav-id="bhaiya"'), 'Should include data-nav-id="bhaiya"');
+    assert.ok(header.innerHTML.includes('data-nav-id="bilal"'), 'Should include data-nav-id="bilal"');
     assert.ok(header.innerHTML.includes('class="nav-home nav-focal"'), 'Active kitchen tab should have nav-home class');
+    assert.ok(header.innerHTML.includes('nav-item-bilal'), 'Bilal tab should have nav-item-bilal class');
+    assert.ok(header.innerHTML.includes('>بلال</a>'), 'Should include بلال Urdu text');
+    assert.ok(header.innerHTML.includes('class="nav-text" data-nav-id="abu">abu</span>'), 'Abu tab should render as text');
+    assert.ok(header.innerHTML.includes('class="nav-text" data-nav-id="bhaiya">bhaiya</span>'), 'Bhaiya tab should render as text');
+    assert.ok(header.innerHTML.includes('href="../"'), 'From /kitchen/, bilal link should point to "../"');
     assert.ok(header.innerHTML.includes('href="./"'), 'Kitchen tab should have href="./"');
     assert.ok(header.innerHTML.includes('href="culture/"'), 'Culture tab should have href="culture/"');
     assert.ok(header.innerHTML.includes('href="me/"'), 'Ammi tab should have href="me/"');
+    assert.ok(header.innerHTML.includes('<span class="mobile-nav-label-en">abu</span>'), 'Mobile dropdown should include abu');
+    assert.ok(header.innerHTML.includes('<span class="mobile-nav-label-ur">ابو</span>'), 'Mobile dropdown should include abu in Urdu');
+    assert.ok(header.innerHTML.includes('<span class="mobile-nav-label-en">bhaiya</span>'), 'Mobile dropdown should include bhaiya');
+    assert.ok(header.innerHTML.includes('<span class="mobile-nav-label-ur">بھیا</span>'), 'Mobile dropdown should include bhaiya in Urdu');
+    assert.ok(header.innerHTML.includes('<span class="mobile-nav-label-en">bilal</span>'), 'Mobile dropdown should include bilal');
+    assert.ok(header.innerHTML.includes('<span class="mobile-nav-label-ur">بلال</span>'), 'Mobile dropdown should include بلال');
     console.log('PASS: renderNavbar produces correct markup and relative paths on /kitchen/.');
 }
 
@@ -217,6 +231,7 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
     header.setAttribute('data-current', 'culture');
     context.window.renderSiteNavbar(header);
 
+    assert.ok(header.innerHTML.includes('href="../../"'), 'From culture, bilal link should point to "../../"');
     assert.ok(header.innerHTML.includes('href="../"'), 'From culture, kitchen link should be "../"');
     assert.ok(header.innerHTML.includes('href="./"'), 'From culture, culture link should be "./"');
     assert.ok(header.innerHTML.includes('href="../me/"'), 'From culture, ammi link should be "../me/"');

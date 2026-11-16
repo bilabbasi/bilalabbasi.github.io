@@ -146,7 +146,10 @@ const KITCHEN_CONFIG = {
     nav: [
         { id: "kitchen", label: "the kitchen", urdu: "باورچی خانہ", path: "kitchen/", focal: true, dividerAfter: true },
         { id: "culture", label: "customs", urdu: "رسم و رواج", path: "kitchen/culture/" },
-        { id: "ammi", label: "ammi", urdu: "امی", path: "kitchen/me/" }
+        { id: "ammi", label: "ammi", urdu: "امی", path: "kitchen/me/" },
+        { id: "abu", label: "abu", urdu: "ابو", isText: true },
+        { id: "bhaiya", label: "bhaiya", urdu: "بھیا", isText: true, dividerAfter: true },
+        { id: "bilal", label: "bilal", desktopLabel: "بلال", urdu: "بلال", path: "", isHome: true }
     ],
 
     // -------------------------------------------------------------------------
@@ -171,6 +174,21 @@ const KITCHEN_CONFIG = {
         ammi: {
             title: "ammi",
             urdu: "امی",
+            urduColor: "#b83b14"
+        },
+        abu: {
+            title: "abu",
+            urdu: "ابو",
+            urduColor: "#b83b14"
+        },
+        bhaiya: {
+            title: "bhaiya",
+            urdu: "بھیا",
+            urduColor: "#b83b14"
+        },
+        bilal: {
+            title: "bilal",
+            urdu: "بلال",
             urduColor: "#b83b14"
         }
     },

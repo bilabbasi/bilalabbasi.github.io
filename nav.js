@@ -150,6 +150,9 @@
      * E.g. computeRelativePath("kitchen/me/", "kitchen/culture/") -> "../culture/"
      */
     function computeRelativePath(fromPath, toPath) {
+        if (!toPath && toPath !== "") return "";
+        fromPath = fromPath || "";
+        toPath = toPath || "";
         if (fromPath === toPath) return "./";
         const fromParts = fromPath.replace(/\/$/, "").split("/").filter(Boolean);
         const toParts = toPath.replace(/\/$/, "").split("/").filter(Boolean);
@@ -244,18 +247,23 @@
         const itemsHtml = [];
         navConfig.forEach(item => {
             const isActive = item.id === currentId;
-            const href = computeRelativePath(fromPath, item.path);
+            let href = (item.path !== undefined) ? computeRelativePath(fromPath, item.path) : "";
+            if (item.isHome && typeof window !== "undefined" && window.location.protocol === "file:") {
+                href += "index.html";
+            }
             const classes = [];
             if (isActive) classes.push("nav-home");
             if (item.focal) classes.push("nav-focal");
+            if (item.id === "bilal" || item.isHome) classes.push("nav-item-bilal");
 
             const classAttr = classes.length ? ` class="${classes.join(" ")}"` : "";
             const idAttr = item.id === "kitchen" ? ` id="kitchen-tab"` : "";
             const ariaSelected = isActive ? "true" : "false";
             const ariaCurrent = isActive ? ` aria-current="page"` : "";
+            const homeAttr = item.isHome ? ` data-is-home="true"` : "";
 
-            // Dynamic label if "the kitchen"
-            let label = item.label;
+            // Dynamic label if "the kitchen", or desktopLabel (e.g. Urdu "بلال" on desktop)
+            let label = item.desktopLabel || item.label;
             if (item.id === "kitchen" && typeof KITCHEN_CONFIG !== "undefined" && KITCHEN_CONFIG.name) {
                 label = KITCHEN_CONFIG.name;
             }
@@ -263,10 +271,19 @@
             // Collapsible items on mobile: items after "the kitchen" and "customs" (e.g. "ammi", and future family spaces)
             const isCollapsible = (item.id !== "kitchen" && item.id !== "culture");
             const collapsibleClass = isCollapsible ? " nav-item-collapsible" : "";
+            const bilalLiClass = (item.id === "bilal" || item.isHome) ? " nav-item-bilal" : "";
 
-            itemsHtml.push(`<li class="nav-item${collapsibleClass}" role="presentation" data-nav-id="${item.id}"><a href="${href}"${classAttr}${idAttr} data-nav-id="${item.id}" role="tab" aria-selected="${ariaSelected}"${ariaCurrent}>${label}</a></li>`);
+            let innerHtml = "";
+            if (item.isText) {
+                innerHtml = `<span class="nav-text" data-nav-id="${item.id}">${label}</span>`;
+            } else {
+                innerHtml = `<a href="${href}"${classAttr}${idAttr}${homeAttr} data-nav-id="${item.id}" role="tab" aria-selected="${ariaSelected}"${ariaCurrent}>${label}</a>`;
+            }
+
+            itemsHtml.push(`<li class="nav-item${collapsibleClass}${bilalLiClass}" role="presentation" data-nav-id="${item.id}">${innerHtml}</li>`);
             if (item.dividerAfter) {
-                itemsHtml.push(`<li class="nav-divider" aria-hidden="true">|</li>`);
+                const dividerCollapsibleClass = isCollapsible ? " nav-divider-collapsible" : "";
+                itemsHtml.push(`<li class="nav-divider${dividerCollapsibleClass}" aria-hidden="true">|</li>`);
             }
         });
 
@@ -284,7 +301,10 @@
             if (!isCollapsible) return; // Exclude items already visible in the top nav bar
 
             const isActive = item.id === currentId;
-            const href = computeRelativePath(fromPath, item.path);
+            let href = item.path ? computeRelativePath(fromPath, item.path) : "";
+            if (item.isHome && typeof window !== "undefined" && window.location.protocol === "file:") {
+                href += "index.html";
+            }
             let label = item.label;
             if (item.id === "kitchen" && typeof KITCHEN_CONFIG !== "undefined" && KITCHEN_CONFIG.name) {
                 label = KITCHEN_CONFIG.name;
@@ -294,16 +314,29 @@
                 if (item.id === "kitchen") urduLabel = "باورچی خانہ";
                 else if (item.id === "culture") urduLabel = "رسم و رواج";
                 else if (item.id === "ammi") urduLabel = "امی";
+                else if (item.id === "abu") urduLabel = "ابو";
+                else if (item.id === "bhaiya") urduLabel = "بھیا";
+                else if (item.id === "bilal") urduLabel = "بلال";
             }
             const activeClass = isActive ? " is-active" : "";
             const ariaCurrent = isActive ? ` aria-current="page"` : "";
+            const homeAttr = item.isHome ? ` data-is-home="true"` : "";
 
-            dropdownItemsHtml.push(`
-                <a href="${href}" class="mobile-nav-link${activeClass}" data-mobile-nav-id="${item.id}"${ariaCurrent}>
-                    <span class="mobile-nav-label-en">${label}</span>
-                    <span class="mobile-nav-label-ur">${urduLabel}</span>
-                </a>
-            `.trim());
+            if (item.isText) {
+                dropdownItemsHtml.push(`
+                    <div class="mobile-nav-link mobile-nav-text" data-mobile-nav-id="${item.id}">
+                        <span class="mobile-nav-label-en">${label}</span>
+                        <span class="mobile-nav-label-ur">${urduLabel}</span>
+                    </div>
+                `.trim());
+            } else {
+                dropdownItemsHtml.push(`
+                    <a href="${href}" class="mobile-nav-link${activeClass}" data-mobile-nav-id="${item.id}"${ariaCurrent}${homeAttr}>
+                        <span class="mobile-nav-label-en">${label}</span>
+                        <span class="mobile-nav-label-ur">${urduLabel}</span>
+                    </a>
+                `.trim());
+            }
         });
 
         const logoSrc = resolveAssetPath(fromPath, "assets/kitchen_collapsible_menu_logo_2.png");
@@ -377,7 +410,7 @@
         if (backdrop && backdrop.addEventListener) {
             backdrop.addEventListener("click", closeMenu);
         }
-        const links = dropdown.querySelectorAll ? dropdown.querySelectorAll(".mobile-nav-link") : [];
+        const links = dropdown.querySelectorAll ? dropdown.querySelectorAll("a.mobile-nav-link") : [];
         if (links.forEach) {
             links.forEach(l => {
                 if (l.addEventListener) l.addEventListener("click", closeMenu);
@@ -809,14 +842,17 @@
                     const fromPath = currentItem ? currentItem.path : "kitchen/";
 
                     navConfig.forEach(item => {
+                        if (item.isText || !item.path) return;
+                        let newRelHref = computeRelativePath(fromPath, item.path);
+                        if (item.isHome && typeof window !== "undefined" && window.location.protocol === "file:") {
+                            newRelHref += "index.html";
+                        }
                         const itemLink = navLinks.querySelector(`a[data-nav-id="${item.id}"]`);
                         if (itemLink) {
-                            const newRelHref = computeRelativePath(fromPath, item.path);
                             itemLink.setAttribute("href", newRelHref);
                         }
-                        const mobileLink = header.querySelector(`.mobile-nav-link[data-mobile-nav-id="${item.id}"]`);
+                        const mobileLink = header.querySelector(`a.mobile-nav-link[data-mobile-nav-id="${item.id}"]`);
                         if (mobileLink) {
-                            const newRelHref = computeRelativePath(fromPath, item.path);
                             mobileLink.setAttribute("href", newRelHref);
                         }
                     });
@@ -895,8 +931,12 @@
         }
 
         // Only intercept intra-navbar tab navigation (tabs with data-nav-id or data-mobile-nav-id)
+        if (link.getAttribute("data-is-home") === "true") {
+            return; // Normal link click back to beginning
+        }
+
         const targetNavId = link.getAttribute("data-nav-id") || link.getAttribute("data-mobile-nav-id");
-        if (!targetNavId) {
+        if (!targetNavId || targetNavId === "bilal") {
             return; // Normal link click
         }
 

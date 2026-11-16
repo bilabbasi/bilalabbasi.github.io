@@ -677,8 +677,9 @@ body {
         margin: 0;
     }
 
-    /* Collapsible family members (ammi, and future spaces) collapse into <menu> */
-    .nav-links .nav-item-collapsible {
+    /* Collapsible family members (ammi, bilal, and future spaces) collapse into <menu> */
+    .nav-links .nav-item-collapsible,
+    .nav-links .nav-divider-collapsible {
         display: none !important;
     }
 
@@ -830,6 +831,16 @@ body {
     .mobile-nav-link:hover,
     .mobile-nav-link:active {
         color: var(--link-hover, #ea580c);
+    }
+
+    .mobile-nav-link.mobile-nav-text {
+        cursor: default;
+        user-select: none;
+    }
+
+    .mobile-nav-link.mobile-nav-text:hover,
+    .mobile-nav-link.mobile-nav-text:active {
+        color: var(--text-title, #1e293b);
     }
 
     /* English label (Left justified) */

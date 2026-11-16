@@ -133,6 +133,32 @@ body {
     align-items: center;
 }
 
+/* End home link in Urdu script (بلال) */
+.nav-item-bilal a {
+    font-family: 'Noto Nastaliq Urdu', 'Urdu Typesetting', 'Jameel Noori Nastaleeq', 'Geeza Pro', Tahoma, serif;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--text-title, #1e293b);
+    opacity: 0.38;
+    direction: rtl;
+    line-height: 1;
+    padding-bottom: 0;
+    border-bottom-color: transparent !important;
+    transition: opacity var(--transition-smooth, 0.25s ease), color var(--transition-smooth, 0.25s ease);
+}
+
+.nav-item-bilal a:hover {
+    opacity: 0.95;
+    color: var(--text-title, #1e293b);
+}
+
+.nav-item-bilal a:focus-visible {
+    opacity: 1;
+    outline: none;
+    box-shadow: 0 0 0 2px var(--bg-main), 0 0 0 3.5px var(--link-color, #7c2d12);
+    border-radius: 4px;
+}
+
 /* List holding navigation links */
 .nav-links {
     position: relative;
@@ -144,7 +170,8 @@ body {
 }
 
 /* Navigation items link text */
-.nav-item a {
+.nav-item a,
+.nav-item .nav-text {
     position: relative;
     display: inline-block;
     text-decoration: none;
@@ -158,6 +185,11 @@ body {
     padding-bottom: 3px;
     /* Reserve space to prevent layout baseline shifts */
     outline: none;
+}
+
+.nav-item .nav-text {
+    cursor: default;
+    user-select: none;
 }
 
 .nav-item a:focus-visible {
