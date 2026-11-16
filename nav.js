@@ -191,6 +191,7 @@
         // Sort items by path specificity (longest path first) so sub-paths match before parent paths
         const sorted = items.slice().sort((a, b) => (b.path || "").length - (a.path || "").length);
         for (const item of sorted) {
+            if (item.isText || !item.path) continue;
             const cleanPath = item.path.replace(/^\/|\/$/g, "");
             if (pathname.includes("/" + cleanPath + "/") ||
                 pathname.endsWith("/" + cleanPath) ||
@@ -301,7 +302,7 @@
             if (!isCollapsible) return; // Exclude items already visible in the top nav bar
 
             const isActive = item.id === currentId;
-            let href = item.path ? computeRelativePath(fromPath, item.path) : "";
+            let href = (item.path !== undefined && item.path !== null) ? computeRelativePath(fromPath, item.path) : "";
             if (item.isHome && typeof window !== "undefined" && window.location.protocol === "file:") {
                 href += "index.html";
             }
@@ -842,7 +843,7 @@
                     const fromPath = currentItem ? currentItem.path : "kitchen/";
 
                     navConfig.forEach(item => {
-                        if (item.isText || !item.path) return;
+                        if (item.isText || item.path === undefined || item.path === null) return;
                         let newRelHref = computeRelativePath(fromPath, item.path);
                         if (item.isHome && typeof window !== "undefined" && window.location.protocol === "file:") {
                             newRelHref += "index.html";
