@@ -26,44 +26,19 @@ kitchen/recipes/
     └── assets/
 ```
 
-### Adding a recipe is a 3-step process:
+### Adding a recipe is a 2-step process:
 
-1. **Create the recipe folder**:
+1. **Run the recipe scaffolder** from the repo root:
    ```bash
-   mkdir -p kitchen/recipes/<dish-slug>/assets
+   # From an existing YAML file:
+   node kitchen/recipes/new.js <dish-slug> path/to/recipe.yaml
+
+   # Or start from a blank template:
+   node kitchen/recipes/new.js <dish-slug> "Dish Name" "Short description."
    ```
+   This creates `kitchen/recipes/<dish-slug>/` with `index.html`, `recipe.js`, and `assets/`. When importing a `.yaml` file, any `image:` paths must be **absolute paths**—`new.js` copies those images into `kitchen/recipes/<dish-slug>/assets/` and rewrites `recipe.js` to reference them. If you didn't pass a `.yaml` file, edit `recipe.js` with your ingredients and steps.
 
-2. **Add `index.html` and `recipe.js`** inside that folder:
-   - **`index.html`**: Copy this 36-line shell directly:
-     ```html
-     <!DOCTYPE html>
-     <html lang="en">
-     <head>
-         <meta charset="UTF-8">
-         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-         <link rel="icon" type="image/png" href="../../../assets/favicon_ba_urdu_orange.png">
-         <title>Dish Name — the kitchen</title>
-         <meta name="description" content="A one-sentence description of the dish.">
-         <meta name="author" content="Bilal Abbasi">
-         <link rel="stylesheet" href="../../../index.css">
-         <link rel="stylesheet" href="../css/recipe-base.css">
-         <link rel="stylesheet" href="../css/recipe-side-by-side.css">
-         <link rel="stylesheet" href="../css/recipe-step-by-step.css">
-         <link rel="stylesheet" href="../css/recipe-progress-bar.css">
-         <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
-         <script src="../../../config.js"></script>
-         <script src="recipe.js"></script>
-         <script src="../recipe-engine.js" defer></script>
-     </head>
-     <body>
-         <div id="recipe-root"></div>
-     </body>
-     </html>
-     ```
-   - **`recipe.js`**: Create `recipe.js` containing `const RECIPE_DATA = \`...\`;` (see template below).
-   - *(Optional)* Put any dish-specific photos or sketches in `assets/`.
-
-3. **Register the recipe in [`config.js`](../../config.js)** under `KITCHEN_CONFIG.recipes`:
+2. **Register the recipe in [`config.js`](../../config.js)** under `KITCHEN_CONFIG.recipes` (the script prints the exact snippet for you):
    ```javascript
    {
        category: "veg",                     // "chicken" | "meat" | "veg" | "dessert"

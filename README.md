@@ -1,29 +1,77 @@
 # bilalabbasi.github.io
 
-This repository hosts my personal website. It is divided into two spaces:
-1. **Professional Portfolio**: Highlights my background as a research scientist in AI, deep learning, and systems engineering.
-2. **The Kitchen**: A space for some of my favourite recipes throughout my childhood.
+Personal website of Bilal Abbasi (`www.bilalabbasi.com`), divided into two spaces:
+1. **Professional** (`/professional/`) — Research, publications, and engineering background.
+2. **The Kitchen** (`/kitchen/`) — Childhood recipes, cultural essays, and Urdu typography.
 
-## Basic ethos
-The site is built with a focus on simplicity, responsiveness, and clean typography.
-* [Vitsœ's Dieter Rams: Ten principles for good design](https://www.vitsoe.com/us/about/good-design)
-* [A vulgar yet poignant website](https://motherfuckingwebsite.com/)
+Built with vanilla HTML5, CSS3, and ES6 JavaScript—no build step, no bundler, no framework.
 
 ---
 
-## Under the hood
-* **Frontend**: Vanilla HTML5 and Javascript (ES6). No complex frameworks or dependencies.
-* **Styling**: Vanilla CSS3, designed to be lightweight and responsive.
-* **Centralized Configuration**: Content is separated from structure. All text, bios, and external links are managed in a single javascript configuration file.
+## Repository Map
+
+### Content (files you edit regularly)
+* `config.js` — All site text, bios, external links, nav tabs, theme colors, and the recipe directory.
+* `kitchen/customs/this_space.md` — Essay for the **customs** page (`/kitchen/customs/`).
+* `kitchen/ammi/us.md` — Essay for the **ammi** page (`/kitchen/ammi/`).
+* `kitchen/recipes/<slug>/recipe.js` — Individual recipe data (YAML inside a JS template string so `file://` works without CORS).
+* `assets/` — Sketches, photos, and favicons.
+
+### Plumbing (layout, styling, and scripts)
+* `index.html` + `gateway.css` — Root cover page (`/`) with the interactive descriptor reel.
+* `professional/index.html` — Professional profile page.
+* `kitchen/index.html` + `kitchen.css` — Kitchen landing page and recipe menu grid.
+* `kitchen/customs/index.html` & `kitchen/ammi/index.html` — Kitchen subpage shells that render their `.md` files.
+* `kitchen/recipes/` — Shared `recipe-engine.js`, modular `css/recipe-*.css`, and `new.js` scaffolder (see [kitchen/recipes/README.md](kitchen/recipes/README.md)).
+* `index.css` — Shared design tokens, typography, navbar, and base 2-column layout.
+* `js/theme.js` — Applies `KITCHEN_CONFIG.theme` CSS variables on kitchen/recipe pages only.
+* `nav.js` — Navbar rendering, ink-brush indicator animations, page transitions, and kitchen page loaders.
+* `serve.sh` / `serve.js` — Local dev server with LAN/Tailscale QR code for mobile testing.
+* `tests/` — Automated checks (`node tests/run_all.js`).
 
 ---
 
-## Repository structure
+## Local Preview & Verification
 
-* `index.html` — Minimalist gateway cover page at the root domain (`/`).
-* `professional/index.html` / `index.css` — Dedicated professional profile (`/professional/`).
-* `kitchen/index.html` / `kitchen.css` — Dedicated dashboard and styles for "The Kitchen" recipes (`/kitchen/`).
-* `config.js` — Central configuration file holding profile info, links, and titles.
-* `kitchen/recipes/` — Contains recipe stylesheets, templates, and recipe data (see [kitchen/recipes/README.md](kitchen/recipes/README.md) for the recipe formatting guide).
-* `assets/` — Images, conceptual sketches, and favicons.
-* `.nojekyll` — Bypasses Jekyll processing on GitHub Pages to ensure fast, static asset delivery.
+Start the local server (prints a QR code for testing on your phone):
+```bash
+./serve.sh
+```
+Or run Python's built-in server:
+```bash
+python3 -m http.server 8000
+```
+
+Run the test suite after any edit:
+```bash
+node tests/run_all.js
+```
+
+---
+
+## How to Make Common Edits
+
+### 1. Add a new recipe
+Run the scaffolder—either from a `.yaml` file or from scratch:
+```bash
+# Option A: Import an existing YAML file directly
+node kitchen/recipes/new.js biryani path/to/biryani.yaml
+
+# Option B: Create a starter template
+node kitchen/recipes/new.js biryani "Ammi’s Biryani" "Fragrant layered basmati rice."
+```
+Then add the printed entry to `KITCHEN_CONFIG.recipes` in `config.js`.
+
+### 2. Edit a bio, links, or gateway descriptors
+Open `config.js` and edit:
+* `GATEWAY_CONFIG.reel.items` — Descriptors on the cover page.
+* `PROFESSIONAL_CONFIG` — Name, subtitle, bio, and external links.
+* `KITCHEN_CONFIG` — Kitchen title, subtitle, bio, theme colors, and recipes.
+
+### 3. Edit the Customs or Ammi essays
+Edit the Markdown directly in:
+* `kitchen/customs/this_space.md`
+* `kitchen/ammi/us.md`
+
+### 4. Update navigation tabs
+Edit `KITCHEN_CONFIG.nav` and `KITCHEN_CONFIG.spaces` in `config.js`.

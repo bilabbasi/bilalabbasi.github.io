@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="assets/favicon_ba_urdu_orange.png">
+    <link rel="icon" type="image/png" href="../../assets/favicon_ba_urdu_orange.png">
     <title>the kitchen</title>
 
     <!-- SEO Meta Tags -->
@@ -21,6 +21,7 @@
 
     <!-- Configuration Data: Shared config containing both professional and kitchen bio contents -->
     <script src="../../config.js"></script>
+    <script src="../../js/theme.js"></script>
 
     <!-- Navigation & Dynamic Content Controller: Automatically loads headers, markdown content, and ink interactions -->
     <script src="../../nav.js" defer></script>
@@ -30,26 +31,23 @@
     <div class="app-wrapper">
 
         <!-- Header: Top bar with navigation for kitchen sections -->
-        <header class="navbar" data-current="culture"></header>
+        <header class="navbar" data-current="ammi"></header>
 
-        <section class="about-section" id="about">
-            <header class="split-title-header" data-space="culture"></header>
+        <!-- About / Me Section -->
+        <section class="about-section" id="me">
+            <div class="about-grid">
+                <div class="about-column about-text">
+                    <header class="split-title-header" data-space="ammi"></header>
+                    <div id="us-content"></div>
+                </div>
+                <div class="about-column">
+                    <img class="about-img" src="../../assets/photos/bilal_baby.png"
+                        alt="Picture of Bilal's mom holding him in the kitchen sink.">
+                </div>
+            </div>
 
-            <div class="about-text" id="this-space-content"></div>
         </section>
 
-        <!-- Photo Section -->
-        <section class="photo-section" id="arrival-picture">
-            <figure class="photo-figure">
-                <img class="photo-img" src="../../assets/photos/ammi_and_abu_arrive_1.JPG"
-                    alt="Ammi and Abu arriving with luggage.">
-                <figcaption class="photo-caption">
-                    Ammi and abu arriving to Toronto for the first time, with my brother in hand.<br>Just after clearing
-                    customs.<br><br>
-                    <strong class="photo-date">July 17, 1987</strong>
-                </figcaption>
-            </figure>
-        </section>
         <!-- Footer -->
         <footer class="footer">
             <p>&copy; 2026 Bilal Abbasi. All rights reserved.</p>

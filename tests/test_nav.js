@@ -183,8 +183,8 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
     vm.runInContext(configCode + '\n' + navCode, context);
 
     assert.strictEqual(typeof context.window.initKitchenDashboard, 'function', 'initKitchenDashboard exists');
-    assert.strictEqual(typeof context.window.initCulturePage, 'function', 'initCulturePage exists');
-    assert.strictEqual(typeof context.window.initMePage, 'function', 'initMePage exists');
+    assert.strictEqual(typeof context.window.initCustomsPage, 'function', 'initCustomsPage exists');
+    assert.strictEqual(typeof context.window.initAmmiPage, 'function', 'initAmmiPage exists');
     console.log('PASS: Shared page initializers defined.');
 }
 
@@ -199,7 +199,7 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
 
     assert.ok(header.innerHTML.includes('<span class="nav-indicator" aria-hidden="true"></span>'), 'Should include persistent nav-indicator');
     assert.ok(header.innerHTML.includes('data-nav-id="kitchen"'), 'Should include data-nav-id="kitchen"');
-    assert.ok(header.innerHTML.includes('data-nav-id="culture"'), 'Should include data-nav-id="culture"');
+    assert.ok(header.innerHTML.includes('data-nav-id="customs"'), 'Should include data-nav-id="customs"');
     assert.ok(header.innerHTML.includes('data-nav-id="ammi"'), 'Should include data-nav-id="ammi"');
     assert.ok(header.innerHTML.includes('data-nav-id="abu"'), 'Should include data-nav-id="abu"');
     assert.ok(header.innerHTML.includes('data-nav-id="bhaiya"'), 'Should include data-nav-id="bhaiya"');
@@ -211,8 +211,8 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
     assert.ok(header.innerHTML.includes('class="nav-text" data-nav-id="bhaiya">bhaiya</span>'), 'Bhaiya tab should render as text');
     assert.ok(header.innerHTML.includes('href="../"'), 'From /kitchen/, bilal link should point to "../"');
     assert.ok(header.innerHTML.includes('href="./"'), 'Kitchen tab should have href="./"');
-    assert.ok(header.innerHTML.includes('href="culture/"'), 'Culture tab should have href="culture/"');
-    assert.ok(header.innerHTML.includes('href="me/"'), 'Ammi tab should have href="me/"');
+    assert.ok(header.innerHTML.includes('href="customs/"'), 'Customs tab should have href="customs/"');
+    assert.ok(header.innerHTML.includes('href="ammi/"'), 'Ammi tab should have href="ammi/"');
     assert.ok(header.innerHTML.includes('<span class="mobile-nav-label-en">abu</span>'), 'Mobile dropdown should include abu');
     assert.ok(header.innerHTML.includes('<span class="mobile-nav-label-ur">ابو</span>'), 'Mobile dropdown should include abu in Urdu');
     assert.ok(header.innerHTML.includes('<span class="mobile-nav-label-en">bhaiya</span>'), 'Mobile dropdown should include bhaiya');
@@ -223,21 +223,21 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
     console.log('PASS: renderNavbar produces correct markup and relative paths on /kitchen/.');
 }
 
-// 4. Test renderNavbar from customs / culture page
+// 4. Test renderNavbar from customs page
 {
-    const { context, header } = createNavTestEnv('/kitchen/culture/index.html');
+    const { context, header } = createNavTestEnv('/kitchen/customs/index.html');
     vm.runInContext(configCode + '\n' + navCode, context);
 
     header.setAttribute('data-nav', 'kitchen');
-    header.setAttribute('data-current', 'culture');
+    header.setAttribute('data-current', 'customs');
     context.window.renderSiteNavbar(header);
 
-    assert.ok(header.innerHTML.includes('href="../../"'), 'From culture, bilal link should point to "../../"');
-    assert.ok(header.innerHTML.includes('<a href="../../" class="mobile-nav-link" data-mobile-nav-id="bilal"'), 'Mobile dropdown bilal link on culture should point to "../../"');
-    assert.ok(header.innerHTML.includes('href="../"'), 'From culture, kitchen link should be "../"');
-    assert.ok(header.innerHTML.includes('href="./"'), 'From culture, culture link should be "./"');
-    assert.ok(header.innerHTML.includes('href="../me/"'), 'From culture, ammi link should be "../me/"');
-    console.log('PASS: renderNavbar produces correct relative paths on /kitchen/culture/.');
+    assert.ok(header.innerHTML.includes('href="../../"'), 'From customs, bilal link should point to "../../"');
+    assert.ok(header.innerHTML.includes('<a href="../../" class="mobile-nav-link" data-mobile-nav-id="bilal"'), 'Mobile dropdown bilal link on customs should point to "../../"');
+    assert.ok(header.innerHTML.includes('href="../"'), 'From customs, kitchen link should be "../"');
+    assert.ok(header.innerHTML.includes('href="./"'), 'From customs, customs link should be "./"');
+    assert.ok(header.innerHTML.includes('href="../ammi/"'), 'From customs, ammi link should be "../ammi/"');
+    console.log('PASS: renderNavbar produces correct relative paths on /kitchen/customs/.');
 }
 
 // 5. Test updateIndicator math
@@ -273,11 +273,11 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
 
 // 6. Test renderSplitHeaders with KITCHEN_CONFIG.spaces
 {
-    const { context, splitHeader } = createNavTestEnv('/kitchen/culture/index.html');
+    const { context, splitHeader } = createNavTestEnv('/kitchen/customs/index.html');
     vm.runInContext(configCode + '\n' + navCode, context);
 
-    // Test with data-space="culture" (renders Urdu script without roman transliteration)
-    splitHeader.setAttribute('data-space', 'culture');
+    // Test with data-space="customs" (renders Urdu script without roman transliteration)
+    splitHeader.setAttribute('data-space', 'customs');
     context.window.renderSplitHeaders();
 
     assert.ok(splitHeader.innerHTML.includes('<h2 class="about-title">customs</h2>'), 'Should contain title customs');
@@ -464,19 +464,19 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
 
 // 12. Test renderRecipeNavbar for stationary "← the kitchen | <recipe_name>"
 {
-    const { context } = createNavTestEnv('/kitchen/recipes/template.html');
+    const { context } = createNavTestEnv('/kitchen/recipes/yellowdaal/index.html');
     vm.runInContext(configCode + '\n' + navCode, context);
 
     const header = context.document.createElement('header');
     header.className = 'navbar';
-    header.setAttribute('data-back', '../');
+    header.setAttribute('data-back', '../../');
     header.setAttribute('data-back-label', '← the kitchen');
 
     // Render recipe navbar
-    context.window.renderRecipeNavbar(header, 'Sourdough', '../');
+    context.window.renderRecipeNavbar(header, 'Ammi’s Yellow Daal', '../../');
     assert.strictEqual(header.getAttribute('data-recipe-nav-mode'), 'breadcrumb');
     assert.ok(header.innerHTML.includes('← the kitchen'), 'Contains "← the kitchen" back link');
-    assert.ok(header.innerHTML.includes('sourdough'), 'Contains recipe title link');
+    assert.ok(header.innerHTML.includes('ammi’s yellow daal'), 'Contains recipe title link');
     assert.ok(header.innerHTML.includes('recipe-top-link active'), 'Recipe title link has recipe-top-link active classes');
     console.log('PASS: Recipe stationary navbar "← the kitchen | <recipe_name>" verified.');
 }

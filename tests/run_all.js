@@ -12,7 +12,8 @@ const testFiles = [
     'test_theme.js',
     'test_styles.js',
     'test_nav.js',
-    'test_gateway.js'
+    'test_gateway.js',
+    'test_links.js'
 ];
 
 console.log('Running test suite...\n');

@@ -147,7 +147,7 @@
 
     /**
      * Computes the relative path between two root-relative paths.
-     * E.g. computeRelativePath("kitchen/me/", "kitchen/culture/") -> "../culture/"
+     * E.g. computeRelativePath("kitchen/ammi/", "kitchen/customs/") -> "../customs/"
      */
     function computeRelativePath(fromPath, toPath) {
         if (!toPath && toPath !== "") return "";
@@ -202,6 +202,21 @@
         return items[0] ? items[0].id : null;
     }
 
+    function getNavConfig(header) {
+        const navKey = header.getAttribute("data-nav") || "kitchen";
+        if (typeof NAVIGATION_CONFIG !== "undefined" && NAVIGATION_CONFIG[navKey]) {
+            return NAVIGATION_CONFIG[navKey];
+        }
+        if (typeof KITCHEN_CONFIG !== "undefined" && KITCHEN_CONFIG.nav) {
+            return KITCHEN_CONFIG.nav;
+        }
+        return [
+            { id: "kitchen", label: "the kitchen", path: "kitchen/", focal: true, dividerAfter: true },
+            { id: "customs", label: "customs", path: "kitchen/customs/" },
+            { id: "ammi", label: "ammi", path: "kitchen/ammi/" }
+        ];
+    }
+
     /**
      * Renders navigation markup into a <header class="navbar"> element
      * using accessible semantics (<nav>, <ul role="tablist">, role="tab", aria-selected).
@@ -226,15 +241,7 @@
             return;
         }
 
-        // Determine navigation configuration
-        const navKey = header.getAttribute("data-nav") || "kitchen";
-        const navConfig = (typeof NAVIGATION_CONFIG !== "undefined" && NAVIGATION_CONFIG[navKey])
-            ? NAVIGATION_CONFIG[navKey]
-            : (typeof KITCHEN_CONFIG !== "undefined" && KITCHEN_CONFIG.nav ? KITCHEN_CONFIG.nav : [
-                { id: "kitchen", label: "the kitchen", path: "kitchen/", focal: true, dividerAfter: true },
-                { id: "culture", label: "customs", path: "kitchen/culture/" },
-                { id: "ammi", label: "ammi", path: "kitchen/me/" }
-            ]);
+        const navConfig = getNavConfig(header);
 
         // Determine active tab ID
         let currentId = header.getAttribute("data-current");
@@ -270,7 +277,7 @@
             }
 
             // Collapsible items on mobile: items after "the kitchen" and "customs" (e.g. "ammi", and future family spaces)
-            const isCollapsible = (item.id !== "kitchen" && item.id !== "culture");
+            const isCollapsible = (item.id !== "kitchen" && item.id !== "customs");
             const collapsibleClass = isCollapsible ? " nav-item-collapsible" : "";
             const bilalLiClass = (item.id === "bilal" || item.isHome) ? " nav-item-bilal" : "";
 
@@ -292,13 +299,13 @@
         itemsHtml.push(`<span class="nav-indicator" aria-hidden="true"></span>`);
 
         // Check if an active page is one of the collapsible sub-pages
-        const isCollapsedActive = navConfig.some(item => item.id === currentId && (item.id !== "kitchen" && item.id !== "culture"));
+        const isCollapsedActive = navConfig.some(item => item.id === currentId && (item.id !== "kitchen" && item.id !== "customs"));
         const toggleActiveClass = isCollapsedActive ? " is-subpage-active" : "";
 
         // Build mobile dropdown items: ONLY items that are NOT in the horizontal bar (i.e. collapsible items)
         const dropdownItemsHtml = [];
         navConfig.forEach(item => {
-            const isCollapsible = (item.id !== "kitchen" && item.id !== "culture");
+            const isCollapsible = (item.id !== "kitchen" && item.id !== "customs");
             if (!isCollapsible) return; // Exclude items already visible in the top nav bar
 
             const isActive = item.id === currentId;
@@ -313,7 +320,7 @@
             let urduLabel = item.urdu || (typeof KITCHEN_CONFIG !== "undefined" && KITCHEN_CONFIG.spaces && KITCHEN_CONFIG.spaces[item.id] ? KITCHEN_CONFIG.spaces[item.id].urdu : "");
             if (!urduLabel) {
                 if (item.id === "kitchen") urduLabel = "باورچی خانہ";
-                else if (item.id === "culture") urduLabel = "رسم و رواج";
+                else if (item.id === "customs") urduLabel = "رسم و رواج";
                 else if (item.id === "ammi") urduLabel = "امی";
                 else if (item.id === "abu") urduLabel = "ابو";
                 else if (item.id === "bhaiya") urduLabel = "بھیا";
@@ -830,14 +837,7 @@
                     });
 
                     // Update all relative links based on new route
-                    const navKey = header.getAttribute("data-nav") || "kitchen";
-                    const navConfig = (typeof NAVIGATION_CONFIG !== "undefined" && NAVIGATION_CONFIG[navKey])
-                        ? NAVIGATION_CONFIG[navKey]
-                        : (typeof KITCHEN_CONFIG !== "undefined" && KITCHEN_CONFIG.nav ? KITCHEN_CONFIG.nav : [
-                            { id: "kitchen", label: "the kitchen", path: "kitchen/", focal: true, dividerAfter: true },
-                            { id: "culture", label: "customs", path: "kitchen/culture/" },
-                            { id: "ammi", label: "ammi", path: "kitchen/me/" }
-                        ]);
+                    const navConfig = getNavConfig(header);
 
                     const currentItem = navConfig.find(item => item.id === finalTargetId);
                     const fromPath = currentItem ? currentItem.path : "kitchen/";
@@ -865,7 +865,7 @@
                     }
                     const toggleBtn = header.querySelector(".mobile-nav-toggle");
                     if (toggleBtn) {
-                        const isSubpage = (finalTargetId !== "kitchen" && finalTargetId !== "culture");
+                        const isSubpage = (finalTargetId !== "kitchen" && finalTargetId !== "customs");
                         if (isSubpage) {
                             toggleBtn.classList.add("is-subpage-active");
                         } else {
@@ -1184,7 +1184,7 @@
                     <div class="menu-items" id="menu-items-${cat.title}">
                         ${cat.items.length > 0 ? cat.items.map(item => `
                             <div class="menu-item">
-                                <a href="${item.url || `recipes/template.html?file=${item.file}`}" class="recipe-link">
+                                <a href="${item.url}" class="recipe-link">
                                     <span class="recipe-name">${item.name}</span>
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                                         stroke-linecap="round" stroke-linejoin="round" class="link-arrow">
@@ -1261,7 +1261,7 @@
     /**
      * Initializes the Customs page by loading markdown from this_space.md.
      */
-    function initCulturePage() {
+    function initCustomsPage() {
         if (typeof KITCHEN_CONFIG !== "undefined") {
             document.title = (KITCHEN_CONFIG.name || "the kitchen") + " — customs";
         }
@@ -1279,7 +1279,7 @@
                         ? marked.parse(markdown)
                         : markdown.trim().split(/\n\s*\n/).map(p => `<p>${p.trim().replace(/\n/g, "<br>")}</p>`).join("");
                     if (!html.includes('href="#arrival-picture"')) {
-                        html = html.replace(/\b(for them)\b/gi, '<a href="#arrival-picture" class="culture-link">$1</a>');
+                        html = html.replace(/\b(for them)\b/gi, '<a href="#arrival-picture" class="customs-link">$1</a>');
                     }
                     thisSpaceEl.innerHTML = html;
                     if (!window.location.hash) {
@@ -1288,7 +1288,7 @@
                         if (document.body) document.body.scrollTop = 0;
                     }
                     thisSpaceEl.querySelectorAll('a[href="#arrival-picture"]').forEach(link => {
-                        link.classList.add("culture-link");
+                        link.classList.add("customs-link");
                         link.addEventListener("click", (e) => {
                             e.preventDefault();
                             const target = document.getElementById("arrival-picture");
@@ -1308,7 +1308,7 @@
     /**
      * Initializes the Ammi / Mom page by loading markdown from us.md.
      */
-    function initMePage() {
+    function initAmmiPage() {
         if (typeof KITCHEN_CONFIG !== "undefined") {
             document.title = (KITCHEN_CONFIG.name || "the kitchen") + " — ammi";
         }
@@ -1343,10 +1343,10 @@
             initKitchenDashboard();
         }
         if (document.getElementById("this-space-content")) {
-            initCulturePage();
+            initCustomsPage();
         }
         if (document.getElementById("us-content")) {
-            initMePage();
+            initAmmiPage();
         }
     }
 
@@ -1411,14 +1411,7 @@
         window.addEventListener("popstate", () => {
             const header = document.querySelector("header.navbar");
             if (header && (header.hasAttribute("data-nav") || header.hasAttribute("data-current"))) {
-                const navKey = header.getAttribute("data-nav") || "kitchen";
-                const navConfig = (typeof NAVIGATION_CONFIG !== "undefined" && NAVIGATION_CONFIG[navKey])
-                    ? NAVIGATION_CONFIG[navKey]
-                    : (typeof KITCHEN_CONFIG !== "undefined" && KITCHEN_CONFIG.nav ? KITCHEN_CONFIG.nav : [
-                        { id: "kitchen", label: "the kitchen", path: "kitchen/", focal: true, dividerAfter: true },
-                        { id: "culture", label: "customs", path: "kitchen/culture/" },
-                        { id: "ammi", label: "ammi", path: "kitchen/me/" }
-                    ]);
+                const navConfig = getNavConfig(header);
                 const detectedId = detectCurrentId(navConfig);
                 const currentRoute = header.getAttribute("data-current");
 
@@ -1553,8 +1546,8 @@
     // Expose globally for dynamic or manual access
     if (typeof window !== "undefined") {
         window.initKitchenDashboard = initKitchenDashboard;
-        window.initCulturePage = initCulturePage;
-        window.initMePage = initMePage;
+        window.initCustomsPage = initCustomsPage;
+        window.initAmmiPage = initAmmiPage;
         window.initActivePageContent = initActivePageContent;
         window.renderSiteNavbar = renderNavbar;
         window.initSiteNavbars = initNavbars;

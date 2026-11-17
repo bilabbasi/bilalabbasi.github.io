@@ -72,19 +72,7 @@ const GATEWAY_CONFIG = {
 
     // How long (in milliseconds) the highlighted title stays on screen before transitioning pages.
     // e.g. 900 = balanced hold; 1400 = longer hold so visitors clearly read the title; 500 = fast
-    navigationDelay: 1100,
-
-    // Backward compatibility for existing door references
-    door: {
-        professional: {
-            text: "the scientist",
-            color: "#4b5563"
-        },
-        kitchen: {
-            text: "the cook",
-            color: "#b83b14"
-        }
-    }
+    navigationDelay: 1100
 };
 
 // -------------------------------------------------------------------------
@@ -145,8 +133,8 @@ const KITCHEN_CONFIG = {
     // Navigation bar tabs (used by nav.js to auto-render headers across all kitchen pages)
     nav: [
         { id: "kitchen", label: "the kitchen", urdu: "باورچی خانہ", path: "kitchen/", focal: true, dividerAfter: true },
-        { id: "culture", label: "customs", urdu: "رسم و رواج", path: "kitchen/culture/" },
-        { id: "ammi", label: "ammi", urdu: "امی", path: "kitchen/me/" },
+        { id: "customs", label: "customs", urdu: "رسم و رواج", path: "kitchen/customs/" },
+        { id: "ammi", label: "ammi", urdu: "امی", path: "kitchen/ammi/" },
         { id: "abu", label: "abu", urdu: "ابو", isText: true },
         { id: "bhaiya", label: "bhaiya", urdu: "بھیا", isText: true, dividerAfter: true },
         { id: "bilal", label: "bilal", desktopLabel: "بلال", urdu: "بلال", path: "", isHome: true }
@@ -155,7 +143,7 @@ const KITCHEN_CONFIG = {
     // -------------------------------------------------------------------------
     // Spaces Configuration (customs, ammi, etc.)
     // -------------------------------------------------------------------------
-    // Configures the split header on sub-pages (e.g. kitchen/culture/ and kitchen/me/).
+    // Configures the split header on sub-pages (e.g. kitchen/customs/ and kitchen/ammi/).
     // - title: English title displayed on the left in large serif font.
     // - urdu: Urdu calligraphy displayed on the right.
     // - urduColor: Optional color override for the Urdu text on this specific page.
@@ -166,7 +154,7 @@ const KITCHEN_CONFIG = {
             urdu: "باورچی خانہ",
             urduColor: "#b83b14"
         },
-        culture: {
+        customs: {
             title: "customs",
             urdu: "رسم و رواج",
             urduColor: "#b83b14"
@@ -227,27 +215,12 @@ const KITCHEN_CONFIG = {
     // -------------------------------------------------------------------------
     // RECIPES LIST & MENU DIRECTORY
     // -------------------------------------------------------------------------
-    // This list powers the recipe menu grid on the kitchen home page.
+    // Powers the recipe menu grid on the kitchen home page.
     //
-    // HOW TO ADD A NEW RECIPE IN 3 SIMPLE STEPS:
-    // -------------------------------------------------------------------------
-    // Step 1: Create a new folder under "kitchen/recipes/<dish-name>/"
-    //         (e.g., "kitchen/recipes/biryani/").
-    //
-    // Step 2: Add two files in that folder:
-    //         a) "index.html" -> Copy directly from "kitchen/recipes/yellowdaal/index.html"
-    //            and change the <title> tag to your dish name.
-    //         b) "recipe.js"  -> Copy from yellowdaal/recipe.js and customize your
-    //            ingredients, quantities, steps, and optional sketch images.
-    //
-    // Step 3: Add an entry to the "recipes" list below:
-    //         {
-    //             category: "chicken" | "meat" | "veg" | "dessert",
-    //             categoryUrdu: "مرغ" | "گوشت" | "سبزی" | "میٹھی",
-    //             name: "my dish name",
-    //             url: "recipes/<dish-name>/",
-    //             description: "A short, mouth-watering one-liner about this dish."
-    //         }
+    // HOW TO ADD A NEW RECIPE:
+    // 1. Run: node kitchen/recipes/new.js <slug> [path/to/recipe.yaml]
+    // 2. Edit kitchen/recipes/<slug>/recipe.js (if you didn't pass a .yaml file).
+    // 3. Add an entry to the "recipes" array below.
     // -------------------------------------------------------------------------
     recipes: [
         {
@@ -287,63 +260,3 @@ const KITCHEN_CONFIG = {
 const NAVIGATION_CONFIG = {
     kitchen: KITCHEN_CONFIG.nav
 };
-
-// -------------------------------------------------------------------------
-// 3. AUTOMATIC KITCHEN THEME APPLICATOR
-// -------------------------------------------------------------------------
-// Applies KITCHEN_CONFIG.theme to CSS variables across kitchen and recipe pages.
-// Only applies if the current page is within the kitchen/ or recipes/ section,
-// ensuring the professional page remains strictly untouched.
-(function applyKitchenTheme() {
-    if (typeof KITCHEN_CONFIG !== "undefined" && KITCHEN_CONFIG.theme) {
-        const isKitchenPage = () => {
-            if (typeof window === "undefined" || !window.location) return true; // Default to true in node/testing
-            const path = window.location.pathname || "";
-
-            // Explicit exclusion for professional profile and root gateway pages
-            if (path.includes("/professional/") || path.endsWith("/professional") || path.endsWith("/professional/index.html")) {
-                return false;
-            }
-
-            // Check for presence of kitchen or recipe stylesheets in document
-            if (typeof document !== "undefined" && document.querySelector) {
-                if (document.querySelector('link[href*="kitchen.css"], link[href*="recipe.css"], link[href*="recipe-"]')) {
-                    return true;
-                }
-            }
-
-            // Fallback: match kitchen/ or recipes/ as the immediate page/directory segment
-            return /\/(kitchen|recipes)(\/|$)/.test(path);
-        };
-
-        const apply = () => {
-            if (!isKitchenPage()) return;
-            if (typeof document !== "undefined" && document.documentElement) {
-                const root = document.documentElement;
-                if (KITCHEN_CONFIG.theme.anchor) {
-                    root.style.setProperty("--text-subtitle", KITCHEN_CONFIG.theme.anchor);
-                    root.style.setProperty("--link-color", KITCHEN_CONFIG.theme.anchor);
-                }
-                if (KITCHEN_CONFIG.theme.distinct) {
-                    root.style.setProperty("--link-hover", KITCHEN_CONFIG.theme.distinct);
-                }
-                if (KITCHEN_CONFIG.theme.pop) {
-                    root.style.setProperty("--color-pop", KITCHEN_CONFIG.theme.pop);
-                }
-                if (KITCHEN_CONFIG.theme.urdu) {
-                    root.style.setProperty("--color-urdu", KITCHEN_CONFIG.theme.urdu);
-                }
-            }
-        };
-
-        // Expose applyTheme for programmatic/dynamic updates
-        KITCHEN_CONFIG.applyTheme = apply;
-
-        if (typeof document !== "undefined" && document.documentElement) {
-            apply();
-        }
-        if (typeof document !== "undefined" && document.addEventListener) {
-            document.addEventListener("DOMContentLoaded", apply);
-        }
-    }
-})();

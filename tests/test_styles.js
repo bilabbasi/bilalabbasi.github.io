@@ -10,7 +10,11 @@
 const assert = require('assert');
 const fs = require('fs');
 
+const indexCss = fs.readFileSync(__dirname + '/../index.css', 'utf-8');
 const kitchenCss = fs.readFileSync(__dirname + '/../kitchen.css', 'utf-8');
+
+assert.match(indexCss, /--ink-brush-mask/, 'index.css should define --ink-brush-mask');
+assert.match(indexCss, /@keyframes qalam-stroke-draw/, 'index.css should define @keyframes qalam-stroke-draw');
 
 // -----------------------------------------------------------------------------
 // 1. kitchen.css Invariants
@@ -27,7 +31,7 @@ assert.match(kitchenCss, /var\(--color-pop/, 'Pop badge should use var(--color-p
 
 assert.match(kitchenCss, /\.nav-item a:hover/, 'All nav links should have hover rules');
 assert.match(kitchenCss, /\.recipe-link::after\s*\{[^}]*mask-image:\s*var\(--ink-brush-mask\)/, 'Recipe links should use --ink-brush-mask');
-assert.match(kitchenCss, /\.culture-link::after\s*\{[^}]*mask-image:\s*var\(--ink-brush-mask\)/, 'Culture links should use --ink-brush-mask');
+assert.match(kitchenCss, /\.customs-link::after\s*\{[^}]*mask-image:\s*var\(--ink-brush-mask\)/, 'Customs links should use --ink-brush-mask');
 
 // -----------------------------------------------------------------------------
 // 2. Modular recipe stylesheets (kitchen/recipes/css/) Invariants
@@ -42,7 +46,6 @@ assert.doesNotMatch(recipeBaseCss, /:root\s*\{[^}]*--text-subtitle/, 'recipe-bas
 assert.match(recipeBaseCss, /var\(--text-subtitle/, 'recipe-base.css should use var(--text-subtitle)');
 assert.match(recipeBaseCss, /var\(--link-hover/, 'recipe-base.css should use var(--link-hover)');
 assert.match(recipeBaseCss, /var\(--color-pop\)/, 'recipe-base.css should use var(--color-pop)');
-assert.match(recipeBaseCss, /--ink-brush-mask/, 'recipe-base.css should define --ink-brush-mask');
 assert.match(recipeBaseCss, /\.recipe-indicators/, 'recipe-base.css should define .recipe-indicators');
 assert.match(recipeBaseCss, /\.nav-item a\.active::after\s*\{[^}]*mask-image:\s*var\(--ink-brush-mask\)/, 'Active back-link should use --ink-brush-mask');
 
