@@ -1,0 +1,295 @@
+/* =========================================================================
+   GATEWAY / COVER PAGE STYLES (index.html only)
+   ========================================================================= */
+
+.gateway-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px 24px 60px 24px;
+    max-width: 1440px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.gateway-card {
+    /* Optical vertical offset: lifts card slightly above exact center to avoid looking bottom-heavy */
+    --gateway-y: -20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0;
+    transform: translateY(var(--gateway-y));
+    transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gateway-card.is-exiting {
+    opacity: 0;
+    transform: translateY(calc(var(--gateway-y) - 8px));
+    pointer-events: none;
+}
+
+/* Title stack: Line 1 = "hi, i'm bilal,", Line 2 = revolving descriptor reel */
+.gateway-title {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-serif);
+    font-size: 3.5rem;
+    font-weight: 500;
+    line-height: 1.15;
+    color: var(--text-title);
+    letter-spacing: -1.2px;
+    text-align: center;
+    /* 2.3em keeps fading upper reel items from crowding Line 1 */
+    gap: 2.3em;
+}
+
+.gateway-static {
+    display: block;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.gateway-intro {
+    display: inline;
+}
+
+.gateway-name-accent {
+    color: #721817;
+}
+
+/* =========================================================================
+   FADED FLAT REEL (DESCRIPTOR STACK & INFINITE CYLINDER)
+   ========================================================================= */
+
+/* Occupies strictly one line height (1.15em) in flow so spinning descriptors never shift layout */
+.gateway-reel {
+    position: relative;
+    display: inline-block;
+    height: 1.15em;
+    line-height: 1.15em;
+    text-align: center;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.gateway-reel.is-dragging {
+    cursor: grabbing;
+}
+
+/* Invisible in-flow anchor matching the longest phrase ("the scientist") so width never jitters */
+.reel-baseline-anchor {
+    visibility: hidden;
+    display: inline-block;
+    height: 1.15em;
+    line-height: 1.15em;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    letter-spacing: inherit;
+    user-select: none;
+    pointer-events: none;
+    text-align: center;
+}
+
+.reel-viewport {
+    position: absolute;
+    top: -1.725em;
+    bottom: -1.725em;
+    left: -24px;
+    right: -24px;
+    height: 4.6em;
+    overflow: hidden;
+    pointer-events: auto;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
+}
+
+.reel-track {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    user-select: none;
+    will-change: transform;
+}
+
+.reel-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 1.15em;
+    line-height: 1.15em;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    letter-spacing: inherit;
+    text-align: center;
+    white-space: nowrap;
+    color: var(--text-muted, #9ca3af);
+    opacity: 0.18;
+    transition: color 0.22s ease, opacity 0.22s ease;
+    will-change: opacity, color;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reel-track,
+    .reel-item {
+        transition-duration: 0.01ms !important;
+    }
+}
+
+.gateway-divider-line {
+    width: 44px;
+    height: 1px;
+    background-color: rgba(30, 41, 59, 0.16);
+    margin-top: 156px;
+    margin-bottom: 24px;
+    border: none;
+    border-radius: 1px;
+    flex-shrink: 0;
+}
+
+.gateway-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    list-style: none;
+    margin-top: 0;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.gateway-link {
+    font-family: var(--font-sans);
+    font-size: 1.15rem;
+    font-weight: 400;
+    color: var(--text-body);
+    text-decoration: none;
+    letter-spacing: 0.2px;
+    transition: var(--transition-smooth);
+    border-bottom: 1.5px solid transparent;
+    padding-bottom: 2px;
+}
+
+.gateway-link:hover,
+.gateway-link.is-selected {
+    color: var(--text-title);
+    border-bottom-color: var(--text-title);
+}
+
+.gateway-link.gateway-link-kitchen:hover,
+.gateway-link.gateway-link-kitchen.is-selected {
+    color: #b83b14;
+    border-bottom-color: #b83b14;
+}
+
+.gateway-link.gateway-link-professional:hover,
+.gateway-link.gateway-link-professional.is-selected {
+    color: #4b5563;
+    border-bottom-color: #4b5563;
+}
+
+.gateway-divider {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    user-select: none;
+}
+
+.gateway-footer {
+    position: absolute;
+    bottom: 24px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    transition: opacity 0.3s ease;
+}
+
+.gateway-footer.is-exiting {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* =========================================================================
+   GATEWAY RESPONSIVE BREAKPOINTS (TABLETS & MOBILE)
+   ========================================================================= */
+
+@media (max-width: 900px) {
+    .gateway-title {
+        font-size: clamp(2.6rem, 5.5vw, 3.2rem);
+    }
+}
+
+@media (max-width: 640px) {
+    .gateway-card {
+        --gateway-y: -16px;
+        transform: translateY(var(--gateway-y));
+        width: 100%;
+    }
+
+    .gateway-title {
+        font-size: clamp(2.1rem, 7vw, 2.6rem);
+        letter-spacing: -0.8px;
+        line-height: 1.15;
+        gap: 2.2em;
+        white-space: normal;
+    }
+
+    .gateway-static {
+        display: block;
+        text-align: center;
+    }
+
+    .gateway-divider-line {
+        width: 36px;
+        margin-top: 112px;
+        margin-bottom: 20px;
+    }
+
+    .gateway-links {
+        margin-top: 0;
+        gap: 24px;
+    }
+
+    .gateway-link {
+        font-size: 1.15rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .gateway-title {
+        font-size: clamp(1.95rem, 6.5vw, 2.35rem);
+        letter-spacing: -0.6px;
+    }
+
+    .gateway-divider-line {
+        width: 32px;
+        margin-top: 104px;
+        margin-bottom: 18px;
+    }
+
+    .gateway-links {
+        margin-top: 0;
+        gap: 20px;
+    }
+
+    .gateway-link {
+        font-size: 1.1rem;
+    }
+}

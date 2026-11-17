@@ -45,6 +45,26 @@
     --ink-bleed-intensity: 2.4;
     --ink-paper-tooth: 0.22;
     --ink-press-scale-y: 0.85;
+    --ink-brush-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 16' preserveAspectRatio='none'%3E%3Cdefs%3E%3Cfilter id='f' x='-10%25' y='-40%25' width='120%25' height='180%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.05 0.2' numOctaves='3' seed='7' result='n'/%3E%3CfeDisplacementMap in='SourceGraphic' in2='n' scale='1.8' xChannelSelector='R' yChannelSelector='G'/%3E%3C/filter%3E%3C/defs%3E%3Cg filter='url(%23f)'%3E%3Cpath fill='black' fill-opacity='0.34' d='M 0.8,9.3 C 5,4.9 22,3.8 60,4.4 C 108,5.0 156,5.8 200,5.4 C 219,5.3 233,6.2 239.6,7.5 C 232,9.3 214,10.1 190,10.0 C 144,9.8 96,11.2 48,11.5 C 18,11.7 5,10.9 0.8,9.3 Z'/%3E%3Cpath fill='black' fill-opacity='0.52' d='M 1.2,9.2 C 6,5.4 22,4.4 60,4.9 C 108,5.4 156,6.1 200,5.8 C 218,5.7 232,6.5 239.2,7.5 C 231,8.9 214,9.6 192,9.5 C 146,9.3 98,10.6 50,10.9 C 20,11.1 6,10.5 1.2,9.2 Z'/%3E%3Cpath fill='black' fill-opacity='0.94' d='M 1.8,9.1 C 7,5.8 24,4.8 62,5.2 C 108,5.7 154,6.4 196,6.1 C 214,6.0 228,6.7 236.5,7.6 C 226,8.7 208,9.2 188,9.1 C 144,8.9 98,10.2 52,10.5 C 22,10.7 8,10.2 1.8,9.1 Z'/%3E%3Cpath fill='none' stroke='black' stroke-width='0.65' stroke-linecap='round' stroke-opacity='0.48' d='M 182,5.9 C 204,5.7 224,6.2 239.4,7.1 M 176,9.3 C 200,9.5 220,9.0 237.8,8.2 M 14,10.4 C 42,10.9 78,10.6 114,9.9'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+@keyframes qalam-stroke-draw {
+    0% {
+        transform: scaleX(0.06) scaleY(0.74);
+        opacity: 0.25;
+    }
+    52% {
+        transform: scaleX(1.045) scaleY(0.84);
+        opacity: 0.92;
+    }
+    82% {
+        transform: scaleX(0.982) scaleY(1.14);
+        opacity: 1;
+    }
+    100% {
+        transform: scaleX(1) scaleY(1);
+        opacity: 0.94;
+    }
 }
 
 /* Reset default browser margins and spacings to start with a clean slate */
@@ -54,7 +74,8 @@
     padding: 0;
 }
 
-/* Base styles for the document body */
+/* Reserve vertical scrollbar space on every page so navigating between
+   non-scrolling (/professional/) and scrolling (/kitchen/) never shifts layout horizontally. */
 html {
     scrollbar-gutter: stable;
 }
@@ -398,10 +419,12 @@ body {
 /* --- Main Layout: Columns split --- */
 .main-content {
     display: grid;
-    grid-template-columns: 1fr 1.25fr; /* Visual column is wider to let images occupy more space */
-    gap: 48px;                         /* Reduced gap to give more room to columns and visually tighten layout */
+    grid-template-columns: 1fr 1.25fr;
+    gap: 48px;
+    /* Fixed 60px top margin (below 40px wrapper padding + 60px navbar) anchors every
+       page title at top = 160px. Never use margin-top: auto or align-items: center here. */
     margin-top: 60px;
-    margin-bottom: auto;               /* Pushes the footer cleanly to the bottom */
+    margin-bottom: auto;
 }
 
 /* --- Left Column: Info, Bio & Links --- */
@@ -409,11 +432,9 @@ body {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    /* Reduced spacing between title, bio paragraph, and links */
     max-width: 580px;
-    /* Prevents lines of text from becoming too wide to read */
+    /* Top-align text column so varying bio lengths never push headings up or down */
     align-self: start;
-    /* Keep the text column top-aligned at the exact same location across all pages */
 }
 
 /* Header layout block */
@@ -745,324 +766,5 @@ body {
 
     .external-links {
         gap: 16px 20px;
-    }
-}
-
-/* =========================================================================
-   GATEWAY / COVER PAGE STYLES
-   ========================================================================= */
-
-/* Full-viewport flex container centering the entire landing card */
-.gateway-wrapper {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 40px 24px 60px 24px;
-    max-width: 1440px;
-    margin: 0 auto;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-/* Main card wrapper containing title, reel, divider, and links */
-.gateway-card {
-    /* Optical vertical offset: lifts card slightly above exact center to avoid looking bottom-heavy */
-    --gateway-y: -20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 0;
-    transform: translateY(var(--gateway-y));
-    transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* Exit transition state: smooth dissolve and slight upward drift before navigating */
-.gateway-card.is-exiting {
-    opacity: 0;
-    transform: translateY(calc(var(--gateway-y) - 8px));
-    pointer-events: none;
-}
-
-/* Title stack: Line 1 = "hi, i'm bilal,", Line 2 = revolving descriptor reel */
-.gateway-title {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--font-serif);
-    font-size: 3.5rem;
-    font-weight: 500;
-    line-height: 1.15;
-    color: var(--text-title);
-    letter-spacing: -1.2px;
-    text-align: center;
-    /* Vertical gap between "hi, i'm bilal," and the reel slot.
-       2.3em gives comfortable clearance so fading upper items never crowd Line 1. */
-    gap: 2.3em;
-}
-
-.gateway-static {
-    display: block;
-    text-align: center;
-    white-space: nowrap;
-}
-
-.gateway-intro {
-    display: inline;
-}
-
-/* Deep wine red accent for the name "bilal" */
-.gateway-name-accent {
-    color: #721817;
-}
-
-/* =========================================================================
-   FADED FLAT REEL (DESCRIPTOR STACK & INFINITE CYLINDER)
-   =========================================================================
-   Positioned beneath "hi, i'm bilal,", horizontally centered. */
-
-/* The reel's in-flow footprint: occupies strictly one line height (1.15em)
-   in the page flow so scrolling descriptors never cause layout shifts. */
-.gateway-reel {
-    position: relative;
-    display: inline-block;
-    height: 1.15em;
-    line-height: 1.15em;
-    text-align: center;
-    cursor: grab;
-    touch-action: none;
-    user-select: none;
-    -webkit-user-select: none;
-}
-
-.gateway-reel.is-dragging {
-    cursor: grabbing;
-}
-
-/* Invisible in-flow anchor matching the longest phrase ("the scientist")
-   to ensure the reel container reserves exact typographic width and baseline.
-   This prevents horizontal width jitter as words of different lengths spin through. */
-.reel-baseline-anchor {
-    visibility: hidden;
-    display: inline-block;
-    height: 1.15em;
-    line-height: 1.15em;
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-    letter-spacing: inherit;
-    user-select: none;
-    pointer-events: none;
-    text-align: center;
-}
-
-/* Masked viewing aperture extending above and below the anchor (4.6em total height).
-   The CSS gradient mask dissolves descriptors into transparency at the top and bottom
-   edges, creating a smooth fading cylinder effect without hard clipping lines. */
-.reel-viewport {
-    position: absolute;
-    top: -1.725em;
-    bottom: -1.725em;
-    left: -24px;
-    right: -24px;
-    height: 4.6em;
-    overflow: hidden;
-    pointer-events: auto;
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
-    mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
-}
-
-/* Track holding descriptor items, translated vertically by JavaScript */
-.reel-track {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    pointer-events: none;
-    user-select: none;
-    will-change: transform;
-}
-
-/* Base style for each item in the reel: centered in the track */
-.reel-item {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 1.15em;
-    line-height: 1.15em;
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-    letter-spacing: inherit;
-    text-align: center;
-    white-space: nowrap;
-    color: var(--text-muted, #9ca3af);
-    opacity: 0.18;
-    transition: color 0.22s ease, opacity 0.22s ease;
-    will-change: opacity, color;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .reel-track,
-    .reel-item {
-        transition-duration: 0.01ms !important;
-    }
-}
-
-/* Minimal Boundary Line separating the revolving animation above and navigation menu below */
-.gateway-divider-line {
-    width: 44px;
-    height: 1px;
-    background-color: rgba(30, 41, 59, 0.16);
-    /* Clearance placing the divider line symmetrically below the lowest faded reel item */
-    margin-top: 156px;
-    margin-bottom: 24px;
-    border: none;
-    border-radius: 1px;
-    flex-shrink: 0;
-}
-
-/* Navigation Links below the title */
-.gateway-links {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 28px;
-    list-style: none;
-    margin-top: 0;
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.gateway-link {
-    font-family: var(--font-sans);
-    font-size: 1.15rem;
-    font-weight: 400;
-    color: var(--text-body);
-    text-decoration: none;
-    letter-spacing: 0.2px;
-    transition: var(--transition-smooth);
-    border-bottom: 1.5px solid transparent;
-    padding-bottom: 2px;
-}
-
-.gateway-link:hover,
-.gateway-link.is-selected {
-    color: var(--text-title);
-    border-bottom-color: var(--text-title);
-}
-
-.gateway-link.gateway-link-kitchen:hover,
-.gateway-link.gateway-link-kitchen.is-selected {
-    color: #b83b14;
-    border-bottom-color: #b83b14;
-}
-
-.gateway-link.gateway-link-professional:hover,
-.gateway-link.gateway-link-professional.is-selected {
-    color: #4b5563;
-    border-bottom-color: #4b5563;
-}
-
-.gateway-divider {
-    color: var(--text-muted);
-    font-size: 0.95rem;
-    user-select: none;
-}
-
-.gateway-footer {
-    position: absolute;
-    bottom: 24px;
-    left: 0;
-    right: 0;
-    text-align: center;
-    transition: opacity 0.3s ease;
-}
-
-.gateway-footer.is-exiting {
-    opacity: 0;
-    pointer-events: none;
-}
-
-/* =========================================================================
-   GATEWAY RESPONSIVE BREAKPOINTS (TABLETS & MOBILE)
-   ========================================================================= */
-
-/* Tablets / Medium Viewports */
-@media (max-width: 900px) {
-    .gateway-title {
-        font-size: clamp(2.6rem, 5.5vw, 3.2rem);
-    }
-}
-
-/* Mobile Screens (portrait smartphones & large phablets) */
-@media (max-width: 640px) {
-    .gateway-card {
-        --gateway-y: -16px;
-        transform: translateY(var(--gateway-y));
-        width: 100%;
-    }
-
-    .gateway-title {
-        /* Scaled typography for mobile: ensures "the scientist" fits horizontally */
-        font-size: clamp(2.1rem, 7vw, 2.6rem);
-        letter-spacing: -0.8px;
-        line-height: 1.15;
-        /* Vertical clearance between "hi, i'm bilal," and top edge of reel */
-        gap: 2.2em;
-        white-space: normal;
-    }
-
-    .gateway-static {
-        display: block;
-        text-align: center;
-    }
-
-    /* Boundary line clearance scaled for mobile reel height */
-    .gateway-divider-line {
-        width: 36px;
-        margin-top: 112px;
-        margin-bottom: 20px;
-    }
-
-    .gateway-links {
-        margin-top: 0;
-        gap: 24px;
-    }
-
-    .gateway-link {
-        font-size: 1.15rem;
-    }
-}
-
-/* Compact Smartphones */
-@media (max-width: 480px) {
-    .gateway-title {
-        font-size: clamp(1.95rem, 6.5vw, 2.35rem);
-        letter-spacing: -0.6px;
-    }
-
-    .gateway-divider-line {
-        width: 32px;
-        margin-top: 104px;
-        margin-bottom: 18px;
-    }
-
-    .gateway-links {
-        margin-top: 0;
-        gap: 20px;
-    }
-
-    .gateway-link {
-        font-size: 1.1rem;
     }
 }

@@ -76,11 +76,12 @@ assert(indexHtml.includes('isNavigating'), 'index.html must manage isNavigating 
 assert(indexHtml.includes('is-selected'), 'index.html must apply is-selected class on click');
 assert(indexHtml.includes('is-exiting'), 'index.html must trigger is-exiting class for page transition');
 
-// 6. Test index.css for mobile-compatible cross-page transitions and boundary divider
+// 6. Test gateway.css and index.css for cross-page transitions and boundary divider
 const indexCss = fs.readFileSync(path.join(rootDir, 'index.css'), 'utf8');
-assert(indexCss.includes('.gateway-divider-line'), 'index.css must style .gateway-divider-line');
-assert(indexCss.includes('.gateway-card.is-exiting'), 'index.css must style .gateway-card.is-exiting');
-assert(indexCss.includes('.gateway-footer.is-exiting'), 'index.css must style .gateway-footer.is-exiting');
+const gatewayCss = fs.readFileSync(path.join(rootDir, 'gateway.css'), 'utf8');
+assert(gatewayCss.includes('.gateway-divider-line'), 'gateway.css must style .gateway-divider-line');
+assert(gatewayCss.includes('.gateway-card.is-exiting'), 'gateway.css must style .gateway-card.is-exiting');
+assert(gatewayCss.includes('.gateway-footer.is-exiting'), 'gateway.css must style .gateway-footer.is-exiting');
 assert(indexCss.includes('page-enter'), 'index.css must define page-enter animation for smooth entrance');
 assert(indexCss.includes('@keyframes page-enter'), 'index.css must define @keyframes page-enter');
 

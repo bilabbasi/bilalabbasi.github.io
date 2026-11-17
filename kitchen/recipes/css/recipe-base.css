@@ -26,33 +26,6 @@
     line-height: 1.2;
 }
 
-/* Style the active navigation link for the kitchen theme */
-:root {
-    --ink-brush-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 16' preserveAspectRatio='none'%3E%3Cdefs%3E%3Cfilter id='f' x='-10%25' y='-40%25' width='120%25' height='180%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.05 0.2' numOctaves='3' seed='7' result='n'/%3E%3CfeDisplacementMap in='SourceGraphic' in2='n' scale='1.8' xChannelSelector='R' yChannelSelector='G'/%3E%3C/filter%3E%3C/defs%3E%3Cg filter='url(%23f)'%3E%3Cpath fill='black' fill-opacity='0.34' d='M 0.8,9.3 C 5,4.9 22,3.8 60,4.4 C 108,5.0 156,5.8 200,5.4 C 219,5.3 233,6.2 239.6,7.5 C 232,9.3 214,10.1 190,10.0 C 144,9.8 96,11.2 48,11.5 C 18,11.7 5,10.9 0.8,9.3 Z'/%3E%3Cpath fill='black' fill-opacity='0.52' d='M 1.2,9.2 C 6,5.4 22,4.4 60,4.9 C 108,5.4 156,6.1 200,5.8 C 218,5.7 232,6.5 239.2,7.5 C 231,8.9 214,9.6 192,9.5 C 146,9.3 98,10.6 50,10.9 C 20,11.1 6,10.5 1.2,9.2 Z'/%3E%3Cpath fill='black' fill-opacity='0.94' d='M 1.8,9.1 C 7,5.8 24,4.8 62,5.2 C 108,5.7 154,6.4 196,6.1 C 214,6.0 228,6.7 236.5,7.6 C 226,8.7 208,9.2 188,9.1 C 144,8.9 98,10.2 52,10.5 C 22,10.7 8,10.2 1.8,9.1 Z'/%3E%3Cpath fill='none' stroke='black' stroke-width='0.65' stroke-linecap='round' stroke-opacity='0.48' d='M 182,5.9 C 204,5.7 224,6.2 239.4,7.1 M 176,9.3 C 200,9.5 220,9.0 237.8,8.2 M 14,10.4 C 42,10.9 78,10.6 114,9.9'/%3E%3C/g%3E%3C/svg%3E");
-}
-
-@keyframes qalam-stroke-draw {
-    0% {
-        transform: scaleX(0.06) scaleY(0.74);
-        opacity: 0.25;
-    }
-
-    52% {
-        transform: scaleX(1.045) scaleY(0.84);
-        opacity: 0.92;
-    }
-
-    82% {
-        transform: scaleX(0.982) scaleY(1.14);
-        opacity: 1;
-    }
-
-    100% {
-        transform: scaleX(1) scaleY(1);
-        opacity: 0.94;
-    }
-}
-
 .navbar {
     --ink-color: var(--link-color);
     --ink-bleed-color: var(--link-hover);
