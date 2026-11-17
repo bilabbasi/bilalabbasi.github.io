@@ -11,6 +11,8 @@ const fs = require('fs');
 const vm = require('vm');
 
 const configCode = fs.readFileSync(__dirname + '/../config.js', 'utf-8');
+const themeCode = fs.readFileSync(__dirname + '/../js/theme.js', 'utf-8');
+const combinedThemeCode = configCode + '\n' + themeCode;
 
 function createEnvironment(pathname, hasKitchenStylesheet = false) {
     const styles = {};
@@ -44,7 +46,7 @@ function createEnvironment(pathname, hasKitchenStylesheet = false) {
 // -----------------------------------------------------------------------------
 {
     const { context, styles } = createEnvironment('/kitchen/index.html', true);
-    vm.runInContext(configCode + '\n;globalThis.KITCHEN_CONFIG = KITCHEN_CONFIG;', context);
+    vm.runInContext(combinedThemeCode + '\n;globalThis.KITCHEN_CONFIG = KITCHEN_CONFIG;', context);
 
     const theme = context.KITCHEN_CONFIG.theme;
     assert.ok(theme, 'KITCHEN_CONFIG.theme must exist');
@@ -74,7 +76,7 @@ function createEnvironment(pathname, hasKitchenStylesheet = false) {
 // -----------------------------------------------------------------------------
 {
     const { context, styles } = createEnvironment('/kitchen/recipes/yellowdaal/index.html', true);
-    vm.runInContext(configCode + '\n;globalThis.KITCHEN_CONFIG = KITCHEN_CONFIG;', context);
+    vm.runInContext(combinedThemeCode + '\n;globalThis.KITCHEN_CONFIG = KITCHEN_CONFIG;', context);
 
     const theme = context.KITCHEN_CONFIG.theme;
     assert.strictEqual(styles['--text-subtitle'], theme.anchor, 'Recipe page text-subtitle matches theme.anchor');
@@ -88,7 +90,7 @@ function createEnvironment(pathname, hasKitchenStylesheet = false) {
 // -----------------------------------------------------------------------------
 {
     const { context, styles } = createEnvironment('/professional/index.html', false);
-    vm.runInContext(configCode, context);
+    vm.runInContext(combinedThemeCode, context);
 
     assert.strictEqual(styles['--link-color'], undefined, 'Professional page must not have --link-color applied');
     assert.strictEqual(styles['--text-subtitle'], undefined, 'Professional page must not have --text-subtitle applied');
@@ -101,7 +103,7 @@ function createEnvironment(pathname, hasKitchenStylesheet = false) {
 // -----------------------------------------------------------------------------
 {
     const { context, styles } = createEnvironment('/Users/bilalabbasi/kitchen-workspace/site/professional/index.html', false);
-    vm.runInContext(configCode, context);
+    vm.runInContext(combinedThemeCode, context);
 
     assert.strictEqual(styles['--link-color'], undefined, 'Ancestor folder containing "kitchen" must not bleed into professional page');
     assert.strictEqual(styles['--text-subtitle'], undefined, 'Ancestor folder containing "kitchen" must not bleed into professional page');
