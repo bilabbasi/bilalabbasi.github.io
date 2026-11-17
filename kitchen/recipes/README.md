@@ -36,7 +36,7 @@ kitchen/recipes/
    # Or start from a blank template:
    node kitchen/recipes/new.js <dish-slug> "Dish Name" "Short description."
    ```
-   This creates `kitchen/recipes/<dish-slug>/` with `index.html`, `recipe.js`, and `assets/`. If you didn't pass a `.yaml` file, edit `recipe.js` with your ingredients and steps.
+   This creates `kitchen/recipes/<dish-slug>/` with `index.html`, `recipe.js`, and `assets/`. When importing a `.yaml` file, any `image:` paths must be **absolute paths**—`new.js` copies those images into `kitchen/recipes/<dish-slug>/assets/` and rewrites `recipe.js` to reference them. If you didn't pass a `.yaml` file, edit `recipe.js` with your ingredients and steps.
 
 2. **Register the recipe in [`config.js`](../../config.js)** under `KITCHEN_CONFIG.recipes` (the script prints the exact snippet for you):
    ```javascript

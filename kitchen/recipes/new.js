@@ -71,6 +71,57 @@ let description = 'A family recipe from Ammi’s kitchen.';
 let category = 'veg';
 let categoryUrdu = 'سبزی';
 let recipeJsContent = '';
+const imagesToCopy = [];
+
+function processYamlImages(yamlText) {
+    const usedNames = new Map();
+    const lines = yamlText.split(/\r?\n/);
+
+    const updatedLines = lines.map(line => {
+        const match = line.match(/^(\s*image:\s*)(.+)$/);
+        if (!match) return line;
+
+        const prefix = match[1];
+        let rawVal = match[2].trim();
+        let comment = '';
+        const commentMatch = rawVal.match(/^((?:"[^"]*"|'[^']*'|[^\s#]+))(\s+#.*)$/);
+        if (commentMatch) {
+            rawVal = commentMatch[1];
+            comment = commentMatch[2];
+        }
+
+        const imgPath = rawVal.replace(/^["']|["']$/g, '').trim();
+        if (!imgPath) return line;
+
+        if (!path.isAbsolute(imgPath)) {
+            console.error(`Error: image path "${imgPath}" must be an absolute path.`);
+            process.exit(1);
+        }
+        if (!fs.existsSync(imgPath)) {
+            console.error(`Error: image file not found: ${imgPath}`);
+            process.exit(1);
+        }
+
+        let destName = usedNames.get(imgPath);
+        if (!destName) {
+            const base = path.basename(imgPath);
+            destName = base;
+            let counter = 2;
+            while ([...usedNames.values()].includes(destName)) {
+                const ext = path.extname(base);
+                const stem = path.basename(base, ext);
+                destName = `${stem}_${counter}${ext}`;
+                counter++;
+            }
+            usedNames.set(imgPath, destName);
+            imagesToCopy.push({ src: imgPath, destName });
+        }
+
+        return `${prefix}"assets/${destName}"${comment}`;
+    });
+
+    return updatedLines.join('\n');
+}
 
 const secondArg = positional[1];
 if (secondArg && /\.(ya?ml)$/i.test(secondArg)) {
@@ -79,7 +130,8 @@ if (secondArg && /\.(ya?ml)$/i.test(secondArg)) {
         console.error(`Error: YAML file not found: ${yamlPath}`);
         process.exit(1);
     }
-    const yamlText = fs.readFileSync(yamlPath, 'utf8').trim();
+    const rawYaml = fs.readFileSync(yamlPath, 'utf8').trim();
+    const yamlText = processYamlImages(rawYaml);
     title = readYamlScalar(yamlText, 'title') || title;
     description = readYamlScalar(yamlText, 'description') || description;
     category = readYamlScalar(yamlText, 'category') || category;
@@ -156,13 +208,16 @@ const indexHtmlContent = `<!DOCTYPE html>
 `;
 
 fs.mkdirSync(assetsDir, { recursive: true });
+for (const img of imagesToCopy) {
+    fs.copyFileSync(img.src, path.join(assetsDir, img.destName));
+}
 fs.writeFileSync(path.join(targetDir, 'index.html'), indexHtmlContent, 'utf8');
 fs.writeFileSync(path.join(targetDir, 'recipe.js'), recipeJsContent, 'utf8');
 
 console.log(`Created recipe in kitchen/recipes/${slug}/`);
 console.log(`  - index.html`);
 console.log(`  - recipe.js`);
-console.log(`  - assets/\n`);
+console.log(`  - assets/${imagesToCopy.length ? ` (${imagesToCopy.length} image${imagesToCopy.length === 1 ? '' : 's'} copied)` : ''}\n`);
 console.log(`Next, add this entry to KITCHEN_CONFIG.recipes in config.js:\n`);
 console.log(`        {
             category: "${category}",
