@@ -40,7 +40,7 @@ const GATEWAY_CONFIG = {
         items: [
             { id: "runner", label: "the runner", atmospheric: true },
             { id: "cook", label: "the cook", target: "kitchen", color: "#b83b14" },
-            { id: "scientist", label: "the scientist", target: "professional", color: "#429747ff" },
+            { id: "scientist", label: "the scientist", target: "professional", color: "#4c7abbff" },
             { id: "reader", label: "the reader", atmospheric: true },
             { id: "son", label: "the son", atmospheric: true },
             { id: "husband", label: "the husband", atmospheric: true },

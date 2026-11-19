@@ -786,6 +786,15 @@ body {
 /* Deep wine red accent for the name "bilal" */
 .gateway-name-accent {
     color: #721817;
+    transition: color 0.22s ease;
+}
+
+.gateway-card[data-state="professional"] .gateway-name-accent {
+    color: var(--gateway-professional-color, #4b5563);
+}
+
+.gateway-card[data-state="kitchen"] .gateway-name-accent {
+    color: var(--gateway-kitchen-color, #b83b14);
 }
 
 /* =========================================================================

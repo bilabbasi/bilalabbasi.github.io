@@ -127,6 +127,10 @@
 
             let currentState = initialTarget;
             let currentT = getTargetOffset(initialTarget);
+            const cardEl = document.querySelector(".gateway-card");
+            if (cardEl) {
+                cardEl.setAttribute("data-state", currentState);
+            }
 
             if (previewItem) {
                 const itemIdx = items.findIndex(it => it.id === previewItem);
@@ -250,6 +254,9 @@
                 if (reelEl) {
                     reelEl.setAttribute("data-state", newState);
                 }
+                if (cardEl) {
+                    cardEl.setAttribute("data-state", newState);
+                }
 
                 const targetT = getTargetOffset(newState);
                 animateTo(targetT, 460);
@@ -331,6 +338,7 @@
                     cancelMomentum();
                     currentState = "scrolling";
                     reelEl.setAttribute("data-state", "scrolling");
+                    if (cardEl) cardEl.setAttribute("data-state", "scrolling");
 
                     velocity += e.deltaY * wheelSensitivity;
                     const maxVel = getItemHeight() * 1.5;
@@ -347,6 +355,7 @@
                     cancelMomentum();
                     currentState = "scrolling";
                     reelEl.setAttribute("data-state", "scrolling");
+                    if (cardEl) cardEl.setAttribute("data-state", "scrolling");
 
                     touchStartY = e.touches[0].clientY;
                     lastTouchY = touchStartY;
@@ -388,6 +397,7 @@
                     cancelMomentum();
                     currentState = "scrolling";
                     reelEl.setAttribute("data-state", "scrolling");
+                    if (cardEl) cardEl.setAttribute("data-state", "scrolling");
 
                     touchStartY = e.clientY;
                     lastTouchY = touchStartY;
