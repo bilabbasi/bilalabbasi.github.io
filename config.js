@@ -28,7 +28,7 @@ const GATEWAY_CONFIG = {
     // - In resting state: all options are visible in faded grey, with the midline
     //   between "the cook" and "the scientist" centered on the second line.
     // - Hovering/clicking "kitchen": smoothly rolls "the cook" into alignment (terracotta).
-    // - Hovering/clicking "professional": smoothly rolls "the scientist" into alignment (slate grey).
+    // - Hovering/clicking "professional": smoothly rolls "the scientist" into alignment (indigo slate).
     // - Scrolling (mouse wheel, drag, or touch swipe): lets visitors explore all other descriptors (easter egg).
     reel: {
         // Descriptors in the circular reel. You can add, edit, or reorder items freely here.
@@ -40,7 +40,7 @@ const GATEWAY_CONFIG = {
         items: [
             { id: "runner", label: "the runner", atmospheric: true },
             { id: "cook", label: "the cook", target: "kitchen", color: "#b83b14" },
-            { id: "scientist", label: "the scientist", target: "professional", color: "#429747ff" },
+            { id: "scientist", label: "the scientist", target: "professional", color: "#4c7abbff" },
             { id: "reader", label: "the reader", atmospheric: true },
             { id: "son", label: "the son", atmospheric: true },
             { id: "husband", label: "the husband", atmospheric: true },

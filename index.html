@@ -32,7 +32,7 @@
                 ],
                 reel: {
                     colors: {
-                        professional: "#4b5563",
+                        professional: "#2b4162",
                         kitchen: "#b83b14"
                     }
                 }
@@ -51,7 +51,7 @@
                     const targetKey = isKitchen ? "kitchen" : "professional";
                     const linkHtml = `<a href="${link.url}" class="gateway-link ${extraClass}" data-reel="${targetKey}" data-door="${targetKey}">${link.label}</a>`;
                     return index < config.links.length - 1
-                        ? `${linkHtml}<span class="gateway-divider">/</span>`
+                        ? `${linkHtml}<span class="gateway-divider" aria-hidden="true">/</span>`
                         : linkHtml;
                 }).join("");
             }
@@ -69,7 +69,7 @@
                 if (it.id && it.color) itemColors[it.id] = it.color;
             });
             const kitchenColor = itemColors.cook || (config.reel && config.reel.colors && config.reel.colors.kitchen) || "#b83b14";
-            const professionalColor = itemColors.scientist || (config.reel && config.reel.colors && config.reel.colors.professional) || "#4b5563";
+            const professionalColor = itemColors.scientist || (config.reel && config.reel.colors && config.reel.colors.professional) || "#2b4162";
             document.documentElement.style.setProperty("--gateway-kitchen-color", kitchenColor);
             document.documentElement.style.setProperty("--gateway-professional-color", professionalColor);
 
@@ -128,6 +128,10 @@
 
             let currentState = initialTarget;
             let currentT = getTargetOffset(initialTarget);
+            const cardEl = document.querySelector(".gateway-card");
+            if (cardEl) {
+                cardEl.setAttribute("data-state", currentState);
+            }
 
             if (previewItem) {
                 const itemIdx = items.findIndex(it => it.id === previewItem);
@@ -251,6 +255,9 @@
                 if (reelEl) {
                     reelEl.setAttribute("data-state", newState);
                 }
+                if (cardEl) {
+                    cardEl.setAttribute("data-state", newState);
+                }
 
                 const targetT = getTargetOffset(newState);
                 animateTo(targetT, 460);
@@ -332,6 +339,7 @@
                     cancelMomentum();
                     currentState = "scrolling";
                     reelEl.setAttribute("data-state", "scrolling");
+                    if (cardEl) cardEl.setAttribute("data-state", "scrolling");
 
                     velocity += e.deltaY * wheelSensitivity;
                     const maxVel = getItemHeight() * 1.5;
@@ -348,6 +356,7 @@
                     cancelMomentum();
                     currentState = "scrolling";
                     reelEl.setAttribute("data-state", "scrolling");
+                    if (cardEl) cardEl.setAttribute("data-state", "scrolling");
 
                     touchStartY = e.touches[0].clientY;
                     lastTouchY = touchStartY;
@@ -389,6 +398,7 @@
                     cancelMomentum();
                     currentState = "scrolling";
                     reelEl.setAttribute("data-state", "scrolling");
+                    if (cardEl) cardEl.setAttribute("data-state", "scrolling");
 
                     touchStartY = e.clientY;
                     lastTouchY = touchStartY;
@@ -490,6 +500,25 @@
                         setReelState("resting");
                     }, 100);
                 });
+
+                // Mirror hover behavior for keyboard focus
+                linksContainer.addEventListener("focusin", (event) => {
+                    if (isNavigating) return;
+                    const link = event.target.closest("a[data-reel], a[data-door]");
+                    if (link) {
+                        const targetKey = link.getAttribute("data-reel") || link.getAttribute("data-door");
+                        setReelState(targetKey);
+                    }
+                });
+
+                linksContainer.addEventListener("focusout", () => {
+                    if (isNavigating) return;
+                    leaveTimer = setTimeout(() => {
+                        if (!linksContainer.contains(document.activeElement)) {
+                            setReelState("resting");
+                        }
+                    }, 100);
+                });
             }
 
             function resetGatewayState() {
@@ -541,10 +570,10 @@
                 </span>
             </h1>
             <div class="gateway-divider-line" aria-hidden="true"></div>
-            <nav class="gateway-links" id="gateway-links">
+            <nav class="gateway-links" id="gateway-links" aria-label="Choose a space">
                 <a href="professional/" class="gateway-link gateway-link-professional" data-reel="professional"
                     data-door="professional">professional</a>
-                <span class="gateway-divider">/</span>
+                <span class="gateway-divider" aria-hidden="true">|</span>
                 <a href="kitchen/" class="gateway-link gateway-link-kitchen" data-reel="kitchen"
                     data-door="kitchen">kitchen</a>
             </nav>
