@@ -1045,7 +1045,7 @@ body {
     align-items: flex-end;
     width: 100%;
     padding-bottom: 18px;
-    margin-bottom: 32px;
+    margin-bottom: 24px;
     border-bottom: 1px solid var(--border-color, #e7e5e4);
 }
 
@@ -1053,7 +1053,8 @@ body {
     font-family: var(--font-serif);
     font-size: 4rem;
     font-weight: 500;
-    line-height: 1;
+    line-height: 1.1;
+    min-height: 1.15em;
     color: var(--text-title);
     letter-spacing: -1.5px;
     text-transform: lowercase;
@@ -1073,7 +1074,7 @@ body {
     font-weight: 500;
     line-height: 1.5;
     padding: 0 0.1em;
-    margin-bottom: 4px;
+    margin-bottom: 10px;
     color: var(--color-urdu, #b83b14);
     background: none;
     -webkit-background-clip: border-box;
@@ -1216,17 +1217,18 @@ body {
     transform: scaleX(1.02) scaleY(var(--ink-press-scale-y, 0.85));
 }
 
-/* Match .main-content's 1fr 1.25fr split & 48px gutter so ammi aligns with the site grid */
+/* Match customs's 780px reading measure while right-aligning the photo flush with the navbar */
 .about-grid {
     display: grid;
-    grid-template-columns: 1fr 1.25fr;
+    grid-template-columns: minmax(0, 780px) auto;
+    justify-content: space-between;
     gap: 48px;
     align-items: start;
     margin-bottom: auto;
 }
 
 .about-grid .about-text {
-    max-width: 580px;
+    max-width: 780px;
 }
 
 .about-grid .about-column:last-child {
