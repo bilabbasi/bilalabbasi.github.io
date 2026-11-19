@@ -930,14 +930,14 @@ body {
 
 .gateway-link.gateway-link-kitchen:hover,
 .gateway-link.gateway-link-kitchen.is-selected {
-    color: #b83b14;
-    border-bottom-color: #b83b14;
+    color: var(--gateway-kitchen-color, #b83b14);
+    border-bottom-color: var(--gateway-kitchen-color, #b83b14);
 }
 
 .gateway-link.gateway-link-professional:hover,
 .gateway-link.gateway-link-professional.is-selected {
-    color: #4b5563;
-    border-bottom-color: #4b5563;
+    color: var(--gateway-professional-color, #4b5563);
+    border-bottom-color: var(--gateway-professional-color, #4b5563);
 }
 
 .gateway-divider {

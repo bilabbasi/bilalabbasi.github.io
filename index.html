@@ -63,6 +63,14 @@
             const anchorEl = document.querySelector(".reel-baseline-anchor");
 
             const items = (config.reel && Array.isArray(config.reel.items)) ? config.reel.items : [];
+            const itemColors = {};
+            items.forEach(it => {
+                if (it.id && it.color) itemColors[it.id] = it.color;
+            });
+            const kitchenColor = itemColors.cook || (config.reel && config.reel.colors && config.reel.colors.kitchen) || "#b83b14";
+            const professionalColor = itemColors.scientist || (config.reel && config.reel.colors && config.reel.colors.professional) || "#4b5563";
+            document.documentElement.style.setProperty("--gateway-kitchen-color", kitchenColor);
+            document.documentElement.style.setProperty("--gateway-professional-color", professionalColor);
 
             const N = items.length;
             const cookIndex = items.findIndex(it => it.id === "cook" || it.target === "kitchen");
@@ -176,9 +184,9 @@
                         el.style.opacity = "1";
                         const itemId = el.getAttribute("data-item-id");
                         if (itemId === "cook" && currentState === "kitchen") {
-                            el.style.color = "#b83b14";
+                            el.style.color = kitchenColor;
                         } else if (itemId === "scientist" && currentState === "professional") {
-                            el.style.color = "#4b5563";
+                            el.style.color = professionalColor;
                         } else {
                             el.style.color = "var(--text-title, #1e293b)";
                         }
