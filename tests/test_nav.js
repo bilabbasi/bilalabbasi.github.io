@@ -4,6 +4,7 @@ const vm = require('vm');
 
 const navCode = fs.readFileSync(__dirname + '/../nav.js', 'utf-8');
 const configCode = fs.readFileSync(__dirname + '/../config.js', 'utf-8');
+const navScript = new vm.Script(configCode + '\n' + navCode);
 
 function createNavTestEnv(initialPath = '/kitchen/index.html') {
     const listeners = {};
@@ -165,33 +166,14 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
     return { context, header, splitHeader, headerListeners, listeners, win, doc, appWrapper };
 }
 
-// 1. Test globals export
+// 1. Test renderNavbar output and exported page initializers
 {
-    const { context } = createNavTestEnv();
-    vm.runInContext(configCode + '\n' + navCode, context);
-
-    assert.strictEqual(typeof context.window.renderSiteNavbar, 'function', 'renderSiteNavbar should be exported');
-    assert.strictEqual(typeof context.window.initSiteNavbars, 'function', 'initSiteNavbars should be exported');
-    assert.strictEqual(typeof context.window.updateNavIndicator, 'function', 'updateNavIndicator should be exported');
-    assert.strictEqual(typeof context.window.renderSplitHeaders, 'function', 'renderSplitHeaders should be exported');
-    console.log('PASS: nav.js loaded and exported globals successfully.');
-}
-
-// 2. Test shared page initializers are defined
-{
-    const { context } = createNavTestEnv();
-    vm.runInContext(configCode + '\n' + navCode, context);
+    const { context, header } = createNavTestEnv('/kitchen/index.html');
+    navScript.runInContext(context);
 
     assert.strictEqual(typeof context.window.initKitchenDashboard, 'function', 'initKitchenDashboard exists');
     assert.strictEqual(typeof context.window.initCustomsPage, 'function', 'initCustomsPage exists');
     assert.strictEqual(typeof context.window.initAmmiPage, 'function', 'initAmmiPage exists');
-    console.log('PASS: Shared page initializers defined.');
-}
-
-// 3. Test renderNavbar output
-{
-    const { context, header } = createNavTestEnv('/kitchen/index.html');
-    vm.runInContext(configCode + '\n' + navCode, context);
 
     header.setAttribute('data-nav', 'kitchen');
     header.setAttribute('data-current', 'kitchen');
@@ -226,7 +208,7 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
 // 4. Test renderNavbar from customs page
 {
     const { context, header } = createNavTestEnv('/kitchen/customs/index.html');
-    vm.runInContext(configCode + '\n' + navCode, context);
+    navScript.runInContext(context);
 
     header.setAttribute('data-nav', 'kitchen');
     header.setAttribute('data-current', 'customs');
@@ -243,7 +225,7 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
 // 5. Test updateIndicator math
 {
     const { context } = createNavTestEnv();
-    vm.runInContext(configCode + '\n' + navCode, context);
+    navScript.runInContext(context);
 
     const mockNavLinks = {
         className: 'nav-links',
@@ -274,7 +256,7 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
 // 6. Test renderSplitHeaders with KITCHEN_CONFIG.spaces
 {
     const { context, splitHeader } = createNavTestEnv('/kitchen/customs/index.html');
-    vm.runInContext(configCode + '\n' + navCode, context);
+    navScript.runInContext(context);
 
     // Test with data-space="customs" (renders Urdu script without roman transliteration)
     splitHeader.setAttribute('data-space', 'customs');
@@ -297,7 +279,7 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
 // 7. Test accessible tablist semantics & procedural SVG brush stroke path morph compatibility
 {
     const { context, header } = createNavTestEnv('/kitchen/index.html');
-    vm.runInContext(configCode + '\n' + navCode, context);
+    navScript.runInContext(context);
 
     header.setAttribute('data-nav', 'kitchen');
     header.setAttribute('data-current', 'kitchen');
@@ -319,7 +301,7 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
 // 8. Test Kinetic Layout Engine (anisotropic qalam stretch, contraction, and 150ms bloom)
 {
     const { context } = createNavTestEnv('/kitchen/index.html');
-    vm.runInContext(configCode + '\n' + navCode, context);
+    navScript.runInContext(context);
 
     let stageKeyframes = null;
     let stageOptions = null;
@@ -395,7 +377,7 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
             setProperty: (k, v) => { rootProps[k] = v; }
         }
     };
-    vm.runInContext(configCode + '\n' + navCode, context);
+    navScript.runInContext(context);
 
     const classes = new Set();
     const mockGhost = {
@@ -465,7 +447,7 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
 // 12. Test renderRecipeNavbar for stationary "← the kitchen | <recipe_name>"
 {
     const { context } = createNavTestEnv('/kitchen/recipes/yellowdaal/index.html');
-    vm.runInContext(configCode + '\n' + navCode, context);
+    navScript.runInContext(context);
 
     const header = context.document.createElement('header');
     header.className = 'navbar';
