@@ -61,13 +61,7 @@ const GATEWAY_CONFIG = {
         //   * 0.85 = brisk stop (little momentum)
         //   * 0.92 = smooth natural decay (default)
         //   * 0.96 = long glide before magnetic settling
-        friction: 0.92,
-
-        // Colors for each interactive target
-        colors: {
-            professional: "#4b5563",
-            kitchen: "#b83b14"
-        }
+        friction: 0.92
     },
 
     // How long (in milliseconds) the highlighted title stays on screen before transitioning pages.

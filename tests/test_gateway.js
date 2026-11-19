@@ -50,8 +50,8 @@ assert(configJs.includes('husband'), 'config.js must configure husband');
 assert(configJs.includes('cyclist'), 'config.js must configure cyclist');
 assert(configJs.includes('gamer'), 'config.js must configure gamer');
 assert(configJs.includes('friend'), 'config.js must configure friend');
-assert(configJs.includes('#4b5563'), 'config.js reel must configure slate grey #4b5563');
-assert(configJs.includes('#b83b14'), 'config.js reel must configure terracotta #b83b14');
+assert(/id:\s*"scientist"[^}]*color:\s*"#[0-9a-fA-F]{6,8}"/.test(configJs), 'config.js scientist item must configure a hex color');
+assert(/id:\s*"cook"[^}]*color:\s*"#[0-9a-fA-F]{6,8}"/.test(configJs), 'config.js cook item must configure a hex color');
 
 // 4. Test vertical translation percentages
 // 4 items: runner (0), cook (1), scientist (2), reader (3). Total track height = 4h.
