@@ -49,6 +49,94 @@
                     </a>
                 `).join("");
             }
+
+            // 5. Wire up "Let's get to work." message modal with JS-obfuscated mailto delivery
+            const trigger = document.getElementById("contact-trigger");
+            const modal = document.getElementById("contact-modal");
+            const closeBtn = document.getElementById("contact-close");
+            const form = document.getElementById("contact-form");
+            const messageInput = document.getElementById("contact-message");
+            const fallbackBox = document.getElementById("contact-fallback");
+            const mailtoLink = document.getElementById("contact-mailto-link");
+            const gmailLink = document.getElementById("contact-gmail-link");
+            const copyBtn = document.getElementById("contact-copy-btn");
+
+            function decodeContactEmail() {
+                const cfg = PROFESSIONAL_CONFIG.contact;
+                if (!cfg || !Array.isArray(cfg.codes)) return "";
+                return cfg.codes.map(c => String.fromCharCode(c ^ cfg.key)).join("");
+            }
+
+            function openModal() {
+                if (!modal) return;
+                if (fallbackBox) fallbackBox.hidden = true;
+                if (form) form.hidden = false;
+                modal.classList.add("is-open");
+                modal.setAttribute("aria-hidden", "false");
+                if (messageInput) setTimeout(() => messageInput.focus(), 50);
+            }
+
+            function closeModal() {
+                if (!modal) return;
+                modal.classList.remove("is-open");
+                modal.setAttribute("aria-hidden", "true");
+                if (trigger) trigger.focus();
+            }
+
+            if (trigger && modal) {
+                trigger.addEventListener("click", openModal);
+                if (closeBtn) closeBtn.addEventListener("click", closeModal);
+                modal.addEventListener("click", (e) => {
+                    if (e.target === modal) closeModal();
+                });
+                document.addEventListener("keydown", (e) => {
+                    if (e.key === "Escape" && modal.classList.contains("is-open")) {
+                        closeModal();
+                    }
+                });
+            }
+
+            if (form) {
+                form.addEventListener("submit", (e) => {
+                    e.preventDefault();
+                    const recipient = decodeContactEmail();
+                    if (!recipient) return;
+
+                    const name = (document.getElementById("contact-name")?.value || "").trim();
+                    const subject = (document.getElementById("contact-subject")?.value || "").trim() || "Hello from bilalabbasi.com";
+                    const rawBody = (messageInput?.value || "").trim();
+                    const body = name ? `${rawBody}\n\n— ${name}` : rawBody;
+
+                    const mailtoUrl = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+                    // Trigger native mail client via synthetic anchor click (more reliable than location.href)
+                    const a = document.createElement("a");
+                    a.href = mailtoUrl;
+                    a.style.display = "none";
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+
+                    // Show fallback options in case the browser/OS has no default mailto: handler
+                    if (mailtoLink) mailtoLink.href = mailtoUrl;
+                    if (gmailLink) gmailLink.href = gmailUrl;
+                    if (copyBtn) {
+                        copyBtn.textContent = "copy email";
+                        copyBtn.onclick = async () => {
+                            try {
+                                await navigator.clipboard.writeText(recipient);
+                                copyBtn.textContent = "copied!";
+                            } catch {
+                                copyBtn.textContent = recipient;
+                            }
+                        };
+                    }
+                    form.hidden = true;
+                    if (fallbackBox) fallbackBox.hidden = false;
+                    form.reset();
+                });
+            }
         });
     </script>
 </head>
@@ -95,6 +183,41 @@
             <p>&copy; 2026 Bilal Abbasi. All rights reserved.</p>
         </footer>
 
+    </div>
+
+    <!-- Minimalist Contact Message Modal -->
+    <div class="contact-modal" id="contact-modal" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title" aria-hidden="true">
+        <div class="contact-modal-card">
+            <div class="contact-modal-header">
+                <h2 class="contact-modal-title" id="contact-modal-title">let's get to work</h2>
+                <button type="button" class="contact-modal-close" id="contact-close" aria-label="Close message box">&times;</button>
+            </div>
+            <form class="contact-form" id="contact-form">
+                <label class="contact-field">
+                    <span class="contact-label">name</span>
+                    <input type="text" id="contact-name" class="contact-input" placeholder="optional" autocomplete="name">
+                </label>
+                <label class="contact-field">
+                    <span class="contact-label">subject</span>
+                    <input type="text" id="contact-subject" class="contact-input" placeholder="Hello from bilalabbasi.com">
+                </label>
+                <label class="contact-field">
+                    <span class="contact-label">message</span>
+                    <textarea id="contact-message" class="contact-textarea" rows="4" placeholder="Write your message..." required></textarea>
+                </label>
+                <div class="contact-actions">
+                    <button type="submit" class="contact-submit">send message</button>
+                </div>
+            </form>
+            <div class="contact-fallback" id="contact-fallback" hidden>
+                <p class="contact-fallback-note">Your mail app should open with this draft. If nothing opened, choose an option below:</p>
+                <div class="contact-fallback-actions">
+                    <a id="contact-gmail-link" class="contact-submit" target="_blank" rel="noopener noreferrer">open in Gmail</a>
+                    <a id="contact-mailto-link" class="contact-secondary-btn">open mail app</a>
+                    <button type="button" id="contact-copy-btn" class="contact-secondary-btn">copy email</button>
+                </div>
+            </div>
+        </div>
     </div>
 
 </body>

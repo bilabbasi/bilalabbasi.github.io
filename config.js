@@ -92,7 +92,13 @@ const PROFESSIONAL_CONFIG = {
     subtitle: "Research Scientist, PhD",
 
     // Your biography paragraph
-    bio: "I am a research scientist at <a href=\"https://www.interdigital.com\" target=\"_blank\" rel=\"noopener noreferrer\">InterDigital</a>, working on AI-based video compression. Previously, I was a researcher at <a href=\"https://eidosmontreal.com\" target=\"_blank\" rel=\"noopener noreferrer\">Eidos-Montréal</a>, working on deep learning for meshes. And, before that, I was doing a PhD at <a href=\"https://www.mcgill.ca\" target=\"_blank\" rel=\"noopener noreferrer\">McGill University</a> in Applied Mathematics. \n \n Let's get to work.",
+    bio: "I am a research scientist at <a href=\"https://www.interdigital.com\" target=\"_blank\" rel=\"noopener noreferrer\">InterDigital</a>, working on AI-based video compression. Previously, I was a researcher at <a href=\"https://eidosmontreal.com\" target=\"_blank\" rel=\"noopener noreferrer\">Eidos-Montréal</a>, working on deep learning for meshes. And, before that, I was doing a PhD at <a href=\"https://www.mcgill.ca\" target=\"_blank\" rel=\"noopener noreferrer\">McGill University</a> in Applied Mathematics. \n \n <button type=\"button\" class=\"bio-contact-trigger\" id=\"contact-trigger\">Let's get to work.</button>",
+
+    // Obfuscated contact email (XOR-encoded char codes decoded only on form submit)
+    contact: {
+        codes: [43, 32, 37, 40, 37, 103, 40, 43, 43, 40, 58, 32, 103, 43, 40, 9, 46, 36, 40, 32, 37, 103, 42, 38, 36],
+        key: 73
+    },
 
     // Tab title
     tab: "professional me",
