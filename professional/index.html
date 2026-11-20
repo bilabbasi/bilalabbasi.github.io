@@ -21,6 +21,14 @@
     <!-- Loader Script: Automatically inserts the data from config.js -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+            // Sync hover accent with "the scientist" color in config.js
+            const scientistItem = (typeof GATEWAY_CONFIG !== "undefined" && GATEWAY_CONFIG.reel && Array.isArray(GATEWAY_CONFIG.reel.items))
+                ? GATEWAY_CONFIG.reel.items.find(it => it.id === "scientist" || it.target === "professional")
+                : null;
+            if (scientistItem && scientistItem.color) {
+                document.documentElement.style.setProperty("--scientist-color", scientistItem.color);
+            }
+
             // 1. Update browser tab title
             document.title = PROFESSIONAL_CONFIG.name;
 

@@ -511,46 +511,61 @@ body {
 }
 
 .professional-content .bio-paragraph a {
-    text-decoration: underline;
-    text-decoration-color: rgba(24, 24, 27, 0.3);
-    text-decoration-thickness: 1px;
-    text-underline-offset: 3px;
+    text-decoration: none;
+    background-image:
+        linear-gradient(var(--scientist-color, #4c7abb), var(--scientist-color, #4c7abb)),
+        linear-gradient(rgba(24, 24, 27, 0.16), rgba(24, 24, 27, 0.16));
+    background-size: 0% 1px, 100% 1px;
+    background-position: 0 100%, 0 100%;
+    background-repeat: no-repeat;
+    padding-bottom: 2px;
+    transition: color 0.22s ease, text-shadow 0.22s ease, background-size 0.24s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .bio-paragraph a:hover,
 .bio-paragraph a:focus,
 .bio-paragraph a:focus-visible {
-    color: var(--link-hover, #0f172a);
-    font-weight: 600;
+    color: var(--scientist-color, #4c7abb);
 }
 
 .professional-content .bio-paragraph a:hover,
 .professional-content .bio-paragraph a:focus,
 .professional-content .bio-paragraph a:focus-visible {
-    text-decoration-color: var(--link-hover, #0f172a);
+    text-shadow: 0 0 0.015em currentColor;
+    background-size: 100% 1px, 100% 1px;
 }
 
 .bio-contact-trigger {
     background: none;
     border: none;
-    padding: 0;
+    padding: 0 0 2px 0;
     margin: 0;
     font: inherit;
     color: inherit;
     cursor: pointer;
-    text-decoration: underline;
-    text-decoration-color: rgba(24, 24, 27, 0.3);
-    text-decoration-thickness: 1px;
-    text-underline-offset: 3px;
-    transition: color var(--transition-smooth), text-decoration-color var(--transition-smooth);
+    text-decoration: none;
+    background-image:
+        linear-gradient(var(--scientist-color, #4c7abb), var(--scientist-color, #4c7abb)),
+        linear-gradient(rgba(24, 24, 27, 0.16), rgba(24, 24, 27, 0.16));
+    background-size: 0% 1px, 100% 1px;
+    background-position: 0 100%, 0 100%;
+    background-repeat: no-repeat;
+    transition: color 0.22s ease, text-shadow 0.22s ease, background-size 0.24s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .bio-contact-trigger:hover,
 .bio-contact-trigger:focus-visible {
-    color: var(--link-hover, #0f172a);
-    font-weight: 600;
-    text-decoration-color: var(--link-hover, #0f172a);
+    color: var(--scientist-color, #4c7abb);
+    text-shadow: 0 0 0.015em currentColor;
+    background-size: 100% 1px, 100% 1px;
     outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .professional-content .bio-paragraph a,
+    .bio-contact-trigger {
+        transition-duration: 0.01ms !important;
+    }
 }
 
 /* --- Contact Message Modal --- */
