@@ -453,7 +453,14 @@ body {
     color: inherit;
     text-decoration: none;
     cursor: pointer;
-    transition: color var(--transition-smooth);
+    transition: color var(--transition-smooth), text-decoration-color var(--transition-smooth);
+}
+
+.professional-content .bio-paragraph a {
+    text-decoration: underline;
+    text-decoration-color: rgba(24, 24, 27, 0.3);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
 }
 
 .bio-paragraph a:hover,
@@ -461,6 +468,12 @@ body {
 .bio-paragraph a:focus-visible {
     color: var(--link-hover, #0f172a);
     font-weight: 600;
+}
+
+.professional-content .bio-paragraph a:hover,
+.professional-content .bio-paragraph a:focus,
+.professional-content .bio-paragraph a:focus-visible {
+    text-decoration-color: var(--link-hover, #0f172a);
 }
 
 /* Outer wrapper block for the social links row */
