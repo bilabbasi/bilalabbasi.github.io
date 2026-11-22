@@ -39,9 +39,16 @@
             const titleEl = document.getElementById("title-text");
             if (titleEl) titleEl.textContent = PROFESSIONAL_CONFIG.subtitle || "Research Scientist, PhD";
 
-            // 3. Set bio text
+            // 3. Set bio text and append contact trigger from config
+            const contactLabel = (PROFESSIONAL_CONFIG.contact && PROFESSIONAL_CONFIG.contact.label) || "Get in touch.";
             const bioEl = document.getElementById("bio-text");
-            if (bioEl) bioEl.innerHTML = PROFESSIONAL_CONFIG.bio;
+            if (bioEl) {
+                bioEl.innerHTML = `${PROFESSIONAL_CONFIG.bio}\n\n<button type="button" class="bio-contact-trigger" id="contact-trigger">${contactLabel}</button>`;
+            }
+            const modalTitleEl = document.getElementById("contact-modal-title");
+            if (modalTitleEl) {
+                modalTitleEl.textContent = contactLabel.replace(/\.$/, "").toLowerCase();
+            }
 
             // 4. Generate the social/profile links dynamically
             const linksList = document.getElementById("links-list");
@@ -58,7 +65,7 @@
                 `).join("");
             }
 
-            // 5. Wire up "Let's get to work." message modal with JS-obfuscated mailto delivery
+            // 5. Wire up contact message modal with JS-obfuscated mailto delivery
             const trigger = document.getElementById("contact-trigger");
             const modal = document.getElementById("contact-modal");
             const closeBtn = document.getElementById("contact-close");
@@ -197,7 +204,7 @@
     <div class="contact-modal" id="contact-modal" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title" aria-hidden="true">
         <div class="contact-modal-card">
             <div class="contact-modal-header">
-                <h2 class="contact-modal-title" id="contact-modal-title">let's get to work</h2>
+                <h2 class="contact-modal-title" id="contact-modal-title"></h2>
                 <button type="button" class="contact-modal-close" id="contact-close" aria-label="Close message box">&times;</button>
             </div>
             <form class="contact-form" id="contact-form">
