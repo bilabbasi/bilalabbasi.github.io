@@ -193,7 +193,8 @@ const indexHtmlContent = `<!DOCTYPE html>
     <!-- Navigation Component -->
     <script src="../../../nav.js" defer></script>
 
-    <!-- Recipe Data -->
+    <!-- Recipe Data & Ingredient Catalog -->
+    <script src="../../ingredients/catalog.js"></script>
     <script src="recipe.js"></script>
 
     <!-- Shared Recipe Engine -->

@@ -38,6 +38,55 @@ ingredients:
 steps:
   - section: "Pressure Cooker Method"
     image: "../../../assets/kitchen_sketch_step1.png"
+    tools:
+      - pressure_cooker
+    ingredients:
+      - name: toor_daal
+        form: dry
+        amount: "1/2"
+        unit: cup
+      - name: chana_daal
+        form: dry
+        amount: 1
+        unit: tbsp
+      - name: onion
+        form: sliced
+        amount: "1/2"
+        unit: medium
+      - name: tomato
+        form: chopped
+        amount: "1/2"
+        unit: medium
+      - name: garlic
+        form: paste
+        amount: 2
+        unit: tsp
+      - name: ginger
+        form: paste
+        amount: 2
+        unit: tsp
+      - name: turmeric
+        form: powder
+        amount: "1/2"
+        unit: tsp
+      - name: coriander_powder
+        form: powder
+        amount: 1.5
+        unit: tsp
+      - name: green_chilli
+        form: whole
+        amount: "5-6"
+      - name: olive_oil
+        form: liquid
+        amount: 4
+        unit: tsp
+      - name: water
+        form: liquid
+        amount: 1.5
+        unit: cups
+      - name: salt
+        form: powder
+        amount: to taste
     items:
       - "Put all of the ingredients for the daal into a pressure cooker and set to medium-high."
       - "Wait for 7-8 whistles and then reduce heat to low."
@@ -53,12 +102,60 @@ steps:
       - "Use a hand blender to lightly blend the daal mixture (do not turn into a smooth purée)."
   - section: "Prepare the Tarka"
     image: "../../../assets/kitchen_sketch_step4.png"
+    tools:
+      - saucepan
+    ingredients:
+      - name: ghee
+        form: melted
+        amount: 3
+        unit: tbsp
+      - name: cumin_seeds
+        form: whole
+        amount: 2
+        unit: tbsp
+      - name: onion
+        form: chopped
+        amount: "1/4"
+        unit: medium
+      - name: garlic
+        form: minced
+        amount: 5
+        unit: cloves
     items:
       - "In a small saucepan, heat the ghee over medium heat."
       - "Once the ghee is glistening, add the cumin seeds, minced garlic, and chopped onions."
       - "Fry until golden brown and aromatic, being careful not to burn the garlic."
       - "Pour the hot tarka mixture directly into the cooked daal and stir."
   - section: "Kachumbar & Serve"
+    tools:
+      - bowl
+    ingredients:
+      - name: onion
+        form: chopped
+        amount: "1/4"
+        unit: medium
+      - name: vinegar
+        form: liquid
+        amount: 1
+        unit: tsp
+      - name: green_chilli
+        form: sliced
+        amount: 1
+      - name: sugar
+        form: granulated
+        amount: 1
+        unit: pinch
+      - name: kashmiri_chili
+        form: powder
+        amount: 1
+        unit: pinch
+      - name: lemon_juice
+        form: liquid
+        amount: 1
+        unit: tbsp
+      - name: salt
+        form: powder
+        amount: to taste
     items:
       - "Kachumbar: Mix all of the chopped onion, vinegar, green chilli, sugar, Kashmiri chili powder, lemon juice, and salt in a bowl."
       - "Serve the hot tarka daal over rice with the fresh kachumbar salad on the side."
