@@ -1184,8 +1184,8 @@
                     <div class="menu-items" id="menu-items-${cat.title}">
                         ${cat.items.length > 0 ? cat.items.map(item => `
                             <div class="menu-item">
-                                <a href="${item.url}" class="recipe-link">
-                                    <span class="recipe-name">${item.name}</span>
+                                <a href="${item.url}" class="recipe-link"${item.isTest ? ' style="color: #dc2626;"' : ''}>
+                                    <span class="recipe-name"${item.isTest ? ' style="color: #dc2626;"' : ''}>${item.name}</span>
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                                         stroke-linecap="round" stroke-linejoin="round" class="link-arrow">
                                         <line x1="7" y1="17" x2="17" y2="7"></line>

@@ -214,6 +214,36 @@ const KITCHEN_CONFIG = {
     },
 
     // -------------------------------------------------------------------------
+    // FLOATING INGREDIENT LENS & STEP TRANSITIONS
+    // -------------------------------------------------------------------------
+    // Controls the Apple Watch-style hover lens on desktop, layout spacing,
+    // and mobile tap-to-focus / vertical swipe transitions.
+    // -------------------------------------------------------------------------
+    floatingLens: {
+        // Desktop hover lens
+        maxScale: 1.75,               // Peak magnification directly under cursor (e.g. 1.5 - 2.0)
+        baseScale: 0.96,              // Resting scale for items outside the hover radius
+        radiusPx: 58,                 // Gaussian falloff radius in px (smaller = more isolated)
+        neighborPushPx: 26,           // Subtle outward nudge of nearby items (0 to disable)
+        maxBlurPx: 3.5,               // Smooth background blur on unfocused items (0 to disable)
+        minOpacity: 0.55,             // Subtle fade on unfocused background items (1.0 to disable)
+        focusThreshold: 0.45,         // Focus falloff (0-1) before background blur & text fade start
+        spring: 0.10,                 // 60fps zoom/blur smoothing (0.06 = slow/silky, 0.25 = snappy)
+
+        // Stage sizing & spacing
+        heroBaseSizePx: 74,           // Base icon size on the recipe landing page
+        heroPaddingPx: 18,            // Minimum gap between items on the landing page
+        stepPaddingPx: 28,            // Minimum gap between active items in desktop step-by-step
+
+        // Mobile tap-to-focus & vertical swipe
+        mobileFocusScale: 1.42,       // Scale of tapped/focused ingredient on mobile
+        mobileBgBlurPx: 3.5,          // Background blur when an ingredient is tapped on mobile
+        mobileBgOpacity: 0.38,        // Background opacity when an ingredient is tapped on mobile
+        mobileFocusDurationMs: 280,   // Duration (ms) of mobile tap-to-focus & unblur transition
+        mobileSwipeFadeFactor: 1.15   // Cross-fade speed during mobile vertical step swipe
+    },
+
+    // -------------------------------------------------------------------------
     // RECIPES LIST & MENU DIRECTORY
     // -------------------------------------------------------------------------
     // Powers the recipe menu grid on the kitchen home page.
@@ -237,6 +267,14 @@ const KITCHEN_CONFIG = {
             name: "dahi ka bhagar",
             url: "recipes/dahi_bhagar/",
             description: "Yogurt, rice, daal. What else?"
+        },
+        {
+            category: "veg",
+            categoryUrdu: "سبزی",
+            name: "test tarka aloo",
+            url: "recipes/test_recipe/",
+            description: "4-step stress-test recipe using real ingredient PNGs.",
+            isTest: true
         },
         {
             category: "meat",
