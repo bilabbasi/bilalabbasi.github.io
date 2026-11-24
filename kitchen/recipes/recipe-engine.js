@@ -47,12 +47,7 @@
             return; // Already present
         }
 
-        let initialMode = 'side-by-side';
-        try {
-            if (window.location.hash === '#step-by-step' || sessionStorage.getItem('recipe_view_mode') === 'step-by-step') {
-                initialMode = 'step-by-step';
-            }
-        } catch (e) {}
+        let initialMode = window.location.hash === '#step-by-step' ? 'step-by-step' : 'side-by-side';
         const isStepMode = initialMode === 'step-by-step';
 
         const markup = `
@@ -998,7 +993,6 @@
             if (indStep) indStep.classList.remove('active');
 
             try {
-                sessionStorage.setItem('recipe_view_mode', 'side-by-side');
                 if (window.location.hash === '#step-by-step') {
                     history.replaceState(null, '', window.location.pathname + window.location.search + '#side-by-side');
                 }
@@ -1022,7 +1016,6 @@
             if (indStep) indStep.classList.add('active');
 
             try {
-                sessionStorage.setItem('recipe_view_mode', 'step-by-step');
                 if (window.location.hash !== '#step-by-step') {
                     history.replaceState(null, '', window.location.pathname + window.location.search + '#step-by-step');
                 }
@@ -1445,12 +1438,7 @@
 
         updateScrollButtonVisibility();
 
-        let initialMode = 'side-by-side';
-        try {
-            if (window.location.hash === '#step-by-step' || sessionStorage.getItem('recipe_view_mode') === 'step-by-step') {
-                initialMode = 'step-by-step';
-            }
-        } catch (e) {}
+        const initialMode = window.location.hash === '#step-by-step' ? 'step-by-step' : 'side-by-side';
 
         if (initialMode === 'step-by-step') {
             window.selectRecipeMode('step-by-step', false);
