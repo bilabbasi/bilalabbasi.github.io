@@ -432,6 +432,9 @@
             stepsScrollingColumn.innerHTML = stepsStepByStepHtml;
 
             if (hasAnyStructuredSteps) {
+                const stepSection = document.getElementById('step-by-step');
+                if (stepSection) stepSection.classList.add('is-structured-steps');
+
                 const floatingItems = collectRecipeItems(recipe);
                 const seedKey = recipe.title || 'recipe';
 
@@ -451,7 +454,7 @@
                 `;
                 bindFloatingStageInteractions(sketchLayers);
                 bindMobileSwipeUrduToggles(sketchLayers);
-                layoutFloatingStage(sketchLayers.querySelector('.floating-stage'));
+                updateStickyLayers(1);
             } else {
                 sketchLayers.innerHTML = sketchLayersHtml;
             }
@@ -585,17 +588,36 @@
         const rows = Math.max(1, Math.ceil(count / cols));
 
         const slots = [];
-        for (let r = 0; r < rows; r++) {
-            for (let c = 0; c < cols; c++) {
-                slots.push({
-                    x: ((c + 0.5) / cols) * (W - 100) + 50 + (rand() - 0.5) * 28,
-                    y: ((r + 0.5) / rows) * (usableH - 80) + 40 + (rand() - 0.5) * 22
-                });
+        if (activeOnly) {
+            // Balanced per-row centering so step items distribute uniformly across the stage
+            const marginX = Math.min(72, W * 0.12);
+            const marginY = Math.min(64, usableH * 0.12);
+            const basePerRow = Math.floor(count / rows);
+            const extra = count % rows;
+            for (let r = 0; r < rows; r++) {
+                const rowCount = basePerRow + (r < extra ? 1 : 0);
+                const y = ((r + 0.5) / rows) * (usableH - marginY * 2) + marginY;
+                for (let c = 0; c < rowCount; c++) {
+                    const x = ((c + 0.5) / rowCount) * (W - marginX * 2) + marginX;
+                    slots.push({
+                        x: x + (rand() - 0.5) * 14,
+                        y: y + (rand() - 0.5) * 12
+                    });
+                }
             }
-        }
-        for (let i = slots.length - 1; i > 0; i--) {
-            const j = Math.floor(rand() * (i + 1));
-            [slots[i], slots[j]] = [slots[j], slots[i]];
+        } else {
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    slots.push({
+                        x: ((c + 0.5) / cols) * (W - 100) + 50 + (rand() - 0.5) * 28,
+                        y: ((r + 0.5) / rows) * (usableH - 80) + 40 + (rand() - 0.5) * 22
+                    });
+                }
+            }
+            for (let i = slots.length - 1; i > 0; i--) {
+                const j = Math.floor(rand() * (i + 1));
+                [slots[i], slots[j]] = [slots[j], slots[i]];
+            }
         }
 
         const boxes = nodes.map((el, idx) => {
@@ -850,6 +872,7 @@
 
             // Only apply background blur when pointer is actively focusing near at least one item
             let peakFocus = 0;
+            let peakItem = null;
             const foci = [];
             items.forEach(item => {
                 let st = animState.get(item);
@@ -869,7 +892,10 @@
                     vy = cy - pointerY;
                     dist = Math.hypot(vx, vy);
                     g = Math.exp(-(dist * dist) / twoSigmaSq);
-                    if (g > peakFocus) peakFocus = g;
+                    if (g > peakFocus) {
+                        peakFocus = g;
+                        peakItem = item;
+                    }
                 }
                 foci.push({ item, st, g, vx, vy, dist });
             });
@@ -884,18 +910,24 @@
                 let z = 1;
 
                 if (pointerX !== null && pointerY !== null) {
-                    targetScale = baseScale + (maxScale - baseScale) * g;
-                    if (pushPx > 0 && dist > 4 && dist < sigma * 2.5) {
+                    const isWinner = item === peakItem && peakFocus >= focusThreshold;
+                    // Plateau at full maxScale inside the hovered item's core so tiny cursor jitters don't shake it
+                    const plateauG = g >= 0.68 ? 1 : g / 0.68;
+                    targetScale = baseScale + (maxScale - baseScale) * plateauG;
+
+                    // Only push surrounding unfocused neighbors, never the zoomed-in winner
+                    if (pushPx > 0 && !isWinner && g < focusThreshold && dist > 4 && dist < sigma * 2.5) {
                         const push = pushPx * g * (1 - g) * 4;
                         targetDx = (vx / dist) * push;
                         targetDy = (vy / dist) * push;
                     }
-                    // Smooth, continuous depth-of-field blur & caption fade on background items
-                    const bgWeight = Math.max(0, Math.min(1, (focusThreshold - g) / Math.max(0.01, focusThreshold))) * peakFocus;
+                    // Smooth, continuous depth-of-field blur & caption fade on non-winning items
+                    const bgWeight = isWinner ? 0 : Math.max(0, Math.min(1, (focusThreshold - g) / Math.max(0.01, focusThreshold))) * peakFocus;
+                    const captionFade = isWinner ? 1 : Math.max(0, 1 - peakFocus * 1.35);
                     targetBlur = maxBlurPx * bgWeight;
                     targetOpacity = 1 - (1 - minOpacity) * bgWeight;
-                    targetTextOpacity = 1 - bgWeight;
-                    z = Math.round(1 + g * 30);
+                    targetTextOpacity = captionFade;
+                    z = isWinner ? 40 : Math.round(1 + plateauG * 25);
                 }
 
                 st.scale += (targetScale - st.scale) * spring;
@@ -981,7 +1013,10 @@
         } else if (mode === 'step-by-step') {
             sideBySideSection.style.display = 'none';
             stepByStepSection.style.display = 'block';
-            layoutFloatingStage(document.querySelector('#sketch-layers .floating-stage'));
+            const stepStage = document.querySelector('#sketch-layers .floating-stage');
+            if (stepStage) {
+                layoutFloatingStage(stepStage, { activeOnly: Boolean(stepStage.querySelector('.floating-item.is-inactive')) });
+            }
 
             if (indSide) indSide.classList.remove('active');
             if (indStep) indStep.classList.add('active');
@@ -1540,30 +1575,18 @@
         const floatingStageLayer = document.querySelector('#sketch-layers .step-floating-stage-layer');
         if (floatingStageLayer) {
             floatingStageLayer.classList.add('active');
+            const effectiveStep = stepNum <= 0 ? 1 : stepNum;
             const items = floatingStageLayer.querySelectorAll('.floating-stage.is-step-stage .floating-item');
             items.forEach(item => {
                 const stepMap = JSON.parse(item.getAttribute('data-step-map') || '{}');
                 const qtyEl = item.querySelector('.floating-item-qty');
                 const isUrdu = item.classList.contains('is-urdu');
 
-                if (stepNum === 0) {
-                    if (window.innerWidth <= 900) {
-                        item.classList.remove('is-active');
-                        item.classList.add('is-inactive');
-                    } else {
-                        item.classList.add('is-active');
-                        item.classList.remove('is-inactive');
-                        const qEn = item.getAttribute('data-total-qty-en') || '';
-                        const qUr = item.getAttribute('data-total-qty-ur') || '';
-                        item.setAttribute('data-current-qty-en', qEn);
-                        item.setAttribute('data-current-qty-ur', qUr);
-                        if (qtyEl) qtyEl.textContent = isUrdu ? qUr : qEn;
-                    }
-                } else if (stepMap[stepNum]) {
+                if (stepMap[effectiveStep]) {
                     item.classList.add('is-active');
                     item.classList.remove('is-inactive');
-                    const qEn = stepMap[stepNum].qtyEn || '';
-                    const qUr = stepMap[stepNum].qtyUr || '';
+                    const qEn = stepMap[effectiveStep].qtyEn || '';
+                    const qUr = stepMap[effectiveStep].qtyUr || '';
                     item.setAttribute('data-current-qty-en', qEn);
                     item.setAttribute('data-current-qty-ur', qUr);
                     if (qtyEl) qtyEl.textContent = isUrdu ? qUr : qEn;
@@ -1573,7 +1596,7 @@
                 }
             });
             const stage = floatingStageLayer.querySelector('.floating-stage');
-            layoutFloatingStage(stage, { activeOnly: stepNum > 0 });
+            layoutFloatingStage(stage, { activeOnly: true });
             return;
         }
 
@@ -1597,7 +1620,9 @@
         updateScrollButtonVisibility();
         updateRecipeNavbarState();
         updateQalamProgress();
-        document.querySelectorAll('.floating-stage').forEach(layoutFloatingStage);
+        document.querySelectorAll('.floating-stage').forEach(stage => {
+            layoutFloatingStage(stage, { activeOnly: Boolean(stage.querySelector('.floating-item.is-inactive')) });
+        });
     }, { passive: true });
 
     window.addEventListener('scroll', () => {

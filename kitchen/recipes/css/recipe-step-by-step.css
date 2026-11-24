@@ -140,6 +140,24 @@
     margin-bottom: auto;
 }
 
+/* Structured recipes on desktop: scrolling steps on LEFT, sticky ingredients on RIGHT */
+.step-by-step-section.is-structured-steps .split-steps-container {
+    grid-template-columns: 1fr 1.25fr;
+    gap: 48px;
+}
+
+.step-by-step-section.is-structured-steps .steps-scrolling-column {
+    grid-column: 1;
+    grid-row: 1;
+    align-items: flex-start;
+    padding: 0 16px 0 40px;
+}
+
+.step-by-step-section.is-structured-steps .visual-sticky-column {
+    grid-column: 2;
+    grid-row: 1;
+}
+
 /* Sticky Visual Left Column */
 .visual-sticky-column {
     position: sticky;
@@ -469,6 +487,25 @@
         width: 100%;
         max-width: 100%;
         overflow: hidden;
+    }
+
+    /* Reset structured desktop column swap back to stacked mobile layout */
+    .step-by-step-section.is-structured-steps .split-steps-container {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .step-by-step-section.is-structured-steps .visual-sticky-column {
+        grid-column: 1;
+        grid-row: 1;
+        background-color: var(--bg-main);
+    }
+
+    .step-by-step-section.is-structured-steps .steps-scrolling-column {
+        grid-column: 1;
+        grid-row: 2;
+        align-items: center;
+        padding: 0 32px 0 20px;
     }
 
     .step-floating-stage-layer .floating-stage.is-step-stage {
