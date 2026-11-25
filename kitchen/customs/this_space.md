@@ -2,11 +2,11 @@ this space is meant to be a tiny window into my life as someone who grew up at t
 
 my story is certainly not unique, but it is my own
 
-through recipes given by my mom, this space is hopefully a reminder that food is more then just a dictation of ingredients and steps
+through recipes given by my mom, this space is hopefully a reminder that food is more than just a dictation of ingredients and steps
 
 it’s a collection of nostalgia, heritage, and customs
 
-this space is a tribute to all of the kids who were too embarassed to bring their food to school
+this space is a tribute to all of the kids who were too embarrassed to bring their food to school
 
 it's a tribute to the kids who got excited seeing The Simpsons go to India
 

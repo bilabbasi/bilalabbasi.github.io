@@ -150,7 +150,7 @@
     letter-spacing: inherit;
     text-align: center;
     white-space: nowrap;
-    color: var(--text-muted, #9ca3af);
+    color: var(--text-muted, #6b7280);
     opacity: 0.18;
     transition: color 0.22s ease, opacity 0.22s ease;
     will-change: opacity, color;
@@ -288,6 +288,7 @@
 
 .gateway-divider {
     color: var(--text-muted);
+    opacity: 0.55;
     font-size: 0.95rem;
     user-select: none;
 }
@@ -297,6 +298,7 @@
     bottom: 24px;
     left: 0;
     right: 0;
+    justify-content: center;
     text-align: center;
     transition: opacity 0.3s ease;
 }

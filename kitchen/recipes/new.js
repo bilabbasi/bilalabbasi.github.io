@@ -176,6 +176,11 @@ const indexHtmlContent = `<!DOCTYPE html>
     <meta name="author" content="Bilal Abbasi">
     <meta name="robots" content="index, follow">
 
+    <!-- Fonts: Lora, Inter, and Noto Nastaliq Urdu -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Nastaliq+Urdu:wght@400..700&display=swap">
+
     <!-- Stylesheets -->
     <link rel="stylesheet" href="../../../index.css">
     <link rel="stylesheet" href="../css/recipe-base.css">

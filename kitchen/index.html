@@ -8,9 +8,14 @@
     <title>the kitchen</title>
 
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Bilal Abbasi's culinary corner. Sourdough baking, recipes, and food science.">
+    <meta name="description" content="Childhood recipes from an Indian immigrant household, family photographs, and essays honoring diaspora heritage and Urdu.">
     <meta name="author" content="Bilal Abbasi">
     <meta name="robots" content="index, follow">
+
+    <!-- Fonts: Lora, Inter, and Noto Nastaliq Urdu -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Nastaliq+Urdu:wght@400..700&display=swap">
 
     <!-- Stylesheets: Controls how the website and kitchen look -->
     <link rel="stylesheet" href="../index.css">
@@ -53,7 +58,7 @@
                     </div>
                 </div>
 
-                <!-- Right Column: Visual Sourdough Sketch -->
+                <!-- Right Column: Visual Kitchen Sketch -->
                 <div class="visual-column">
                     <div class="sketch-container">
                         <img src="../assets/kitchen_sketch.png"
@@ -73,7 +78,7 @@
                 onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); document.getElementById('menu').scrollIntoView({ behavior: 'smooth' }); }">
                 <span class="scroll-text">the menu</span>
                 <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
                     <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
             </div>

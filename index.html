@@ -13,6 +13,11 @@
     <meta name="author" content="Bilal Abbasi">
     <meta name="robots" content="index, follow">
 
+    <!-- Fonts: Lora & Inter (loaded via <link> without Urdu font on English-only gateway) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+
     <!-- Stylesheets: Base tokens/typography + gateway cover layout -->
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="gateway.css">
@@ -25,14 +30,13 @@
         document.addEventListener("DOMContentLoaded", () => {
             const config = (typeof GATEWAY_CONFIG !== 'undefined') ? GATEWAY_CONFIG : {
                 name: "hi, i'm bilal",
-                greetingPrefix: "hi, i'm bilal, the",
                 links: [
                     { label: "office", url: "office/", target: "office" },
                     { label: "kitchen", url: "kitchen/", target: "kitchen" }
                 ],
                 reel: {
                     colors: {
-                        office: "#2b4162",
+                        office: "#3d68a8",
                         kitchen: "#b83b14"
                     }
                 }
@@ -197,13 +201,13 @@
                         }
                     } else if (d < 0.78) {
                         el.style.opacity = "0.40";
-                        el.style.color = "var(--text-muted, #9ca3af)";
+                        el.style.color = "var(--text-muted, #6b7280)";
                     } else if (d < 1.78) {
                         el.style.opacity = "0.18";
-                        el.style.color = "var(--text-muted, #9ca3af)";
+                        el.style.color = "var(--text-muted, #6b7280)";
                     } else {
                         el.style.opacity = "0";
-                        el.style.color = "var(--text-muted, #9ca3af)";
+                        el.style.color = "var(--text-muted, #6b7280)";
                     }
                 }
             }
@@ -539,7 +543,7 @@
             });
 
             document.addEventListener("visibilitychange", () => {
-                if (document.visibilityState === "visible") {
+                if (document.visibilityState === "visible" && isNavigating) {
                     resetGatewayState();
                 }
             });
@@ -573,7 +577,7 @@
             <nav class="gateway-links" id="gateway-links" aria-label="Choose a space">
                 <a href="office/" class="gateway-link gateway-link-office" data-reel="office"
                     data-door="office">office</a>
-                <span class="gateway-divider" aria-hidden="true">|</span>
+                <span class="gateway-divider" aria-hidden="true">/</span>
                 <a href="kitchen/" class="gateway-link gateway-link-kitchen" data-reel="kitchen"
                     data-door="kitchen">kitchen</a>
             </nav>

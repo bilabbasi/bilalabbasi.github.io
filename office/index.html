@@ -8,9 +8,14 @@
     <title>Bilal Abbasi</title>
 
     <!-- SEO Meta Tags - Helps Google find the site -->
-    <meta name="description" content="Personal space of Bilal Abbasi. Focused on systems engineering and research.">
+    <meta name="description" content="Bilal Abbasi — Research Scientist (PhD, McGill) working on AI-based video compression and deep learning for meshes.">
     <meta name="author" content="Bilal Abbasi">
     <meta name="robots" content="index, follow">
+
+    <!-- Fonts: Lora & Inter (loaded via <link> without Urdu font on English-only page) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap">
 
     <!-- Stylesheet: Controls how the website looks (colors, fonts, sizes) -->
     <link rel="stylesheet" href="../index.css">
@@ -47,7 +52,7 @@
             }
             const modalTitleEl = document.getElementById("contact-modal-title");
             if (modalTitleEl) {
-                modalTitleEl.textContent = contactLabel.replace(/\.$/, "").toLowerCase();
+                modalTitleEl.textContent = contactLabel.replace(/\.$/, "");
             }
 
             // 4. Generate the social/profile links dynamically
@@ -57,7 +62,7 @@
                     <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="external-link">
                         ${link.label}
                         <!-- Inline SVG: Creates the small arrow icon pointing top-right (↗) next to links -->
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
                             <line x1="7" y1="17" x2="17" y2="7"></line>
                             <polyline points="7 7 17 7 17 17"></polyline>
                         </svg>
@@ -70,6 +75,7 @@
             const modal = document.getElementById("contact-modal");
             const closeBtn = document.getElementById("contact-close");
             const form = document.getElementById("contact-form");
+            const nameInput = document.getElementById("contact-name");
             const messageInput = document.getElementById("contact-message");
             const fallbackBox = document.getElementById("contact-fallback");
             const mailtoLink = document.getElementById("contact-mailto-link");
@@ -82,13 +88,20 @@
                 return cfg.codes.map(c => String.fromCharCode(c ^ cfg.key)).join("");
             }
 
+            function getModalFocusables() {
+                if (!modal) return [];
+                return Array.from(modal.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'))
+                    .filter(el => !el.closest('[hidden]') && el.offsetParent !== null);
+            }
+
             function openModal() {
                 if (!modal) return;
                 if (fallbackBox) fallbackBox.hidden = true;
                 if (form) form.hidden = false;
                 modal.classList.add("is-open");
                 modal.setAttribute("aria-hidden", "false");
-                if (messageInput) setTimeout(() => messageInput.focus(), 50);
+                const firstField = nameInput || messageInput;
+                if (firstField) setTimeout(() => firstField.focus(), 50);
             }
 
             function closeModal() {
@@ -105,8 +118,25 @@
                     if (e.target === modal) closeModal();
                 });
                 document.addEventListener("keydown", (e) => {
-                    if (e.key === "Escape" && modal.classList.contains("is-open")) {
+                    if (!modal.classList.contains("is-open")) return;
+                    if (e.key === "Escape") {
                         closeModal();
+                        return;
+                    }
+                    if (e.key === "Tab") {
+                        const focusables = getModalFocusables();
+                        if (focusables.length === 0) return;
+                        const first = focusables[0];
+                        const last = focusables[focusables.length - 1];
+                        if (e.shiftKey) {
+                            if (document.activeElement === first || !modal.contains(document.activeElement)) {
+                                e.preventDefault();
+                                last.focus();
+                            }
+                        } else if (document.activeElement === last || !modal.contains(document.activeElement)) {
+                            e.preventDefault();
+                            first.focus();
+                        }
                     }
                 });
             }
@@ -137,11 +167,11 @@
                     if (mailtoLink) mailtoLink.href = mailtoUrl;
                     if (gmailLink) gmailLink.href = gmailUrl;
                     if (copyBtn) {
-                        copyBtn.textContent = "copy email";
+                        copyBtn.textContent = "Copy email";
                         copyBtn.onclick = async () => {
                             try {
                                 await navigator.clipboard.writeText(recipient);
-                                copyBtn.textContent = "copied!";
+                                copyBtn.textContent = "Copied!";
                             } catch {
                                 copyBtn.textContent = recipient;
                             }
@@ -161,8 +191,8 @@
     <!-- Main wrapper holding the header, main content, and footer -->
     <div class="app-wrapper">
 
-        <!-- Header: Fixed-height navbar preserving vertical alignment stability -->
-        <header class="navbar"></header>
+        <!-- Header: Fixed-height spacer preserving vertical alignment stability -->
+        <header class="navbar" aria-hidden="true"></header>
 
         <!-- Main Content Area: Split into two columns -->
         <main class="main-content office-content" id="me">
@@ -187,7 +217,7 @@
             <div class="visual-column">
                 <div class="sketch-container office-sketch">
                     <img src="../assets/office/watercolor_office_image_transparent.png"
-                        alt="Conceptual mechanical line illustration" class="sketch-img">
+                        alt="Watercolor illustration of a raccoon mapped through layered mathematical manifolds" class="sketch-img">
                 </div>
             </div>
 
@@ -210,7 +240,7 @@
             <form class="contact-form" id="contact-form">
                 <label class="contact-field">
                     <span class="contact-label">name</span>
-                    <input type="text" id="contact-name" class="contact-input" placeholder="optional" autocomplete="name">
+                    <input type="text" id="contact-name" class="contact-input" placeholder="Optional" autocomplete="name">
                 </label>
                 <label class="contact-field">
                     <span class="contact-label">subject</span>
@@ -221,15 +251,15 @@
                     <textarea id="contact-message" class="contact-textarea" rows="4" placeholder="Write your message..." required></textarea>
                 </label>
                 <div class="contact-actions">
-                    <button type="submit" class="contact-submit">send message</button>
+                    <button type="submit" class="contact-submit">Send message</button>
                 </div>
             </form>
             <div class="contact-fallback" id="contact-fallback" hidden>
                 <p class="contact-fallback-note">Your mail app should open with this draft. If nothing opened, choose an option below:</p>
                 <div class="contact-fallback-actions">
-                    <a id="contact-gmail-link" class="contact-submit" target="_blank" rel="noopener noreferrer">open in Gmail</a>
-                    <a id="contact-mailto-link" class="contact-secondary-btn">open mail app</a>
-                    <button type="button" id="contact-copy-btn" class="contact-secondary-btn">copy email</button>
+                    <a id="contact-gmail-link" class="contact-submit" target="_blank" rel="noopener noreferrer">Open in Gmail</a>
+                    <a id="contact-mailto-link" class="contact-secondary-btn">Open mail app</a>
+                    <button type="button" id="contact-copy-btn" class="contact-secondary-btn">Copy email</button>
                 </div>
             </div>
         </div>

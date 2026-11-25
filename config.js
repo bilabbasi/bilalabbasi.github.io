@@ -9,7 +9,6 @@
 // -------------------------------------------------------------------------
 const GATEWAY_CONFIG = {
     name: "hi, i'm bilal",
-    greetingPrefix: "hi, i'm bilal, the",
     // Navigation links shown at the bottom of the gateway
     links: [
         {
@@ -40,7 +39,7 @@ const GATEWAY_CONFIG = {
         items: [
             { id: "runner", label: "the runner", atmospheric: true },
             { id: "cook", label: "the cook", target: "kitchen", color: "#b83b14" },
-            { id: "scientist", label: "the scientist", target: "office", color: "#4c7abbff" },
+            { id: "scientist", label: "the scientist", target: "office", color: "#3d68a8" },
             { id: "reader", label: "the reader", atmospheric: true },
             { id: "son", label: "the son", atmospheric: true },
             { id: "husband", label: "the husband", atmospheric: true },
@@ -89,9 +88,6 @@ const OFFICE_CONFIG = {
         key: 73
     },
 
-    // Tab title
-    tab: "office",
-
     // Links to your profiles (LinkedIn, Google Scholar, GitHub, etc.)
     links: [
         {
@@ -127,9 +123,6 @@ const KITCHEN_CONFIG = {
     
     all credit goes to my mom.
     only the mistakes are mine.`,
-
-    // Tab title
-    tab: "kitchen me",
 
     // Navigation bar tabs (used by nav.js to auto-render headers across all kitchen pages)
     nav: [
@@ -188,8 +181,8 @@ const KITCHEN_CONFIG = {
     // Changing these colors will automatically propagate across all kitchen
     // and recipe pages without touching any CSS files.
     theme: {
-        anchor: "#c55c00ff",    // Primary warm amber/terracotta: links, subtitles, resting ink
-        distinct: "#693501ff",  // Electric tangerine: hover states & active underline
+        anchor: "#c55c00",    // Roasted saffron: links, subtitles, resting ink
+        distinct: "#693501",  // Clove umber: hover states & active underline
         pop: "#2b4162",       // Accent slate: badges, category tags, focal highlights
         urdu: "#b83b14"       // Rich terracotta pigment: Urdu calligraphy subtitle in space headers
     },
@@ -285,7 +278,7 @@ const KITCHEN_CONFIG = {
         },
         {
             category: "meat",
-            categoryUrdu: "کاری",
+            categoryUrdu: "گوشت",
             name: "cari",
             url: "recipes/cari/",
             description: "A coconut and anees dish unlike anything you've tried before. I promise."
