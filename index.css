@@ -4,9 +4,6 @@
    This file controls the colors, sizes, alignment, and fonts of the page.
    Follow the comments below to easily customize the layout of your site. */
 
-/* Import Google Fonts (Lora for serif heading, Inter for clean body text, Noto Nastaliq Urdu for Urdu calligraphy) */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Nastaliq+Urdu:wght@400..700&display=swap');
-
 /* Define design colors and settings so they can be changed in one place */
 :root {
     --bg-main: #ffffff;
@@ -17,8 +14,8 @@
     /* Color of the subtitle (muted charcoal) */
     --text-body: #4b5563;
     /* Color of your bio paragraphs (muted charcoal) */
-    --text-muted: #9ca3af;
-    /* Color for minor symbols and arrow indicators (light gray) */
+    --text-muted: #6b7280;
+    /* Color for minor symbols, captions, and footers (WCAG AA 4.8:1 on #ffffff) */
     --link-color: #18181b;
     /* Default color of link text */
     --link-hover: #4b5563;
@@ -61,13 +58,13 @@ html {
 
 html,
 body {
-    height: 100%;
+    min-height: 100%;
     background-color: var(--bg-main);
     color: var(--text-body);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
-    overflow: hidden;
-    /* Desktop layout: Lock height to prevent page scrolling */
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 /* Custom design for scrollbars (appears only when screen size is small) */
@@ -89,7 +86,7 @@ body {
 .app-wrapper {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    min-height: 100vh;
     padding: 40px 80px 24px 80px;
     /* Padding: 40px top, 80px left/right, 24px bottom */
     max-width: 1440px;
@@ -418,25 +415,6 @@ body {
     align-items: baseline;
 }
 
-/* Smooth fade-in for page elements after typing finishes */
-.profile-fade {
-    opacity: 0;
-    transition: opacity 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-.profile-fade.visible {
-    opacity: 1;
-}
-
-.info-column .profile-fade {
-    transform: translateY(6px);
-    transition: opacity 0.8s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-.info-column .profile-fade.visible {
-    transform: translateY(0);
-}
-
 /* Bio Paragraph */
 .bio-paragraph {
     font-size: 1.05rem;
@@ -459,7 +437,7 @@ body {
 .professional-content .bio-paragraph a {
     text-decoration: none;
     background-image:
-        linear-gradient(var(--scientist-color, #4c7abb), var(--scientist-color, #4c7abb)),
+        linear-gradient(var(--scientist-color, #3d68a8), var(--scientist-color, #3d68a8)),
         linear-gradient(rgba(24, 24, 27, 0.16), rgba(24, 24, 27, 0.16));
     background-size: 0% 1px, 100% 1px;
     background-position: 0 100%, 0 100%;
@@ -471,7 +449,7 @@ body {
 .bio-paragraph a:hover,
 .bio-paragraph a:focus,
 .bio-paragraph a:focus-visible {
-    color: var(--scientist-color, #4c7abb);
+    color: var(--scientist-color, #3d68a8);
 }
 
 .professional-content .bio-paragraph a:hover,
@@ -491,7 +469,7 @@ body {
     cursor: pointer;
     text-decoration: none;
     background-image:
-        linear-gradient(var(--scientist-color, #4c7abb), var(--scientist-color, #4c7abb)),
+        linear-gradient(var(--scientist-color, #3d68a8), var(--scientist-color, #3d68a8)),
         linear-gradient(rgba(24, 24, 27, 0.16), rgba(24, 24, 27, 0.16));
     background-size: 0% 1px, 100% 1px;
     background-position: 0 100%, 0 100%;
@@ -501,7 +479,7 @@ body {
 
 .bio-contact-trigger:hover,
 .bio-contact-trigger:focus-visible {
-    color: var(--scientist-color, #4c7abb);
+    color: var(--scientist-color, #3d68a8);
     text-shadow: 0 0 0.015em currentColor;
     background-size: 100% 1px, 100% 1px;
     outline: none;
@@ -574,16 +552,23 @@ body {
     border: none;
     font-size: 1.5rem;
     line-height: 1;
-    color: var(--text-muted, #9ca3af);
+    color: var(--text-muted, #6b7280);
     cursor: pointer;
     padding: 4px;
+    min-width: 32px;
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
     transition: color 0.18s ease;
 }
 
 .contact-modal-close:hover,
 .contact-modal-close:focus-visible {
     color: var(--text-title, #18181b);
-    outline: none;
+    outline: 2px solid var(--text-title, #18181b);
+    outline-offset: 2px;
 }
 
 .contact-form {
@@ -608,7 +593,7 @@ body {
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--text-muted, #9ca3af);
+    color: var(--text-body, #4b5563);
 }
 
 .contact-input,
@@ -798,6 +783,10 @@ body {
         gap: 56px;
     }
 
+    .professional-content .main-subtitle {
+        font-size: clamp(2.15rem, 3.05vw, 2.75rem);
+    }
+
     .professional-sketch {
         margin-top: -45px;
     }
@@ -899,6 +888,18 @@ body {
 
     .info-column {
         max-width: 100%;
+    }
+
+    .bio-paragraph {
+        text-align: left;
+    }
+
+    .external-link {
+        min-height: 44px;
+    }
+
+    .external-link::after {
+        bottom: 9px;
     }
 
     .sketch-container {
@@ -1112,7 +1113,7 @@ body {
     letter-spacing: inherit;
     text-align: center;
     white-space: nowrap;
-    color: var(--text-muted, #9ca3af);
+    color: var(--text-muted, #6b7280);
     opacity: 0.18;
     transition: color 0.22s ease, opacity 0.22s ease;
     will-change: opacity, color;
@@ -1162,26 +1163,36 @@ body {
     padding-bottom: 2px;
 }
 
+.gateway-link:focus-visible {
+    outline: none;
+    border-radius: 4px;
+    box-shadow: 0 0 0 2px var(--bg-main, #ffffff), 0 0 0 3.5px currentColor;
+}
+
 .gateway-link:hover,
+.gateway-link:focus-visible,
 .gateway-link.is-selected {
     color: var(--text-title);
     border-bottom-color: var(--text-title);
 }
 
 .gateway-link.gateway-link-kitchen:hover,
+.gateway-link.gateway-link-kitchen:focus-visible,
 .gateway-link.gateway-link-kitchen.is-selected {
     color: var(--gateway-kitchen-color, #b83b14);
     border-bottom-color: var(--gateway-kitchen-color, #b83b14);
 }
 
 .gateway-link.gateway-link-professional:hover,
+.gateway-link.gateway-link-professional:focus-visible,
 .gateway-link.gateway-link-professional.is-selected {
-    color: var(--gateway-professional-color, #4b5563);
-    border-bottom-color: var(--gateway-professional-color, #4b5563);
+    color: var(--gateway-professional-color, #3d68a8);
+    border-bottom-color: var(--gateway-professional-color, #3d68a8);
 }
 
 .gateway-divider {
     color: var(--text-muted);
+    opacity: 0.55;
     font-size: 0.95rem;
     user-select: none;
 }
@@ -1191,6 +1202,7 @@ body {
     bottom: 24px;
     left: 0;
     right: 0;
+    justify-content: center;
     text-align: center;
     transition: opacity 0.3s ease;
 }
