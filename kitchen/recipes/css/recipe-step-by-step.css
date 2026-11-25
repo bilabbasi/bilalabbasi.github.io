@@ -234,7 +234,7 @@
 }
 
 .floating-stage-hint [lang="ur"] {
-    font-family: 'Noto Nastaliq Urdu', 'Geeza Pro', serif;
+    font-family: var(--font-urdu);
     font-size: 0.92rem;
     color: var(--color-urdu, #b83b14);
 }
@@ -341,7 +341,7 @@
 
 .floating-item.is-urdu .floating-item-name,
 .floating-item.is-urdu .floating-item-qty {
-    font-family: 'Noto Nastaliq Urdu', 'Geeza Pro', serif;
+    font-family: var(--font-urdu);
     color: var(--color-urdu, #b45309);
 }
 

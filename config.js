@@ -184,7 +184,16 @@ const KITCHEN_CONFIG = {
         anchor: "#c55c00",    // Roasted saffron: links, subtitles, resting ink
         distinct: "#693501",  // Clove umber: hover states & active underline
         pop: "#2b4162",       // Accent slate: badges, category tags, focal highlights
-        urdu: "#b83b14"       // Rich terracotta pigment: Urdu calligraphy subtitle in space headers
+        urdu: "#b83b14",      // Rich terracotta pigment: Urdu calligraphy subtitle in space headers
+        // Centralized Urdu calligraphy font for all kitchen & recipe pages (loaded automatically by js/theme.js).
+        // Examples:
+        //   { family: "Gulzar", googleFonts: "Gulzar" }
+        //   { family: "Noto Nastaliq Urdu", googleFonts: "Noto+Nastaliq+Urdu:wght@400..700" }
+        //   { family: "Aref Ruqaa", googleFonts: "Aref+Ruqaa:wght@400;700" }
+        urduFont: {
+            family: "Noto Nastaliq Urdu",
+            googleFonts: "Noto+Nastaliq+Urdu:wght@400..700"
+        }
     },
 
     // -------------------------------------------------------------------------

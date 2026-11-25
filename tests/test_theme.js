@@ -60,6 +60,7 @@ function createEnvironment(pathname, hasKitchenStylesheet = false) {
     assert.strictEqual(styles['--link-hover'], theme.distinct, '--link-hover should match theme.distinct');
     assert.strictEqual(styles['--color-pop'], theme.pop, '--color-pop should match theme.pop');
     assert.strictEqual(styles['--color-urdu'], theme.urdu, '--color-urdu should match theme.urdu');
+    assert.ok(styles['--font-urdu'] && styles['--font-urdu'].includes(theme.urduFont.family), '--font-urdu should include theme.urduFont.family');
 
     // Test dynamic runtime color updates via KITCHEN_CONFIG.applyTheme()
     assert.strictEqual(typeof context.KITCHEN_CONFIG.applyTheme, 'function');
@@ -96,6 +97,7 @@ function createEnvironment(pathname, hasKitchenStylesheet = false) {
     assert.strictEqual(styles['--text-subtitle'], undefined, 'Office page must not have --text-subtitle applied');
     assert.strictEqual(styles['--color-pop'], undefined, 'Office page must not have --color-pop applied');
     assert.strictEqual(styles['--color-urdu'], undefined, 'Office page must not have --color-urdu applied');
+    assert.strictEqual(styles['--font-urdu'], undefined, 'Office page must not have --font-urdu applied');
 }
 
 // -----------------------------------------------------------------------------

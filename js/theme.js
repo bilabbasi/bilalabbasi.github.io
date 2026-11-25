@@ -44,6 +44,32 @@
         if (theme.urdu) {
             root.style.setProperty("--color-urdu", theme.urdu);
         }
+        if (theme.urduFont) {
+            const family = typeof theme.urduFont === "string" ? theme.urduFont : theme.urduFont.family;
+            const query = typeof theme.urduFont === "string"
+                ? theme.urduFont.trim().replace(/\s+/g, "+")
+                : (theme.urduFont.googleFonts || (family ? family.trim().replace(/\s+/g, "+") : ""));
+
+            if (family) {
+                root.style.setProperty(
+                    "--font-urdu",
+                    `'${family}', 'Urdu Typesetting', 'Jameel Noori Nastaleeq', 'Geeza Pro', Tahoma, serif`
+                );
+            }
+            if (query && document.head && document.createElement) {
+                const href = `https://fonts.googleapis.com/css2?family=${query}&display=swap`;
+                let link = document.getElementById ? document.getElementById("kitchen-urdu-font") : null;
+                if (!link) {
+                    link = document.createElement("link");
+                    link.id = "kitchen-urdu-font";
+                    link.rel = "stylesheet";
+                    link.href = href;
+                    document.head.appendChild(link);
+                } else if (link.href !== href) {
+                    link.href = href;
+                }
+            }
+        }
     }
 
     KITCHEN_CONFIG.applyTheme = applyTheme;
