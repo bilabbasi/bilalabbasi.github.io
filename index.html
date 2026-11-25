@@ -66,6 +66,28 @@
             const reelEl = document.getElementById("gateway-reel");
             const trackEl = document.getElementById("reel-track");
             const anchorEl = document.querySelector(".reel-baseline-anchor");
+            const restingPhraseEl = document.getElementById("reel-resting-phrase");
+            if (restingPhraseEl && config.reel && config.reel.restingLabel) {
+                restingPhraseEl.textContent = config.reel.restingLabel;
+            }
+            if (reelEl && config.reel && config.reel.evaporation) {
+                const ev = config.reel.evaporation;
+                if (typeof ev.duration === "number") {
+                    reelEl.style.setProperty("--evap-duration", `${ev.duration}ms`);
+                }
+                if (typeof ev.revealDuration === "number") {
+                    reelEl.style.setProperty("--reel-reveal-duration", `${ev.revealDuration}ms`);
+                }
+                if (typeof ev.blur === "number") {
+                    reelEl.style.setProperty("--evap-blur", `${ev.blur}px`);
+                }
+                if (typeof ev.rise === "number") {
+                    reelEl.style.setProperty("--evap-rise", `${-Math.abs(ev.rise)}px`);
+                }
+                if (typeof ev.spread === "number") {
+                    reelEl.style.setProperty("--evap-spread", `${ev.spread}em`);
+                }
+            }
 
             const items = (config.reel && Array.isArray(config.reel.items)) ? config.reel.items : [];
             const itemColors = {};
@@ -94,29 +116,46 @@
                 trackEl.innerHTML = trackHtml;
             }
 
-            function getItemHeight() {
-                if (anchorEl && anchorEl.offsetHeight > 0) {
-                    return anchorEl.offsetHeight;
+            const viewportEl = reelEl ? reelEl.querySelector(".reel-viewport") : null;
+
+            function getHorizontalMetrics() {
+                const viewportW = (viewportEl && viewportEl.clientWidth) || (reelEl && reelEl.clientWidth) || 720;
+                const viewportCenterX = viewportW / 2;
+                const children = trackEl ? trackEl.children : [];
+                let cycleWidth = 0;
+                if (children.length >= 2 * N && N > 0) {
+                    cycleWidth = children[N].offsetLeft - children[0].offsetLeft;
                 }
-                return 56;
+                if (!cycleWidth || cycleWidth <= 0) {
+                    cycleWidth = Math.max(1, N) * 280;
+                }
+                const avgStep = cycleWidth / Math.max(1, N);
+                const copy1Origin = (children.length > N ? children[N].offsetLeft : cycleWidth) - viewportCenterX;
+                return { viewportW, viewportCenterX, cycleWidth, avgStep, copy1Origin, children };
             }
 
-            // Target positions for canonical states:
-            // Center of aperture is 2.0 * H.
-            // Target index K has center (K + 0.5) * H.
-            // So T = (K - 1.5) * H.
+            function getItemCenterX(childIdx, metrics) {
+                const { children, avgStep } = metrics;
+                if (children && children[childIdx]) {
+                    const el = children[childIdx];
+                    return el.offsetLeft + el.offsetWidth / 2;
+                }
+                return (childIdx + 0.5) * avgStep;
+            }
+
+            // Target translateX offsets (center of target item aligned to viewportCenterX)
             function getTargetOffset(state) {
-                const H = getItemHeight();
+                const m = getHorizontalMetrics();
+                const cIdx = (cookIndex >= 0 ? cookIndex : 1);
+                const sIdx = (scientistIndex >= 0 ? scientistIndex : 2);
                 if (state === "kitchen") {
-                    const idx = (cookIndex >= 0 ? cookIndex : 1);
-                    return (N + idx - 1.5) * H;
+                    return getItemCenterX(N + cIdx, m) - m.viewportCenterX;
                 } else if (state === "office") {
-                    const idx = (scientistIndex >= 0 ? scientistIndex : 2);
-                    return (N + idx - 1.5) * H;
+                    return getItemCenterX(N + sIdx, m) - m.viewportCenterX;
                 } else {
                     // Resting: midpoint between cook and scientist
-                    const mid = ((cookIndex >= 0 ? cookIndex : 1) + (scientistIndex >= 0 ? scientistIndex : 2)) / 2;
-                    return (N + mid - 1.5) * H;
+                    const midCenter = (getItemCenterX(N + cIdx, m) + getItemCenterX(N + sIdx, m)) / 2;
+                    return midCenter - m.viewportCenterX;
                 }
             }
 
@@ -140,14 +179,23 @@
             if (previewItem) {
                 const itemIdx = items.findIndex(it => it.id === previewItem);
                 if (itemIdx >= 0) {
-                    const H = getItemHeight();
-                    currentT = (N + itemIdx - 1.5) * H;
+                    const m = getHorizontalMetrics();
+                    currentT = getItemCenterX(N + itemIdx, m) - m.viewportCenterX;
                     currentState = "scrolling";
+                }
+            }
+
+            function evaporateRestingPhrase() {
+                if (reelEl && !reelEl.classList.contains("has-evaporated")) {
+                    reelEl.classList.add("has-evaporated");
                 }
             }
 
             if (reelEl) {
                 reelEl.setAttribute("data-state", currentState);
+                if (currentState !== "resting") {
+                    evaporateRestingPhrase();
+                }
             }
 
             let leaveTimer = null;
@@ -170,24 +218,25 @@
 
             function renderTrack() {
                 if (!trackEl) return;
-                const H = getItemHeight();
-                const C = N * H;
+                const m = getHorizontalMetrics();
+                const C = m.cycleWidth;
+                const minWrap = m.copy1Origin;
+                const maxWrap = m.copy1Origin + C;
 
-                // Circular wrap currentT into Copy 1 range [0.5 * C, 1.5 * C)
-                while (currentT < 0.5 * C) currentT += C;
-                while (currentT >= 1.5 * C) currentT -= C;
+                // Circular wrap currentT into Copy 1 range [copy1Origin, copy1Origin + C)
+                while (currentT < minWrap) currentT += C;
+                while (currentT >= maxWrap) currentT -= C;
 
-                trackEl.style.transform = `translateY(${-currentT}px)`;
+                trackEl.style.transform = `translateX(${-currentT}px)`;
 
-                const viewportCenterY = 2.0 * H;
-                const children = trackEl.children;
+                const children = m.children;
                 const totalChildren = children.length;
 
                 for (let i = 0; i < totalChildren; i++) {
                     const el = children[i];
-                    const itemCenterY = (i + 0.5) * H;
-                    const screenDist = itemCenterY - currentT - viewportCenterY;
-                    const d = Math.abs(screenDist) / H;
+                    const itemCenterX = el.offsetLeft + el.offsetWidth / 2;
+                    const screenDist = itemCenterX - currentT - m.viewportCenterX;
+                    const d = Math.abs(screenDist) / m.avgStep;
 
                     if (d < 0.28) {
                         el.style.opacity = "1";
@@ -199,10 +248,10 @@
                         } else {
                             el.style.color = "var(--text-title, #1e293b)";
                         }
-                    } else if (d < 0.78) {
+                    } else if (d < 0.92) {
                         el.style.opacity = "0.40";
                         el.style.color = "var(--text-muted, #6b7280)";
-                    } else if (d < 1.78) {
+                    } else if (d < 1.95) {
                         el.style.opacity = "0.18";
                         el.style.color = "var(--text-muted, #6b7280)";
                     } else {
@@ -215,8 +264,7 @@
             function animateTo(targetT, duration = 460, onComplete = null) {
                 cancelAnimation();
                 cancelMomentum();
-                const H = getItemHeight();
-                const C = N * H;
+                const C = getHorizontalMetrics().cycleWidth;
 
                 // Pick shortest direction around circle
                 let delta = ((targetT - currentT) % C + C * 1.5) % C - 0.5 * C;
@@ -250,6 +298,9 @@
                     newState = "resting";
                 }
                 currentState = newState;
+                if (newState !== "resting") {
+                    evaporateRestingPhrase();
+                }
 
                 if (leaveTimer) {
                     clearTimeout(leaveTimer);
@@ -276,25 +327,26 @@
             // =====================================================================
             let velocity = 0;
             let isDragging = false;
-            let touchStartY = 0;
-            let lastTouchY = 0;
+            let touchStartX = 0;
+            let lastTouchX = 0;
             let lastTouchTime = 0;
 
             function snapToNearest() {
-                const H = getItemHeight();
-                const C = N * H;
+                const m = getHorizontalMetrics();
+                const C = m.cycleWidth;
+                const cIdx = (cookIndex >= 0 ? cookIndex : 1);
+                const sIdx = (scientistIndex >= 0 ? scientistIndex : 2);
+                const midTarget = (getItemCenterX(N + cIdx, m) + getItemCenterX(N + sIdx, m)) / 2 - m.viewportCenterX;
 
-                const mid = ((cookIndex >= 0 ? cookIndex : 1) + (scientistIndex >= 0 ? scientistIndex : 2)) / 2;
-                const candidates = [mid];
+                const candidateTargets = [midTarget];
                 for (let k = 0; k < N; k++) {
-                    candidates.push(k);
+                    candidateTargets.push(getItemCenterX(N + k, m) - m.viewportCenterX);
                 }
 
                 let bestTarget = null;
                 let minDelta = Infinity;
 
-                candidates.forEach(cand => {
-                    const candTarget = (N + cand - 1.5) * H;
+                candidateTargets.forEach(candTarget => {
                     let delta = ((candTarget - currentT) % C + C * 1.5) % C - 0.5 * C;
                     if (Math.abs(delta) < Math.abs(minDelta)) {
                         minDelta = delta;
@@ -335,35 +387,44 @@
             }
 
             if (reelEl) {
-                // Wheel / Trackpad listener
+                // Start one-way evaporation as soon as the cursor touches the resting phrase
+                reelEl.addEventListener("mouseenter", () => {
+                    if (isNavigating) return;
+                    evaporateRestingPhrase();
+                });
+
+                // Wheel / Trackpad listener (supports both horizontal swipe and vertical mouse wheel)
                 reelEl.addEventListener("wheel", (e) => {
                     if (isNavigating) return;
                     e.preventDefault();
+                    evaporateRestingPhrase();
                     cancelAnimation();
                     cancelMomentum();
                     currentState = "scrolling";
                     reelEl.setAttribute("data-state", "scrolling");
                     if (cardEl) cardEl.setAttribute("data-state", "scrolling");
 
-                    velocity += e.deltaY * wheelSensitivity;
-                    const maxVel = getItemHeight() * 1.5;
+                    const primaryDelta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+                    velocity += primaryDelta * wheelSensitivity * 2.2;
+                    const maxVel = getHorizontalMetrics().avgStep * 0.9;
                     if (velocity > maxVel) velocity = maxVel;
                     if (velocity < -maxVel) velocity = -maxVel;
 
                     startMomentum();
                 }, { passive: false });
 
-                // Touch listeners (Mobile swipe)
+                // Touch listeners (Mobile horizontal swipe)
                 reelEl.addEventListener("touchstart", (e) => {
                     if (isNavigating || e.touches.length !== 1) return;
+                    evaporateRestingPhrase();
                     cancelAnimation();
                     cancelMomentum();
                     currentState = "scrolling";
                     reelEl.setAttribute("data-state", "scrolling");
                     if (cardEl) cardEl.setAttribute("data-state", "scrolling");
 
-                    touchStartY = e.touches[0].clientY;
-                    lastTouchY = touchStartY;
+                    touchStartX = e.touches[0].clientX;
+                    lastTouchX = touchStartX;
                     lastTouchTime = performance.now();
                     isDragging = true;
                     velocity = 0;
@@ -371,15 +432,15 @@
 
                 reelEl.addEventListener("touchmove", (e) => {
                     if (!isDragging || e.touches.length !== 1) return;
-                    const touchY = e.touches[0].clientY;
-                    const deltaY = lastTouchY - touchY;
+                    const touchX = e.touches[0].clientX;
+                    const deltaX = lastTouchX - touchX;
                     const now = performance.now();
                     const dt = Math.max(1, now - lastTouchTime);
-                    velocity = (deltaY / dt) * 16;
-                    lastTouchY = touchY;
+                    velocity = (deltaX / dt) * 16;
+                    lastTouchX = touchX;
                     lastTouchTime = now;
 
-                    currentT += deltaY;
+                    currentT += deltaX;
                     renderTrack();
                 }, { passive: true });
 
@@ -395,17 +456,18 @@
                     startMomentum();
                 });
 
-                // Mouse drag listeners (Desktop drag)
+                // Mouse drag listeners (Desktop horizontal drag)
                 reelEl.addEventListener("mousedown", (e) => {
                     if (isNavigating || e.button !== 0) return;
+                    evaporateRestingPhrase();
                     cancelAnimation();
                     cancelMomentum();
                     currentState = "scrolling";
                     reelEl.setAttribute("data-state", "scrolling");
                     if (cardEl) cardEl.setAttribute("data-state", "scrolling");
 
-                    touchStartY = e.clientY;
-                    lastTouchY = touchStartY;
+                    touchStartX = e.clientX;
+                    lastTouchX = touchStartX;
                     lastTouchTime = performance.now();
                     isDragging = true;
                     velocity = 0;
@@ -414,15 +476,15 @@
 
                 window.addEventListener("mousemove", (e) => {
                     if (!isDragging) return;
-                    const touchY = e.clientY;
-                    const deltaY = lastTouchY - touchY;
+                    const touchX = e.clientX;
+                    const deltaX = lastTouchX - touchX;
                     const now = performance.now();
                     const dt = Math.max(1, now - lastTouchTime);
-                    velocity = (deltaY / dt) * 16;
-                    lastTouchY = touchY;
+                    velocity = (deltaX / dt) * 16;
+                    lastTouchX = touchX;
                     lastTouchTime = now;
 
-                    currentT += deltaY;
+                    currentT += deltaX;
                     renderTrack();
                 });
 
@@ -434,9 +496,17 @@
                 });
             }
 
-            window.addEventListener("resize", () => {
+            function syncStaticPosition() {
+                if (currentState !== "scrolling") {
+                    currentT = getTargetOffset(currentState);
+                }
                 renderTrack();
-            });
+            }
+
+            window.addEventListener("resize", syncStaticPosition);
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(syncStaticPosition);
+            }
 
             // Initial render
             renderTrack();
@@ -563,6 +633,7 @@
                 </span>
                 <span class="gateway-reel" id="gateway-reel" data-state="resting" aria-hidden="true">
                     <span class="reel-baseline-anchor">the scientist</span>
+                    <span class="reel-resting-phrase" id="reel-resting-phrase">a bit of everything</span>
                     <span class="reel-viewport" id="reel-viewport">
                         <span class="reel-track" id="reel-track">
                             <span class="reel-item reel-runner" id="reel-item-runner">the runner</span>
