@@ -172,6 +172,17 @@
     }
 
     /**
+     * Appends index.html to directory URLs when opened directly over file:///.
+     */
+    function withFileIndex(href) {
+        if (!href) return href;
+        if (typeof window !== "undefined" && window.location && window.location.protocol === "file:" && href.endsWith("/")) {
+            return href + "index.html";
+        }
+        return href;
+    }
+
+    /**
      * Resolves a repo-relative asset path (e.g. "assets/foo.png") relative to fromPath.
      */
     function resolveAssetPath(fromPath, assetRel) {
@@ -255,10 +266,7 @@
         const itemsHtml = [];
         navConfig.forEach(item => {
             const isActive = item.id === currentId;
-            let href = (item.path !== undefined) ? computeRelativePath(fromPath, item.path) : "";
-            if (item.isHome && typeof window !== "undefined" && window.location.protocol === "file:") {
-                href += "index.html";
-            }
+            let href = (item.path !== undefined) ? withFileIndex(computeRelativePath(fromPath, item.path)) : "";
             const classes = [];
             if (isActive) classes.push("nav-home");
             if (item.focal) classes.push("nav-focal");
@@ -266,7 +274,6 @@
 
             const classAttr = classes.length ? ` class="${classes.join(" ")}"` : "";
             const idAttr = item.id === "kitchen" ? ` id="kitchen-tab"` : "";
-            const ariaSelected = isActive ? "true" : "false";
             const ariaCurrent = isActive ? ` aria-current="page"` : "";
             const homeAttr = item.isHome ? ` data-is-home="true"` : "";
 
@@ -283,12 +290,12 @@
 
             let innerHtml = "";
             if (item.isText) {
-                innerHtml = `<span class="nav-text" data-nav-id="${item.id}">${label}</span>`;
+                innerHtml = `<span class="nav-text" data-nav-id="${item.id}" aria-disabled="true" title="coming soon">${label}</span>`;
             } else {
-                innerHtml = `<a href="${href}"${classAttr}${idAttr}${homeAttr} data-nav-id="${item.id}" role="tab" aria-selected="${ariaSelected}"${ariaCurrent}>${label}</a>`;
+                innerHtml = `<a href="${href}"${classAttr}${idAttr}${homeAttr} data-nav-id="${item.id}"${ariaCurrent}>${label}</a>`;
             }
 
-            itemsHtml.push(`<li class="nav-item${collapsibleClass}${bilalLiClass}" role="presentation" data-nav-id="${item.id}">${innerHtml}</li>`);
+            itemsHtml.push(`<li class="nav-item${collapsibleClass}${bilalLiClass}" data-nav-id="${item.id}">${innerHtml}</li>`);
             if (item.dividerAfter) {
                 const dividerCollapsibleClass = isCollapsible ? " nav-divider-collapsible" : "";
                 itemsHtml.push(`<li class="nav-divider${dividerCollapsibleClass}" aria-hidden="true">|</li>`);
@@ -309,10 +316,7 @@
             if (!isCollapsible) return; // Exclude items already visible in the top nav bar
 
             const isActive = item.id === currentId;
-            let href = (item.path !== undefined && item.path !== null) ? computeRelativePath(fromPath, item.path) : "";
-            if (item.isHome && typeof window !== "undefined" && window.location.protocol === "file:") {
-                href += "index.html";
-            }
+            let href = (item.path !== undefined && item.path !== null) ? withFileIndex(computeRelativePath(fromPath, item.path)) : "";
             let label = item.label;
             if (item.id === "kitchen" && typeof KITCHEN_CONFIG !== "undefined" && KITCHEN_CONFIG.name) {
                 label = KITCHEN_CONFIG.name;
@@ -332,7 +336,7 @@
 
             if (item.isText) {
                 dropdownItemsHtml.push(`
-                    <div class="mobile-nav-link mobile-nav-text" data-mobile-nav-id="${item.id}">
+                    <div class="mobile-nav-link mobile-nav-text" data-mobile-nav-id="${item.id}" aria-disabled="true">
                         <span class="mobile-nav-label-en">${label}</span>
                         <span class="mobile-nav-label-ur">${urduLabel}</span>
                     </div>
@@ -351,7 +355,7 @@
 
         header.innerHTML = `
             <nav class="nav-container" aria-label="Primary">
-                <ul class="nav-links" role="tablist">
+                <ul class="nav-links">
                     ${itemsHtml.join("\n                    ")}
                 </ul>
                 <button class="mobile-nav-toggle${toggleActiveClass}" type="button" aria-expanded="false" aria-controls="mobile-nav-dropdown" aria-label="Toggle navigation menu">
@@ -820,18 +824,16 @@
                 if (finalTargetId) {
                     header.setAttribute("data-current", finalTargetId);
 
-                    // Update active class and ARIA state on tab links
+                    // Update active class and ARIA state on nav links
                     let targetActiveLink = null;
                     navLinks.querySelectorAll(".nav-item a").forEach(a => {
                         if (a.getAttribute("data-nav-id") === finalTargetId) {
                             a.classList.add("nav-home");
                             a.classList.remove("active");
-                            a.setAttribute("aria-selected", "true");
                             a.setAttribute("aria-current", "page");
                             targetActiveLink = a;
                         } else {
                             a.classList.remove("nav-home", "active");
-                            a.setAttribute("aria-selected", "false");
                             a.removeAttribute("aria-current");
                         }
                     });
@@ -844,10 +846,7 @@
 
                     navConfig.forEach(item => {
                         if (item.isText || item.path === undefined || item.path === null) return;
-                        let newRelHref = computeRelativePath(fromPath, item.path);
-                        if (item.isHome && typeof window !== "undefined" && window.location.protocol === "file:") {
-                            newRelHref += "index.html";
-                        }
+                        const newRelHref = withFileIndex(computeRelativePath(fromPath, item.path));
                         const itemLink = navLinks.querySelector(`a[data-nav-id="${item.id}"]`);
                         if (itemLink) {
                             itemLink.setAttribute("href", newRelHref);
@@ -1113,12 +1112,18 @@
         });
     }
 
+    let cleanupKitchenIndicator = null;
+
     /**
      * Initializes the main Kitchen dashboard (recipes grid, title, bio, external links).
      * Automatically called by initActivePageContent() when on the kitchen home page.
      */
     function initKitchenDashboard() {
         if (typeof KITCHEN_CONFIG === "undefined") return;
+        if (typeof cleanupKitchenIndicator === "function") {
+            cleanupKitchenIndicator();
+            cleanupKitchenIndicator = null;
+        }
 
         document.title = KITCHEN_CONFIG.name;
         const titleEl = document.getElementById("main-title");
@@ -1139,7 +1144,7 @@
             linksList.innerHTML = links.map(link => `
                 <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="external-link">
                     ${link.label}
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
                         <line x1="7" y1="17" x2="17" y2="7"></line>
                         <polyline points="7 7 17 7 17 17"></polyline>
                     </svg>
@@ -1175,7 +1180,7 @@
                             <span class="column-title-text">${cat.title}</span>
                             <span class="column-title-right">
                                 ${cat.titleUrdu ? `<span class="urdu-title">${cat.titleUrdu}</span>` : ""}
-                                <svg class="menu-collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <svg class="menu-collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
                                     <polyline points="6 9 12 15 18 9"></polyline>
                                 </svg>
                             </span>
@@ -1184,10 +1189,10 @@
                     <div class="menu-items" id="menu-items-${cat.title}">
                         ${cat.items.length > 0 ? cat.items.map(item => `
                             <div class="menu-item">
-                                <a href="${item.url}" class="recipe-link"${item.isTest ? ' style="color: #dc2626;"' : ''}>
+                                <a href="${withFileIndex(item.url)}" class="recipe-link"${item.isTest ? ' style="color: #dc2626;"' : ''}>
                                     <span class="recipe-name"${item.isTest ? ' style="color: #dc2626;"' : ''}>${item.name}</span>
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                                        stroke-linecap="round" stroke-linejoin="round" class="link-arrow">
+                                        stroke-linecap="round" stroke-linejoin="round" class="link-arrow" aria-hidden="true" focusable="false">
                                         <line x1="7" y1="17" x2="17" y2="7"></line>
                                         <polyline points="7 7 17 7 17 17"></polyline>
                                     </svg>
@@ -1216,7 +1221,7 @@
         const menuSection = document.getElementById("menu");
         const scrollIndicator = document.querySelector(".hero-section .scroll-indicator");
         if (menuSection && scrollIndicator && typeof IntersectionObserver !== "undefined") {
-            const updateIndicatorVisibility = (entry) => {
+            const updateIndicatorVisibility = () => {
                 if (window.innerWidth > 768) {
                     scrollIndicator.classList.remove("is-hidden");
                     return;
@@ -1235,26 +1240,35 @@
             };
 
             const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => updateIndicatorVisibility(entry));
+                entries.forEach(() => updateIndicatorVisibility());
             }, {
                 threshold: [0, 0.1, 0.2, 0.5],
                 rootMargin: "0px 0px -80px 0px"
             });
             observer.observe(menuSection);
 
-            window.addEventListener("scroll", () => {
+            const onScroll = () => {
                 if (window.innerWidth > 768) return;
                 const scrollY = window.scrollY || window.pageYOffset || 0;
                 if (scrollY < 60) {
                     scrollIndicator.classList.remove("is-hidden");
                 }
-            }, { passive: true });
+            };
 
-            window.addEventListener("resize", () => {
+            const onResize = () => {
                 if (window.innerWidth > 768) {
                     scrollIndicator.classList.remove("is-hidden");
                 }
-            }, { passive: true });
+            };
+
+            window.addEventListener("scroll", onScroll, { passive: true });
+            window.addEventListener("resize", onResize, { passive: true });
+
+            cleanupKitchenIndicator = () => {
+                observer.disconnect();
+                window.removeEventListener("scroll", onScroll);
+                window.removeEventListener("resize", onResize);
+            };
         }
     }
 
@@ -1355,14 +1369,6 @@
      */
     function initNavbars() {
         if (typeof document === "undefined") return;
-        if (typeof history !== "undefined" && "scrollRestoration" in history) {
-            history.scrollRestoration = "manual";
-        }
-        if (typeof window !== "undefined" && !window.location.hash) {
-            window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-            if (document.documentElement) document.documentElement.scrollTop = 0;
-            if (document.body) document.body.scrollTop = 0;
-        }
         initActivePageContent();
         const headers = document.querySelectorAll("header.navbar");
         headers.forEach(header => {
@@ -1385,15 +1391,6 @@
         } else {
             initNavbars();
         }
-
-        // Ensure clean scroll-to-top on back/forward cache restores (iOS Safari / Chrome)
-        window.addEventListener("pageshow", () => {
-            if (!window.location.hash) {
-                window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-                if (document.documentElement) document.documentElement.scrollTop = 0;
-                if (document.body) document.body.scrollTop = 0;
-            }
-        });
 
         // Sticky scrolled shadow/border toggle
         window.addEventListener("scroll", () => {
@@ -1434,14 +1431,28 @@
     /**
      * Renders stationary recipe navbar: "← the kitchen | <recipe_name>"
      * with <recipe_name> active and underlined by the Urdu qalam indicator.
+     * Idempotent: skips rebuilding DOM when already rendered for the same recipe.
      */
     function renderRecipeNavbar(header, recipeTitle, backUrl) {
         if (!header) header = document.querySelector("header.navbar[data-back]") || document.querySelector("header.navbar");
         if (!header) return;
 
-        const effectiveBackUrl = backUrl || header.getAttribute("data-back") || "../../";
+        const effectiveBackUrl = withFileIndex(backUrl || header.getAttribute("data-back") || "../../");
         const backLabel = header.getAttribute("data-back-label") || "← the kitchen";
         const title = (recipeTitle || header.getAttribute("data-recipe-title") || "the recipe").toLowerCase();
+
+        const alreadyRendered = header.getAttribute("data-recipe-nav-mode") === "breadcrumb" &&
+            header.getAttribute("data-recipe-title") === title &&
+            header.querySelector &&
+            header.querySelector("#recipe-top-tab");
+        if (alreadyRendered) {
+            const existingNavLinks = header.querySelector(".nav-links");
+            const activeLink = existingNavLinks && (existingNavLinks.querySelector("#recipe-top-tab") || existingNavLinks.querySelector(".active"));
+            if (existingNavLinks && activeLink) {
+                updateIndicator(existingNavLinks, activeLink, false);
+            }
+            return;
+        }
 
         header.setAttribute("data-recipe-title", title);
         header.setAttribute("data-recipe-nav-mode", "breadcrumb");
@@ -1450,66 +1461,10 @@
 
         header.innerHTML = `
         <nav class="nav-container" aria-label="Breadcrumb">
-            <ul class="nav-links has-indicator" role="tablist">
-                <li class="nav-item" role="presentation"><a href="${effectiveBackUrl}" id="kitchen-tab" role="tab">${backLabel}</a></li>
+            <ul class="nav-links has-indicator">
+                <li class="nav-item"><a href="${effectiveBackUrl}" id="kitchen-tab">${backLabel}</a></li>
                 <li class="nav-divider" aria-hidden="true">|</li>
-                <li class="nav-item" role="presentation"><a href="#me" class="recipe-top-link active" id="recipe-top-tab" role="tab" aria-selected="true" aria-current="page">${title}</a></li>
-                <span class="nav-indicator" aria-hidden="true"></span>
-            </ul>
-        </nav>`.trim();
-
-        const topLink = header.querySelector("#recipe-top-tab");
-        if (topLink) {
-            topLink.addEventListener("click", (e) => {
-                e.preventDefault();
-                window.scrollTo({ top: 0, behavior: "smooth" });
-            });
-        }
-
-        const navLinks = header.querySelector(".nav-links");
-        if (navLinks) {
-            ensureIndicator(navLinks);
-            attachContinuousNav(header);
-            const positionActive = () => {
-                const activeLink = navLinks.querySelector("#recipe-top-tab") || navLinks.querySelector(".active");
-                if (activeLink) {
-                    updateIndicator(navLinks, activeLink, false);
-                }
-            };
-            positionActive();
-            requestAnimationFrame(positionActive);
-            setTimeout(positionActive, 40);
-            setTimeout(positionActive, 120);
-        }
-    }
-
-    function setRecipeNavbarMode(header, isModeActive, recipeTitle, backUrl) {
-        renderRecipeNavbar(header, recipeTitle, backUrl);
-    }
-
-    /**
-     * Renders stationary recipe navbar: "← the kitchen | <recipe_name>"
-     * with <recipe_name> active and underlined by the Urdu qalam indicator.
-     */
-    function renderRecipeNavbar(header, recipeTitle, backUrl) {
-        if (!header) header = document.querySelector("header.navbar[data-back]") || document.querySelector("header.navbar");
-        if (!header) return;
-
-        const effectiveBackUrl = backUrl || header.getAttribute("data-back") || "../../";
-        const backLabel = header.getAttribute("data-back-label") || "← the kitchen";
-        const title = (recipeTitle || header.getAttribute("data-recipe-title") || "the recipe").toLowerCase();
-
-        header.setAttribute("data-recipe-title", title);
-        header.setAttribute("data-recipe-nav-mode", "breadcrumb");
-
-        ensureInkFilterDefs();
-
-        header.innerHTML = `
-        <nav class="nav-container" aria-label="Breadcrumb">
-            <ul class="nav-links has-indicator" role="tablist">
-                <li class="nav-item" role="presentation"><a href="${effectiveBackUrl}" id="kitchen-tab" role="tab">${backLabel}</a></li>
-                <li class="nav-divider" aria-hidden="true">|</li>
-                <li class="nav-item" role="presentation"><a href="#me" class="recipe-top-link active" id="recipe-top-tab" role="tab" aria-selected="true" aria-current="page">${title}</a></li>
+                <li class="nav-item"><a href="#me" class="recipe-top-link active" id="recipe-top-tab" aria-current="page">${title}</a></li>
                 <span class="nav-indicator" aria-hidden="true"></span>
             </ul>
         </nav>`.trim();

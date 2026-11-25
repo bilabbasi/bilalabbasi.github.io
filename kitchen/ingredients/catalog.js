@@ -257,5 +257,21 @@ const INGREDIENT_CATALOG = {
       "ur": "پیالہ",
       "image": ""
     }
-  }
+  },
+  "existingAssets": [
+    "../../ingredients/images/coriander_powder/powder.png",
+    "../../ingredients/images/garlic/diced.png",
+    "../../ingredients/images/garlic/minced.png",
+    "../../ingredients/images/garlic/paste.png",
+    "../../ingredients/images/ginger/minced.png",
+    "../../ingredients/images/ginger/paste.png",
+    "../../ingredients/images/green_chilli/sliced.png",
+    "../../ingredients/images/onion/diced.png",
+    "../../ingredients/images/onion/sliced.png",
+    "../../ingredients/images/potato/diced.png",
+    "../../ingredients/images/tomato/chopped.png",
+    "../../ingredients/images/tools/karahi.png",
+    "../../ingredients/images/tools/pressure_cooker.png",
+    "../../ingredients/images/tools/saucepan.png"
+  ]
 };

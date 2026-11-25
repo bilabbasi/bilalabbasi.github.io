@@ -81,19 +81,19 @@
                 </main>
 
                 <!-- Scroll indicators pointing to the recipe layouts below -->
-                <div class="recipe-indicators">
-                    <div class="scroll-indicator ${!isStepMode ? 'active' : ''}" id="indicator-side-by-side" onclick="selectRecipeMode('side-by-side')">
+                <div class="recipe-indicators" role="group" aria-label="Recipe layout view">
+                    <button type="button" class="scroll-indicator ${!isStepMode ? 'active' : ''}" id="indicator-side-by-side" aria-pressed="${!isStepMode}" onclick="selectRecipeMode('side-by-side')">
                         <span class="scroll-text">side by side</span>
-                        <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
                             <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
-                    </div>
-                    <div class="scroll-indicator ${isStepMode ? 'active' : ''}" id="indicator-step-by-step" onclick="selectRecipeMode('step-by-step')">
+                    </button>
+                    <button type="button" class="scroll-indicator ${isStepMode ? 'active' : ''}" id="indicator-step-by-step" aria-pressed="${isStepMode}" onclick="selectRecipeMode('step-by-step')">
                         <span class="scroll-text">step by step</span>
-                        <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
                             <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
-                    </div>
+                    </button>
                 </div>
             </section>
 
@@ -113,8 +113,8 @@
                         <h3 class="column-title">steps</h3>
                         <div class="steps-scroll-wrapper">
                             <div class="menu-items steps-scroll-container" id="steps-scroll-container"></div>
-                            <button class="scroll-down-btn" id="scroll-steps-btn" aria-label="Scroll steps down">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <button type="button" class="scroll-down-btn" id="scroll-steps-btn" aria-label="Scroll steps down">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
                                     <line x1="12" y1="5" x2="12" y2="19"></line>
                                     <polyline points="19 12 12 19 5 12"></polyline>
                                 </svg>
@@ -297,10 +297,12 @@
             ingredientsContainer.innerHTML = recipe.ingredients.map(sec => `
                 <div class="recipe-section">
                     <h4 class="recipe-section-title">
-                        <span>${sec.section}</span>
-                        <svg class="collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
+                        <button type="button" class="recipe-section-toggle" aria-expanded="true">
+                            <span>${sec.section}</span>
+                            <svg class="collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
                     </h4>
                     <div class="recipe-section-content">
                         ${(sec.items || []).map(item => `
@@ -328,6 +330,17 @@
 
         if (recipe.steps && recipe.steps.length > 0) {
             const hasAnyStructuredSteps = recipe.steps.some(sec => sec && typeof sec === 'object' && (Array.isArray(sec.ingredients) || Array.isArray(sec.tools)));
+            const forceFloatingPreview = typeof window !== 'undefined' &&
+                window.location &&
+                new URLSearchParams(window.location.search).get('floating') === '1';
+            const floatingItems = (hasAnyStructuredSteps && window.RecipeFloatingStage)
+                ? window.RecipeFloatingStage.collectRecipeItems(recipe, resolveImagePath)
+                : [];
+            const useFloatingStage = Boolean(
+                hasAnyStructuredSteps &&
+                window.RecipeFloatingStage &&
+                (forceFloatingPreview || window.RecipeFloatingStage.hasCompleteAssets(floatingItems, recipe))
+            );
             recipe.steps.forEach(sec => {
                 globalSectionCounter++;
                 const formattedSectionNum = String(globalSectionCounter).padStart(2, '0');
@@ -355,10 +368,12 @@
                     stepsSideBySideHtml += `
                         <div class="recipe-section">
                             <h4 class="recipe-section-title">
-                                <span>${sectionTitle}</span>
-                                <svg class="collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="6 9 12 15 18 9"></polyline>
-                                </svg>
+                                <button type="button" class="recipe-section-toggle" aria-expanded="true">
+                                    <span>${sectionTitle}</span>
+                                    <svg class="collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </button>
                             </h4>
                             <div class="recipe-section-content">
                     `;
@@ -406,8 +421,8 @@
                     `;
                 }
 
-                // Visual sketch layer for this step (single sketch for non-structured recipes)
-                if (!hasAnyStructuredSteps) {
+                // Visual sketch layer for this step (single sketch when floating stage is inactive)
+                if (!useFloatingStage) {
                     const stepVisualSrc = resolveImagePath(sectionImage || defaultRecipeImg);
                     sketchLayersHtml += `
                         <img src="${stepVisualSrc}" alt="Step ${globalSectionCounter} visual" class="sketch-layer" data-step="${globalSectionCounter}">
@@ -418,12 +433,11 @@
             stepsScrollContainer.innerHTML = stepsSideBySideHtml;
             stepsScrollingColumn.innerHTML = stepsStepByStepHtml;
 
-            if (hasAnyStructuredSteps && window.RecipeFloatingStage) {
+            if (useFloatingStage) {
                 const Floating = window.RecipeFloatingStage;
                 const stepSection = document.getElementById('step-by-step');
                 if (stepSection) stepSection.classList.add('is-structured-steps');
 
-                const floatingItems = Floating.collectRecipeItems(recipe, resolveImagePath);
                 const seedKey = recipe.title || 'recipe';
 
                 const heroSketchContainer = document.querySelector('.hero-section .sketch-container');
@@ -469,8 +483,14 @@
             sideBySideSection.style.display = 'block';
             stepByStepSection.style.display = 'none';
 
-            if (indSide) indSide.classList.add('active');
-            if (indStep) indStep.classList.remove('active');
+            if (indSide) {
+                indSide.classList.add('active');
+                indSide.setAttribute('aria-pressed', 'true');
+            }
+            if (indStep) {
+                indStep.classList.remove('active');
+                indStep.setAttribute('aria-pressed', 'false');
+            }
 
             try {
                 if (window.location.hash === '#step-by-step') {
@@ -482,7 +502,6 @@
                 sideBySideSection.scrollIntoView({ behavior: 'smooth' });
             }
             setTimeout(updateScrollButtonVisibility, 300);
-            setTimeout(updateRecipeNavbarState, 100);
             updateQalamProgress();
         } else if (mode === 'step-by-step') {
             sideBySideSection.style.display = 'none';
@@ -492,8 +511,14 @@
                 window.RecipeFloatingStage.layoutFloatingStage(stepStage, { activeOnly: Boolean(stepStage.querySelector('.floating-item.is-inactive')) });
             }
 
-            if (indSide) indSide.classList.remove('active');
-            if (indStep) indStep.classList.add('active');
+            if (indSide) {
+                indSide.classList.remove('active');
+                indSide.setAttribute('aria-pressed', 'false');
+            }
+            if (indStep) {
+                indStep.classList.add('active');
+                indStep.setAttribute('aria-pressed', 'true');
+            }
 
             try {
                 if (window.location.hash !== '#step-by-step') {
@@ -505,7 +530,6 @@
             if (shouldScroll) {
                 stepByStepSection.scrollIntoView({ behavior: 'smooth' });
             }
-            setTimeout(updateRecipeNavbarState, 100);
             updateQalamProgress();
         }
     };
@@ -515,6 +539,13 @@
         const destIngredients = document.getElementById('ingredients-centered-list');
         if (sourceIngredients && destIngredients && destIngredients.children.length === 0) {
             destIngredients.innerHTML = sourceIngredients.innerHTML;
+            destIngredients.querySelectorAll('.recipe-section').forEach(sec => sec.classList.remove('collapsed'));
+            destIngredients.querySelectorAll('.recipe-section-toggle').forEach(btn => {
+                const label = btn.querySelector('span');
+                const staticSpan = document.createElement('span');
+                staticSpan.textContent = label ? label.textContent : btn.textContent.trim();
+                btn.replaceWith(staticSpan);
+            });
         }
     }
 
@@ -527,21 +558,6 @@
             } else {
                 scrollStepsBtn.classList.remove('visible');
             }
-        }
-    }
-
-    /* =====================================================================
-       RECIPE NAVBAR BREADCRUMB & SCROLL STATE
-       ===================================================================== */
-    function updateRecipeNavbarState() {
-        const navbar = document.querySelector("header.navbar");
-        if (!navbar) return;
-
-        const hero = document.querySelector(".hero-section");
-        const isPastHero = hero ? (hero.getBoundingClientRect().bottom < window.innerHeight * 0.65) : (window.scrollY > 150);
-
-        if (typeof window.setRecipeNavbarMode === "function") {
-            window.setRecipeNavbarMode(navbar, isPastHero, currentRecipeTitle, "../../");
         }
     }
 
@@ -602,14 +618,15 @@
         }
 
         // Collapsible recipe sections
-        document.querySelectorAll('#menu .recipe-section-title').forEach(title => {
-            if (title.dataset.listenerAdded) return;
-            title.dataset.listenerAdded = "true";
+        document.querySelectorAll('#menu .recipe-section-toggle').forEach(toggle => {
+            if (toggle.dataset.listenerAdded) return;
+            toggle.dataset.listenerAdded = "true";
 
-            title.addEventListener('click', () => {
-                const section = title.closest('.recipe-section');
+            toggle.addEventListener('click', () => {
+                const section = toggle.closest('.recipe-section');
                 if (section) {
-                    section.classList.toggle('collapsed');
+                    const isCollapsed = section.classList.toggle('collapsed');
+                    toggle.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
                     updateScrollButtonVisibility();
                 }
             });
@@ -727,7 +744,6 @@
 
     window.addEventListener('resize', () => {
         updateScrollButtonVisibility();
-        updateRecipeNavbarState();
         updateQalamProgress();
         if (window.RecipeFloatingStage) {
             document.querySelectorAll('.floating-stage').forEach(stage => {
@@ -737,7 +753,6 @@
     }, { passive: true });
 
     window.addEventListener('scroll', () => {
-        updateRecipeNavbarState();
         updateQalamProgress();
     }, { passive: true });
 

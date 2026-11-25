@@ -10,10 +10,23 @@ from ingredients import INGREDIENTS, TOOLS, UNITS
 
 def build_catalog() -> dict:
     """Convert Python dataclasses into a JSON-serializable catalog."""
+    ingredients_dir = Path(__file__).resolve().parent
+    # Paths in ingredients.py are relative to kitchen/recipes/<slug>/
+    sample_recipe_dir = ingredients_dir.parent / "recipes" / "_sample"
+    existing_assets = []
+    for ing in INGREDIENTS.values():
+        for rel_path in ing.forms.values():
+            if rel_path and (sample_recipe_dir / rel_path).resolve().is_file():
+                existing_assets.append(rel_path)
+    for tool in TOOLS.values():
+        if tool.image and (sample_recipe_dir / tool.image).resolve().is_file():
+            existing_assets.append(tool.image)
+
     return {
         "units": {k: asdict(v) for k, v in UNITS.items()},
         "ingredients": {k: asdict(v) for k, v in INGREDIENTS.items()},
         "tools": {k: asdict(v) for k, v in TOOLS.items()},
+        "existingAssets": sorted(set(existing_assets)),
     }
 
 

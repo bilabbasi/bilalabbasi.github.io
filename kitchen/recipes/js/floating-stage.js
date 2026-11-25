@@ -38,6 +38,61 @@
         rootEl.style.setProperty('--mobile-focus-duration', `${lensCfg.mobileFocusDurationMs}ms`);
     }
 
+    function parseAmount(val) {
+        if (typeof val === "number") return Number.isFinite(val) ? val : NaN;
+        if (typeof val !== "string") return NaN;
+        const trimmed = val.trim();
+        if (!trimmed) return NaN;
+        if (/^\d+(?:\.\d+)?$/.test(trimmed)) return Number(trimmed);
+        const fracMatch = trimmed.match(/^(\d+)\s*\/\s*(\d+)$/);
+        if (fracMatch) {
+            const den = Number(fracMatch[2]);
+            return den > 0 ? Number(fracMatch[1]) / den : NaN;
+        }
+        const mixedMatch = trimmed.match(/^(\d+)\s+(\d+)\s*\/\s*(\d+)$/);
+        if (mixedMatch) {
+            const den = Number(mixedMatch[3]);
+            return den > 0 ? Number(mixedMatch[1]) + Number(mixedMatch[2]) / den : NaN;
+        }
+        return NaN;
+    }
+
+    function formatSummedAmount(sum, preferFraction) {
+        const rounded = Math.round(sum * 100) / 100;
+        if (preferFraction) {
+            const whole = Math.floor(rounded);
+            const rem = Math.round((rounded - whole) * 100) / 100;
+            const fracMap = { 0.25: "1/4", 0.5: "1/2", 0.75: "3/4", 0.33: "1/3", 0.67: "2/3" };
+            if (rem === 0) return String(whole);
+            if (fracMap[rem]) return whole > 0 ? `${whole} ${fracMap[rem]}` : fracMap[rem];
+        }
+        return String(rounded);
+    }
+
+    function hasCompleteAssets(items, recipe) {
+        if (!Array.isArray(items) || items.length === 0) return false;
+        const catalog = (typeof INGREDIENT_CATALOG !== "undefined") ? INGREDIENT_CATALOG : null;
+        const existingSet = (catalog && Array.isArray(catalog.existingAssets))
+            ? new Set(catalog.existingAssets)
+            : null;
+
+        const allItemsReady = items.every(item => {
+            if (!item.rawImgSrc) return false;
+            if (existingSet && !existingSet.has(item.rawImgSrc)) return false;
+            return true;
+        });
+        if (!allItemsReady) return false;
+
+        // Every step must declare at least one ingredient or tool so no step renders a blank stage
+        const steps = (recipe && Array.isArray(recipe.steps)) ? recipe.steps : [];
+        return steps.length > 0 && steps.every(sec =>
+            sec && typeof sec === "object" && (
+                (Array.isArray(sec.ingredients) && sec.ingredients.length > 0) ||
+                (Array.isArray(sec.tools) && sec.tools.length > 0)
+            )
+        );
+    }
+
     function collectRecipeItems(recipe, resolveImagePath) {
         const catalog = (typeof INGREDIENT_CATALOG !== "undefined") ? INGREDIENT_CATALOG : { ingredients: {}, tools: {}, units: {} };
         const byId = new Map();
@@ -56,6 +111,7 @@
                         en: tool.en,
                         ur: tool.ur || tool.en,
                         form: "vessel",
+                        rawImgSrc: tool.image || "",
                         imgSrc: tool.image ? resolveImagePath(tool.image) : "",
                         totalQtyEn: "",
                         totalQtyUr: "",
@@ -76,9 +132,10 @@
                 const unitKey = entry.unit || "";
                 const unitObj = (catalog.units && catalog.units[unitKey]) || null;
                 const amountVal = (entry.amount !== undefined && entry.amount !== null) ? entry.amount : "";
-                const amountNum = typeof amountVal === "number" ? amountVal : parseFloat(amountVal);
-                const qtyEn = [String(amountVal), unitObj ? unitObj.en : unitKey].filter(Boolean).join(" ");
-                const qtyUr = [String(amountVal), unitObj ? unitObj.ur : unitKey].filter(Boolean).join(" ");
+                const amountRaw = String(amountVal).trim();
+                const amountNum = parseAmount(amountVal);
+                const qtyEn = [amountRaw, unitObj ? unitObj.en : unitKey].filter(Boolean).join(" ");
+                const qtyUr = [amountRaw, unitObj ? unitObj.ur : unitKey].filter(Boolean).join(" ");
 
                 if (!byId.has(id)) {
                     byId.set(id, {
@@ -87,6 +144,7 @@
                         en: item.en,
                         ur: item.ur || item.en,
                         form,
+                        rawImgSrc: rawImg,
                         imgSrc: rawImg ? resolveImagePath(rawImg) : "",
                         totalQtyEn: "",
                         totalQtyUr: "",
@@ -96,23 +154,33 @@
                 }
                 const rec = byId.get(id);
                 rec.perStep[stepNum] = { qtyEn, qtyUr };
-                rec._totals.push({ amountNum, amountRaw: String(amountVal), unitKey, unitObj });
+                rec._totals.push({ amountNum, amountRaw, unitKey, unitObj });
             });
         });
 
         const items = Array.from(byId.values());
         items.forEach(rec => {
             if (rec.kind === "ingredient" && rec._totals.length > 0) {
-                const firstUnit = rec._totals[0].unitKey;
-                const allSameUnit = rec._totals.every(t => t.unitKey === firstUnit && !isNaN(t.amountNum));
-                if (allSameUnit) {
-                    const sum = Math.round(rec._totals.reduce((acc, t) => acc + t.amountNum, 0) * 100) / 100;
-                    const unitObj = rec._totals[0].unitObj;
-                    rec.totalQtyEn = [String(sum), unitObj ? unitObj.en : firstUnit].filter(Boolean).join(" ");
-                    rec.totalQtyUr = [String(sum), unitObj ? unitObj.ur : firstUnit].filter(Boolean).join(" ");
+                if (rec._totals.length === 1) {
+                    const only = rec._totals[0];
+                    rec.totalQtyEn = [only.amountRaw, only.unitObj ? only.unitObj.en : only.unitKey].filter(Boolean).join(" ");
+                    rec.totalQtyUr = [only.amountRaw, only.unitObj ? only.unitObj.ur : only.unitKey].filter(Boolean).join(" ");
                 } else {
-                    rec.totalQtyEn = rec._totals.map(t => `${t.amountRaw} ${t.unitObj ? t.unitObj.en : t.unitKey}`.trim()).join(" + ");
-                    rec.totalQtyUr = rec._totals.map(t => `${t.amountRaw} ${t.unitObj ? t.unitObj.ur : t.unitKey}`.trim()).join(" + ");
+                    const firstUnit = rec._totals[0].unitKey;
+                    const allSameUnit = rec._totals.every(t => t.unitKey === firstUnit && !Number.isNaN(t.amountNum));
+                    if (allSameUnit) {
+                        const sum = rec._totals.reduce((acc, t) => acc + t.amountNum, 0);
+                        const preferFraction = rec._totals.some(t => t.amountRaw.includes("/"));
+                        const formatted = formatSummedAmount(sum, preferFraction);
+                        const unitObj = rec._totals[0].unitObj;
+                        rec.totalQtyEn = [formatted, unitObj ? unitObj.en : firstUnit].filter(Boolean).join(" ");
+                        rec.totalQtyUr = [formatted, unitObj ? unitObj.ur : firstUnit].filter(Boolean).join(" ");
+                    } else {
+                        const uniqueEn = [...new Set(rec._totals.map(t => `${t.amountRaw} ${t.unitObj ? t.unitObj.en : t.unitKey}`.trim()).filter(Boolean))];
+                        const uniqueUr = [...new Set(rec._totals.map(t => `${t.amountRaw} ${t.unitObj ? t.unitObj.ur : t.unitKey}`.trim()).filter(Boolean))];
+                        rec.totalQtyEn = uniqueEn.join(" + ");
+                        rec.totalQtyUr = uniqueUr.join(" + ");
+                    }
                 }
             }
             delete rec._totals;
@@ -284,10 +352,15 @@
             `;
         }).join("");
 
+        const hintHtml = !isStepStage
+            ? `<p class="floating-stage-hint">select any ingredient for <span dir="rtl" lang="ur">اردو</span></p>`
+            : "";
+
         return `
             <div class="floating-stage ${isStepStage ? 'is-step-stage' : 'is-hero-stage'}" data-seed="${seedKey}">
                 ${itemsHtml}
             </div>
+            ${hintHtml}
         `;
     }
 
@@ -593,6 +666,9 @@
     window.RecipeFloatingStage = {
         getFloatingLensConfig,
         applyFloatingLensCssVars,
+        parseAmount,
+        formatSummedAmount,
+        hasCompleteAssets,
         collectRecipeItems,
         layoutFloatingStage,
         renderFloatingStageHtml,

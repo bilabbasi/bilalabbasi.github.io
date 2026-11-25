@@ -168,6 +168,11 @@ body {
     /* Dynamically constrained to fit perfectly within the initial viewport */
 }
 
+.hero-section .main-subtitle {
+    line-height: 1.45;
+    margin-top: 4px;
+}
+
 .hero-section .scroll-indicator {
     margin-top: 0;
     padding-top: 0;
@@ -180,10 +185,20 @@ body {
     align-items: center;
     gap: 8px;
     margin-top: auto;
-    padding-top: 10px;
+    padding: 10px 0 0 0;
+    background: none;
+    border: none;
+    font: inherit;
+    color: inherit;
     cursor: pointer;
     user-select: none;
     transition: opacity var(--transition-smooth);
+}
+
+.scroll-indicator:focus-visible {
+    outline: 2px solid var(--link-hover);
+    outline-offset: 6px;
+    border-radius: 4px;
 }
 
 .scroll-indicator:hover {
@@ -328,9 +343,9 @@ body {
     animation: bounce-indicator 2s infinite;
 }
 
-/* Fade down inactive buttons to keep visual focus on active indicator */
+/* Fade down inactive buttons to keep visual focus on active indicator while staying legible */
 .recipe-indicators .scroll-indicator:not(.active) {
-    opacity: 0.5;
+    opacity: 0.72;
 }
 
 /* Stop bouncing arrows on inactive button indicators */
@@ -452,124 +467,7 @@ body {
 }
 
 /* -------------------------------------------------------------------------
-   6. CUSTOMS / ABOUT SECTION & DUAL-SCRIPT HEADINGS
-   ------------------------------------------------------------------------- */
-
-.about-title {
-    font-family: var(--font-serif);
-    font-size: 3rem;
-    font-weight: 500;
-    line-height: 1.1;
-    color: var(--text-title);
-    letter-spacing: -1px;
-    text-transform: lowercase;
-    margin-bottom: 48px;
-}
-
-.about-section {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    background-color: var(--bg-main);
-    position: relative;
-    z-index: 1;
-    padding-top: 80px;
-    padding-bottom: 120px;
-    flex-shrink: 0;
-    scroll-snap-align: start;
-}
-
-.about-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
-    align-items: start;
-    margin-bottom: auto;
-}
-
-.about-img {
-    width: 85%;
-    height: auto;
-    display: block;
-    border-radius: 8px;
-}
-
-.split-title-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    padding-bottom: 18px;
-    margin-bottom: 32px;
-    border-bottom: 1px solid var(--border-color, #e7e5e4);
-}
-
-.split-title-header .about-title {
-    font-family: var(--font-serif);
-    font-size: 4rem;
-    font-weight: 500;
-    line-height: 1;
-    color: var(--text-title);
-    letter-spacing: -1.5px;
-    text-transform: lowercase;
-    margin: 0;
-}
-
-.split-title-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 6px;
-}
-
-.split-title-urdu {
-    font-family: 'Noto Nastaliq Urdu', 'Urdu Typesetting', 'Jameel Noori Nastaleeq', 'Geeza Pro', Tahoma, sans-serif;
-    font-size: 2.65rem;
-    font-weight: 500;
-    line-height: 1.6;
-    padding: 0 0.1em;
-    margin-bottom: 14px;
-    color: var(--color-urdu, #b83b14);
-    background: none;
-    -webkit-background-clip: border-box;
-    background-clip: border-box;
-    -webkit-text-fill-color: initial;
-    user-select: none;
-}
-
-.split-title-roman {
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-size: 1.05rem;
-    font-weight: 400;
-    color: var(--text-muted, #78716c);
-    letter-spacing: 0.02em;
-}
-
-.about-section#about {
-    min-height: calc(100vh - 110px);
-    padding-top: 10px;
-    padding-bottom: 20px;
-    justify-content: flex-start;
-}
-
-.about-section#about .split-title-header {
-    max-width: 780px;
-    margin-bottom: 18px;
-    padding-bottom: 14px;
-}
-
-.about-section#about .about-text {
-    max-width: 780px;
-    font-size: 1.05rem;
-    line-height: 1.4;
-}
-
-.about-section#about .about-text p {
-    margin: 0 0 0.45em 0;
-}
-
-/* -------------------------------------------------------------------------
-   7. BASE RESPONSIVENESS OVERRIDES
+   6. BASE RESPONSIVENESS OVERRIDES
    ------------------------------------------------------------------------- */
 
 @media (max-width: 900px) {
@@ -603,33 +501,5 @@ body {
     .scroll-indicator {
         padding-top: 10px;
         margin-bottom: 20px;
-    }
-
-    .split-title-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 14px;
-        padding-bottom: 20px;
-        margin-bottom: 24px;
-    }
-
-    .split-title-header .about-title {
-        font-size: 2.6rem;
-    }
-
-    .split-title-right {
-        align-items: flex-start;
-        gap: 4px;
-    }
-
-    .split-title-urdu {
-        font-size: 1.8rem;
-        line-height: 1.5;
-        margin-bottom: 8px;
-        align-self: flex-start;
-    }
-
-    .split-title-roman {
-        font-size: 0.95rem;
     }
 }
