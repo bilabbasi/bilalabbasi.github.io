@@ -28,27 +28,27 @@
         document.addEventListener("DOMContentLoaded", () => {
             // Sync hover accent with "the scientist" color in config.js
             const scientistItem = (typeof GATEWAY_CONFIG !== "undefined" && GATEWAY_CONFIG.reel && Array.isArray(GATEWAY_CONFIG.reel.items))
-                ? GATEWAY_CONFIG.reel.items.find(it => it.id === "scientist" || it.target === "professional")
+                ? GATEWAY_CONFIG.reel.items.find(it => it.id === "scientist" || it.target === "office")
                 : null;
             if (scientistItem && scientistItem.color) {
                 document.documentElement.style.setProperty("--scientist-color", scientistItem.color);
             }
 
             // 1. Update browser tab title
-            document.title = PROFESSIONAL_CONFIG.name;
+            document.title = OFFICE_CONFIG.name;
 
             // 2. Set name and subtitle immediately
             const nameEl = document.getElementById("name-text");
-            if (nameEl) nameEl.textContent = PROFESSIONAL_CONFIG.name || "Bilal Abbasi";
+            if (nameEl) nameEl.textContent = OFFICE_CONFIG.name || "Bilal Abbasi";
 
             const titleEl = document.getElementById("title-text");
-            if (titleEl) titleEl.textContent = PROFESSIONAL_CONFIG.subtitle || "Research Scientist, PhD";
+            if (titleEl) titleEl.textContent = OFFICE_CONFIG.subtitle || "Research Scientist, PhD";
 
             // 3. Set bio text and append contact trigger from config
-            const contactLabel = (PROFESSIONAL_CONFIG.contact && PROFESSIONAL_CONFIG.contact.label) || "Get in touch.";
+            const contactLabel = (OFFICE_CONFIG.contact && OFFICE_CONFIG.contact.label) || "Get in touch.";
             const bioEl = document.getElementById("bio-text");
             if (bioEl) {
-                bioEl.innerHTML = `${PROFESSIONAL_CONFIG.bio}\n\n<button type="button" class="bio-contact-trigger" id="contact-trigger">${contactLabel}</button>`;
+                bioEl.innerHTML = `${OFFICE_CONFIG.bio}\n\n<button type="button" class="bio-contact-trigger" id="contact-trigger">${contactLabel}</button>`;
             }
             const modalTitleEl = document.getElementById("contact-modal-title");
             if (modalTitleEl) {
@@ -57,8 +57,8 @@
 
             // 4. Generate the social/profile links dynamically
             const linksList = document.getElementById("links-list");
-            if (linksList && PROFESSIONAL_CONFIG.links) {
-                linksList.innerHTML = PROFESSIONAL_CONFIG.links.map(link => `
+            if (linksList && OFFICE_CONFIG.links) {
+                linksList.innerHTML = OFFICE_CONFIG.links.map(link => `
                     <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="external-link">
                         ${link.label}
                         <!-- Inline SVG: Creates the small arrow icon pointing top-right (↗) next to links -->
@@ -83,7 +83,7 @@
             const copyBtn = document.getElementById("contact-copy-btn");
 
             function decodeContactEmail() {
-                const cfg = PROFESSIONAL_CONFIG.contact;
+                const cfg = OFFICE_CONFIG.contact;
                 if (!cfg || !Array.isArray(cfg.codes)) return "";
                 return cfg.codes.map(c => String.fromCharCode(c ^ cfg.key)).join("");
             }
@@ -195,7 +195,7 @@
         <header class="navbar" aria-hidden="true"></header>
 
         <!-- Main Content Area: Split into two columns -->
-        <main class="main-content professional-content" id="me">
+        <main class="main-content office-content" id="me">
 
             <!-- Left Column: Biography headings and list of links -->
             <div class="info-column">
@@ -207,7 +207,7 @@
                 <!-- Main bio paragraph text (populated by JavaScript loader) -->
                 <p class="bio-paragraph" id="bio-text"></p>
 
-                <!-- Container where the social/professional links will be loaded -->
+                <!-- Container where the social/office links will be loaded -->
                 <div class="external-links" id="links-list">
                     <!-- Links list will be injected here -->
                 </div>
@@ -215,8 +215,8 @@
 
             <!-- Right Column: Visual Sketch illustration -->
             <div class="visual-column">
-                <div class="sketch-container professional-sketch">
-                    <img src="../assets/professional/watercolor_professional_image_transparent.png"
+                <div class="sketch-container office-sketch">
+                    <img src="../assets/office/watercolor_office_image_transparent.png"
                         alt="Watercolor illustration of a raccoon mapped through layered mathematical manifolds" class="sketch-img">
                 </div>
             </div>

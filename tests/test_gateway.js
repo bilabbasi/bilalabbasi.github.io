@@ -2,10 +2,10 @@
 // TEST SUITE: GATEWAY & FADED FLAT REEL VERIFICATION
 // =========================================================================
 // This test verifies:
-// 1. Elimination of typewriter delays on gateway and professional pages.
+// 1. Elimination of typewriter delays on gateway and office pages.
 // 2. Presence of the 4 reel items (runner, cook, scientist, reader) and baseline anchor.
 // 3. Presence and correctness of GATEWAY_CONFIG reel and color configurations.
-// 4. Mathematical exactness of vertical reel offsets for resting, kitchen, and professional states.
+// 4. Mathematical exactness of vertical reel offsets for resting, kitchen, and office states.
 
 const fs = require('fs');
 const path = require('path');
@@ -30,12 +30,12 @@ assert(indexHtml.includes('id="gateway-links"'), 'index.html must have #gateway-
 assert(!indexHtml.includes('id="gateway-cursor"'), 'index.html must NOT have typing cursor #gateway-cursor');
 assert(!indexHtml.includes('typeChar'), 'index.html must NOT have typewriter function typeChar');
 
-// 2. Check professional/index.html markup
-const profHtml = fs.readFileSync(path.join(rootDir, 'professional', 'index.html'), 'utf8');
-assert(!profHtml.includes('id="name-cursor"'), 'professional page must NOT have typing cursor #name-cursor');
-assert(!profHtml.includes('id="title-cursor"'), 'professional page must NOT have typing cursor #title-cursor');
-assert(!profHtml.includes('typeName'), 'professional page must NOT have typewriter function typeName');
-assert(!profHtml.includes('typeSubtitle'), 'professional page must NOT have typewriter function typeSubtitle');
+// 2. Check office/index.html markup
+const officeHtml = fs.readFileSync(path.join(rootDir, 'office', 'index.html'), 'utf8');
+assert(!officeHtml.includes('id="name-cursor"'), 'office page must NOT have typing cursor #name-cursor');
+assert(!officeHtml.includes('id="title-cursor"'), 'office page must NOT have typing cursor #title-cursor');
+assert(!officeHtml.includes('typeName'), 'office page must NOT have typewriter function typeName');
+assert(!officeHtml.includes('typeSubtitle'), 'office page must NOT have typewriter function typeSubtitle');
 
 // 3. Check config.js for GATEWAY_CONFIG.reel and color configurations
 const configJs = fs.readFileSync(path.join(rootDir, 'config.js'), 'utf8');
@@ -58,16 +58,16 @@ assert(/id:\s*"cook"[^}]*color:\s*"#[0-9a-fA-F]{6,8}"/.test(configJs), 'config.j
 const stateOffsets = {
     resting: -37.5,      // Halfway between cook and scientist (1.5h / 4h = 37.5%)
     kitchen: -25.0,      // Item 1 ("cook") aligned at top (1h / 4h = 25%)
-    professional: -50.0  // Item 2 ("scientist") aligned at top (2h / 4h = 50%)
+    office: -50.0        // Item 2 ("scientist") aligned at top (2h / 4h = 50%)
 };
 
 assert.strictEqual(stateOffsets.resting, -37.5, 'Resting state offset must be -37.5%');
 assert.strictEqual(stateOffsets.kitchen, -25.0, 'Kitchen state offset must be -25.0%');
-assert.strictEqual(stateOffsets.professional, -50.0, 'Professional state offset must be -50.0%');
+assert.strictEqual(stateOffsets.office, -50.0, 'Office state offset must be -50.0%');
 
-// Verify that resting state sits symmetrically between kitchen and professional states
-const midpoint = (stateOffsets.kitchen + stateOffsets.professional) / 2;
-assert.strictEqual(stateOffsets.resting, midpoint, 'Resting state must be the exact midpoint between kitchen and professional');
+// Verify that resting state sits symmetrically between kitchen and office states
+const midpoint = (stateOffsets.kitchen + stateOffsets.office) / 2;
+assert.strictEqual(stateOffsets.resting, midpoint, 'Resting state must be the exact midpoint between kitchen and office');
 
 // 5. Test revolver click delay & transition controllers
 assert(indexHtml.includes('NAVIGATION_DELAY_MS'), 'index.html must define NAVIGATION_DELAY_MS');

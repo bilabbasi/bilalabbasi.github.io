@@ -3,7 +3,7 @@
  *
  * Verifies that theme colors defined in config.js (theme.anchor, theme.distinct,
  * theme.pop, theme.urdu) propagate dynamically into CSS variables on kitchen and recipe
- * pages, while remaining strictly isolated from the professional page.
+ * pages, while remaining strictly isolated from the office page.
  */
 
 const assert = require('assert');
@@ -84,27 +84,27 @@ function createEnvironment(pathname, hasKitchenStylesheet = false) {
 }
 
 // -----------------------------------------------------------------------------
-// 3. Strict Professional Page Isolation (Zero Style Bleed)
+// 3. Strict Office Page Isolation (Zero Style Bleed)
 // -----------------------------------------------------------------------------
 {
-    const { context, styles } = createEnvironment('/professional/index.html', false);
+    const { context, styles } = createEnvironment('/office/index.html', false);
     vm.runInContext(configCode, context);
 
-    assert.strictEqual(styles['--link-color'], undefined, 'Professional page must not have --link-color applied');
-    assert.strictEqual(styles['--text-subtitle'], undefined, 'Professional page must not have --text-subtitle applied');
-    assert.strictEqual(styles['--color-pop'], undefined, 'Professional page must not have --color-pop applied');
-    assert.strictEqual(styles['--color-urdu'], undefined, 'Professional page must not have --color-urdu applied');
+    assert.strictEqual(styles['--link-color'], undefined, 'Office page must not have --link-color applied');
+    assert.strictEqual(styles['--text-subtitle'], undefined, 'Office page must not have --text-subtitle applied');
+    assert.strictEqual(styles['--color-pop'], undefined, 'Office page must not have --color-pop applied');
+    assert.strictEqual(styles['--color-urdu'], undefined, 'Office page must not have --color-urdu applied');
 }
 
 // -----------------------------------------------------------------------------
 // 4. Isolation on Local file:/// URLs with "kitchen" in parent directory
 // -----------------------------------------------------------------------------
 {
-    const { context, styles } = createEnvironment('/Users/bilalabbasi/kitchen-workspace/site/professional/index.html', false);
+    const { context, styles } = createEnvironment('/Users/bilalabbasi/kitchen-workspace/site/office/index.html', false);
     vm.runInContext(configCode, context);
 
-    assert.strictEqual(styles['--link-color'], undefined, 'Ancestor folder containing "kitchen" must not bleed into professional page');
-    assert.strictEqual(styles['--text-subtitle'], undefined, 'Ancestor folder containing "kitchen" must not bleed into professional page');
+    assert.strictEqual(styles['--link-color'], undefined, 'Ancestor folder containing "kitchen" must not bleed into office page');
+    assert.strictEqual(styles['--text-subtitle'], undefined, 'Ancestor folder containing "kitchen" must not bleed into office page');
 }
 
 console.log('PASS: test_theme.js passed all checks.');

@@ -14,17 +14,17 @@ The website is designed with a high-fidelity minimalist, typographic aesthetic i
 * **Colors**:
   * **Base**: Dark charcoal text (`#1e293b` for titles, `#475569` for body) on a warm off-white background (`#fafaf9`).
   * **Accents**:
-    * *Professional Profile*: Monochromatic/neutral grayscale.
+    * *Office*: Monochromatic/neutral grayscale.
     * *Kitchen/Recipes*: Warm culinary accents, including terracotta brown (`#7c2d12` for links, `#ea580c` for hover states) and warm amber/ochre (`#b45309` for subtitle).
 * **Visual Assets**:
-  * Hand-drawn sketch illustrations (e.g. portrait silhouette on professional page, culinary sketches and process drawings on kitchen/recipe pages) that scale dynamically to fit viewport heights.
+  * Hand-drawn sketch illustrations (e.g. portrait silhouette on office page, culinary sketches and process drawings on kitchen/recipe pages) that scale dynamically to fit viewport heights.
   * In recipe step-by-step mode, sketches use `mix-blend-mode: multiply;` and `filter: contrast(1.02);` to blend seamlessly with the warm off-white paper background.
 
 ---
 
 ## 📐 2. Layout & Spacing Stability Rules (CRITICAL)
 
-To maintain absolute visual stability, the elements on the professional landing page (`professional/index.html`), kitchen landing page (`kitchen/index.html`), and recipe page template (`kitchen/recipes/template.html`) must not shift horizontally or vertically when navigating between pages.
+To maintain absolute visual stability, the elements on the office landing page (`office/index.html`), kitchen landing page (`kitchen/index.html`), and recipe page template (`kitchen/recipes/template.html`) must not shift horizontally or vertically when navigating between pages.
 
 ### A. Navigation Tab Position & Height
 * The navigation header (`.navbar`) must remain in the **exact same location** across all pages.
@@ -39,7 +39,7 @@ To maintain absolute visual stability, the elements on the professional landing 
   * **NEVER** use auto margins (`margin-top: auto`) or vertical grid alignment (`align-items: center`) on the whole grid container, as varying bio text heights will push the titles up/down between page transitions.
 
 ### C. Scrollbar Jump Prevention
-* Always ensure `scrollbar-gutter: stable;` is declared on the `html` element. This reserves a vertical layout gutter for the scrollbar, preventing horizontal baseline jumps when navigating from a non-scrollable page (like the professional home) to a scrollable page (like the kitchen page).
+* Always ensure `scrollbar-gutter: stable;` is declared on the `html` element. This reserves a vertical layout gutter for the scrollbar, preventing horizontal baseline jumps when navigating from a non-scrollable page (like the office home) to a scrollable page (like the kitchen page).
 
 ### D. Image Containment
 * Illustrations (`.sketch-img`) must remain in full view inside the viewport bounds.

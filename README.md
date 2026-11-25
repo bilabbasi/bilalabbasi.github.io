@@ -1,7 +1,7 @@
 # bilalabbasi.github.io
 
 This repository hosts my personal website. It is divided into two spaces:
-1. **Professional Portfolio**: Highlights my background as a research scientist in AI, deep learning, and systems engineering.
+1. **The Office**: Highlights my background as a research scientist in AI, deep learning, and systems engineering.
 2. **The Kitchen**: A space for some of my favourite recipes throughout my childhood.
 
 ## Basic ethos
@@ -21,7 +21,7 @@ The site is built with a focus on simplicity, responsiveness, and clean typograp
 ## Repository structure
 
 * `index.html` — Minimalist gateway cover page at the root domain (`/`).
-* `professional/index.html` / `index.css` — Dedicated professional profile (`/professional/`).
+* `office/index.html` / `index.css` — Dedicated office profile (`/office/`).
 * `kitchen/index.html` / `kitchen.css` — Dedicated dashboard and styles for "The Kitchen" recipes (`/kitchen/`).
 * `config.js` — Central configuration file holding profile info, links, and titles.
 * `kitchen/recipes/` — Contains recipe stylesheets, templates, and recipe data (see [kitchen/recipes/README.md](kitchen/recipes/README.md) for the recipe formatting guide).

@@ -197,7 +197,7 @@ body {
     min-height: calc(100vh - 100px);
     /* Fills screen minus wrapper top padding (40px) and navbar height (60px) */
     padding-bottom: 20px;
-    /* Adds bottom padding to match professional wrapper bottom padding */
+    /* Adds bottom padding to match office wrapper bottom padding */
     justify-content: space-between;
     flex-shrink: 0;
     /* Prevent flex shrinking to respect min-height */
