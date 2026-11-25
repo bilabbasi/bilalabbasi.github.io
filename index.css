@@ -75,7 +75,7 @@
 }
 
 /* Reserve vertical scrollbar space on every page so navigating between
-   non-scrolling (/professional/) and scrolling (/kitchen/) never shifts layout horizontally. */
+   non-scrolling (/office/) and scrolling (/kitchen/) never shifts layout horizontally. */
 html {
     scrollbar-gutter: stable;
 }
@@ -510,7 +510,7 @@ body {
     transition: color var(--transition-smooth), text-decoration-color var(--transition-smooth);
 }
 
-.professional-content .bio-paragraph a {
+.office-content .bio-paragraph a {
     text-decoration: none;
     background-image:
         linear-gradient(var(--scientist-color, #4c7abb), var(--scientist-color, #4c7abb)),
@@ -528,9 +528,9 @@ body {
     color: var(--scientist-color, #4c7abb);
 }
 
-.professional-content .bio-paragraph a:hover,
-.professional-content .bio-paragraph a:focus,
-.professional-content .bio-paragraph a:focus-visible {
+.office-content .bio-paragraph a:hover,
+.office-content .bio-paragraph a:focus,
+.office-content .bio-paragraph a:focus-visible {
     text-shadow: 0 0 0.015em currentColor;
     background-size: 100% 1px, 100% 1px;
 }
@@ -562,7 +562,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .professional-content .bio-paragraph a,
+    .office-content .bio-paragraph a,
     .bio-contact-trigger {
         transition-duration: 0.01ms !important;
     }
@@ -845,18 +845,18 @@ body {
     pointer-events: none;              /* Prevents mouse dragging/saving issues on clicks */
 }
 
-/* Enhanced presence and gravitas for professional page illustration */
+/* Enhanced presence and gravitas for office page illustration */
 @media (min-width: 901px) {
-    .main-content.professional-content {
+    .main-content.office-content {
         grid-template-columns: 1fr 1.35fr;
         gap: 56px;
     }
 
-    .professional-sketch {
+    .office-sketch {
         margin-top: -45px;
     }
 
-    .professional-sketch .sketch-img {
+    .office-sketch .sketch-img {
         max-height: calc(100vh - 145px);
         opacity: 0.98;
         filter: contrast(1.04) saturate(1.03);
@@ -864,11 +864,11 @@ body {
 }
 
 @media (max-width: 900px) {
-    .professional-sketch {
+    .office-sketch {
         max-width: 460px;
     }
 
-    .professional-sketch .sketch-img {
+    .office-sketch .sketch-img {
         max-height: 52vh;
         opacity: 0.98;
         filter: contrast(1.04) saturate(1.03);
@@ -947,7 +947,7 @@ body {
         margin-bottom: 40px;
     }
 
-    .main-content.professional-content {
+    .main-content.office-content {
         margin-top: 36px; /* Elevates text on mobile while preserving comfortable top breathing room */
     }
 
@@ -991,7 +991,7 @@ body {
         font-size: 1.8rem;
     }
 
-    .main-content.professional-content {
+    .main-content.office-content {
         margin-top: 28px;
     }
 

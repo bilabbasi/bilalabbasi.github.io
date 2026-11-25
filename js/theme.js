@@ -1,7 +1,7 @@
 /**
  * Applies KITCHEN_CONFIG.theme to CSS custom properties on kitchen and recipe pages.
  * Runs synchronously in <head> before first paint to prevent a flash of unstyled colors,
- * while keeping /professional/ and the root gateway strictly untouched.
+ * while keeping /office/ and the root gateway strictly untouched.
  */
 (function () {
     if (typeof KITCHEN_CONFIG === "undefined" || !KITCHEN_CONFIG.theme) return;
@@ -10,7 +10,7 @@
         if (typeof window === "undefined" || !window.location) return true;
         const path = window.location.pathname || "";
 
-        if (path.includes("/professional/") || path.endsWith("/professional") || path.endsWith("/professional/index.html")) {
+        if (path.includes("/office/") || path.endsWith("/office") || path.endsWith("/office/index.html")) {
             return false;
         }
 
@@ -21,7 +21,7 @@
         }
 
         // Match kitchen/ or recipes/ as a whole path segment so an ancestor folder
-        // containing "kitchen" in its name never leaks kitchen colors onto /professional/.
+        // containing "kitchen" in its name never leaks kitchen colors onto /office/.
         return /\/(kitchen|recipes)(\/|$)/.test(path);
     }
 

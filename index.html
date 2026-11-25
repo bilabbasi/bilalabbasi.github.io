@@ -27,12 +27,12 @@
                 name: "hi, i'm bilal",
                 greetingPrefix: "hi, i'm bilal, the",
                 links: [
-                    { label: "professional", url: "professional/", target: "professional" },
+                    { label: "office", url: "office/", target: "office" },
                     { label: "kitchen", url: "kitchen/", target: "kitchen" }
                 ],
                 reel: {
                     colors: {
-                        professional: "#2b4162",
+                        office: "#2b4162",
                         kitchen: "#b83b14"
                     }
                 }
@@ -47,8 +47,8 @@
             if (linksContainer && config.links && config.links.length > 0) {
                 linksContainer.innerHTML = config.links.map((link, index) => {
                     const isKitchen = link.url.includes("kitchen");
-                    const extraClass = isKitchen ? "gateway-link-kitchen" : "gateway-link-professional";
-                    const targetKey = isKitchen ? "kitchen" : "professional";
+                    const extraClass = isKitchen ? "gateway-link-kitchen" : "gateway-link-office";
+                    const targetKey = isKitchen ? "kitchen" : "office";
                     const linkHtml = `<a href="${link.url}" class="gateway-link ${extraClass}" data-reel="${targetKey}" data-door="${targetKey}">${link.label}</a>`;
                     return index < config.links.length - 1
                         ? `${linkHtml}<span class="gateway-divider" aria-hidden="true">/</span>`
@@ -69,13 +69,13 @@
                 if (it.id && it.color) itemColors[it.id] = it.color;
             });
             const kitchenColor = itemColors.cook || (config.reel && config.reel.colors && config.reel.colors.kitchen) || "#b83b14";
-            const professionalColor = itemColors.scientist || (config.reel && config.reel.colors && config.reel.colors.professional) || "#2b4162";
+            const officeColor = itemColors.scientist || (config.reel && config.reel.colors && config.reel.colors.office) || "#2b4162";
             document.documentElement.style.setProperty("--gateway-kitchen-color", kitchenColor);
-            document.documentElement.style.setProperty("--gateway-professional-color", professionalColor);
+            document.documentElement.style.setProperty("--gateway-office-color", officeColor);
 
             const N = items.length;
             const cookIndex = items.findIndex(it => it.id === "cook" || it.target === "kitchen");
-            const scientistIndex = items.findIndex(it => it.id === "scientist" || it.target === "professional");
+            const scientistIndex = items.findIndex(it => it.id === "scientist" || it.target === "office");
 
             // Build 3 sets of items for seamless circular infinite wrapping
             let trackHtml = "";
@@ -106,7 +106,7 @@
                 if (state === "kitchen") {
                     const idx = (cookIndex >= 0 ? cookIndex : 1);
                     return (N + idx - 1.5) * H;
-                } else if (state === "professional") {
+                } else if (state === "office") {
                     const idx = (scientistIndex >= 0 ? scientistIndex : 2);
                     return (N + idx - 1.5) * H;
                 } else {
@@ -116,13 +116,13 @@
                 }
             }
 
-            // Preview query param for headless verification (?state=professional, ?state=kitchen, ?state=resting, ?item=cyclist, etc.)
+            // Preview query param for headless verification (?state=office, ?state=kitchen, ?state=resting, ?item=cyclist, etc.)
             const urlParams = new URLSearchParams(window.location.search);
             const previewState = urlParams.get("state");
             const previewItem = urlParams.get("item");
 
             let initialTarget = "resting";
-            if (previewState && (previewState === "professional" || previewState === "kitchen" || previewState === "resting")) {
+            if (previewState && (previewState === "office" || previewState === "kitchen" || previewState === "resting")) {
                 initialTarget = previewState;
             }
 
@@ -190,8 +190,8 @@
                         const itemId = el.getAttribute("data-item-id");
                         if (itemId === "cook" && currentState === "kitchen") {
                             el.style.color = kitchenColor;
-                        } else if (itemId === "scientist" && currentState === "professional") {
-                            el.style.color = professionalColor;
+                        } else if (itemId === "scientist" && currentState === "office") {
+                            el.style.color = officeColor;
                         } else {
                             el.style.color = "var(--text-title, #1e293b)";
                         }
@@ -571,8 +571,8 @@
             </h1>
             <div class="gateway-divider-line" aria-hidden="true"></div>
             <nav class="gateway-links" id="gateway-links" aria-label="Choose a space">
-                <a href="professional/" class="gateway-link gateway-link-professional" data-reel="professional"
-                    data-door="professional">professional</a>
+                <a href="office/" class="gateway-link gateway-link-office" data-reel="office"
+                    data-door="office">office</a>
                 <span class="gateway-divider" aria-hidden="true">|</span>
                 <a href="kitchen/" class="gateway-link gateway-link-kitchen" data-reel="kitchen"
                     data-door="kitchen">kitchen</a>

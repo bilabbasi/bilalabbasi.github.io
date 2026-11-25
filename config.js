@@ -13,9 +13,9 @@ const GATEWAY_CONFIG = {
     // Navigation links shown at the bottom of the gateway
     links: [
         {
-            label: "professional", // Display text for the link
-            url: "professional/",   // Destination URL
-            target: "professional"  // Associates link with "the scientist" reel state
+            label: "office",        // Display text for the link
+            url: "office/",         // Destination URL
+            target: "office"        // Associates link with "the scientist" reel state
         },
         {
             label: "kitchen",       // Display text for the link
@@ -28,19 +28,19 @@ const GATEWAY_CONFIG = {
     // - In resting state: all options are visible in faded grey, with the midline
     //   between "the cook" and "the scientist" centered on the second line.
     // - Hovering/clicking "kitchen": smoothly rolls "the cook" into alignment (terracotta).
-    // - Hovering/clicking "professional": smoothly rolls "the scientist" into alignment (indigo slate).
+    // - Hovering/clicking "office": smoothly rolls "the scientist" into alignment (indigo slate).
     // - Scrolling (mouse wheel, drag, or touch swipe): lets visitors explore all other descriptors (easter egg).
     reel: {
         // Descriptors in the circular reel. You can add, edit, or reorder items freely here.
         // - id: unique slug for DOM classes and query parameters (?item=<id>)
         // - label: visible text rendered on the reel
-        // - target: optional ("kitchen" | "professional"); associates item with a navigation link
+        // - target: optional ("kitchen" | "office"); associates item with a navigation link
         // - color: hex color used when this item is active/locked
         // - atmospheric: true = easter egg descriptor (renders in dark charcoal #1e293b when centered)
         items: [
             { id: "runner", label: "the runner", atmospheric: true },
             { id: "cook", label: "the cook", target: "kitchen", color: "#b83b14" },
-            { id: "scientist", label: "the scientist", target: "professional", color: "#4c7abbff" },
+            { id: "scientist", label: "the scientist", target: "office", color: "#4c7abbff" },
             { id: "reader", label: "the reader", atmospheric: true },
             { id: "son", label: "the son", atmospheric: true },
             { id: "husband", label: "the husband", atmospheric: true },
@@ -70,13 +70,13 @@ const GATEWAY_CONFIG = {
 };
 
 // -------------------------------------------------------------------------
-// 1. PROFESSIONAL ME CONFIGURATION
+// 1. OFFICE CONFIGURATION
 // -------------------------------------------------------------------------
-const PROFESSIONAL_CONFIG = {
+const OFFICE_CONFIG = {
     // Your name as you want it displayed (e.g. "Bilal Abbasi")
     name: "Bilal Abbasi",
 
-    // Your professional subtitle (appears under your name)
+    // Your office subtitle (appears under your name)
     subtitle: "Research Scientist, PhD",
 
     // Your biography paragraph
@@ -90,7 +90,7 @@ const PROFESSIONAL_CONFIG = {
     },
 
     // Tab title
-    tab: "professional me",
+    tab: "office",
 
     // Links to your profiles (LinkedIn, Google Scholar, GitHub, etc.)
     links: [

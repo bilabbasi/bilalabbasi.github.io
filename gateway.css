@@ -67,8 +67,8 @@
     transition: color 0.22s ease;
 }
 
-.gateway-card[data-state="professional"] .gateway-name-accent {
-    color: var(--gateway-professional-color, #4b5563);
+.gateway-card[data-state="office"] .gateway-name-accent {
+    color: var(--gateway-office-color, #4b5563);
 }
 
 .gateway-card[data-state="kitchen"] .gateway-name-accent {
@@ -212,30 +212,30 @@
     color: var(--text-title);
 }
 
-/* Professional door: crisp architectural underline sweeping left-to-right */
-.gateway-link.gateway-link-professional::after {
+/* Office door: crisp architectural underline sweeping left-to-right */
+.gateway-link.gateway-link-office::after {
     content: '';
     position: absolute;
     left: 0;
     right: 0;
     bottom: 8px;
     height: 1.5px;
-    background-color: var(--gateway-professional-color, #2b4162);
+    background-color: var(--gateway-office-color, #2b4162);
     transform: scaleX(0);
     transform-origin: left center;
     transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
     pointer-events: none;
 }
 
-.gateway-link.gateway-link-professional:hover,
-.gateway-link.gateway-link-professional:focus-visible,
-.gateway-link.gateway-link-professional.is-selected {
-    color: var(--gateway-professional-color, #2b4162);
+.gateway-link.gateway-link-office:hover,
+.gateway-link.gateway-link-office:focus-visible,
+.gateway-link.gateway-link-office.is-selected {
+    color: var(--gateway-office-color, #2b4162);
 }
 
-.gateway-link.gateway-link-professional:hover::after,
-.gateway-link.gateway-link-professional:focus-visible::after,
-.gateway-link.gateway-link-professional.is-selected::after {
+.gateway-link.gateway-link-office:hover::after,
+.gateway-link.gateway-link-office:focus-visible::after,
+.gateway-link.gateway-link-office.is-selected::after {
     transform: scaleX(1);
 }
 
@@ -280,7 +280,7 @@
 
 @media (prefers-reduced-motion: reduce) {
     .gateway-link,
-    .gateway-link.gateway-link-professional::after,
+    .gateway-link.gateway-link-office::after,
     .gateway-link.gateway-link-kitchen::after {
         transition-duration: 0.01ms !important;
     }

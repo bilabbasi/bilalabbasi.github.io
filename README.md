@@ -1,7 +1,7 @@
 # bilalabbasi.github.io
 
 Personal website of Bilal Abbasi (`www.bilalabbasi.com`), divided into two spaces:
-1. **Professional** (`/professional/`) — Research, publications, and engineering background.
+1. **Office** (`/office/`) — Research, publications, and engineering background.
 2. **The Kitchen** (`/kitchen/`) — Childhood recipes, cultural essays, and Urdu typography.
 
 Built with vanilla HTML5, CSS3, and ES6 JavaScript—no build step, no bundler, no framework.
@@ -19,7 +19,7 @@ Built with vanilla HTML5, CSS3, and ES6 JavaScript—no build step, no bundler, 
 
 ### Plumbing (layout, styling, and scripts)
 * `index.html` + `gateway.css` — Root cover page (`/`) with the interactive descriptor reel.
-* `professional/index.html` — Professional profile page.
+* `office/index.html` — Office profile page.
 * `kitchen/index.html` + `kitchen.css` — Kitchen landing page and recipe menu grid.
 * `kitchen/customs/index.html` & `kitchen/ammi/index.html` — Kitchen subpage shells that render their `.md` files.
 * `kitchen/recipes/` — Shared `recipe-engine.js`, modular `css/recipe-*.css`, and `new.js` scaffolder (see [kitchen/recipes/README.md](kitchen/recipes/README.md)).
@@ -65,7 +65,7 @@ Then add the printed entry to `KITCHEN_CONFIG.recipes` in `config.js`.
 ### 2. Edit a bio, links, or gateway descriptors
 Open `config.js` and edit:
 * `GATEWAY_CONFIG.reel.items` — Descriptors on the cover page.
-* `PROFESSIONAL_CONFIG` — Name, subtitle, bio, and external links.
+* `OFFICE_CONFIG` — Name, subtitle, bio, and external links.
 * `KITCHEN_CONFIG` — Kitchen title, subtitle, bio, theme colors, and recipes.
 
 ### 3. Edit the Customs or Ammi essays
