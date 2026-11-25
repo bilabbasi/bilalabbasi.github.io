@@ -7,3 +7,5 @@
 skills-lock.json
 .impeccable/*.local.json
 pr.md
+__pycache__/
+*.pyc

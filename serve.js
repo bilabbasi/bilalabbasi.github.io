@@ -40,7 +40,7 @@ function getTailscaleIp() {
     // 1. Try checking tailscale CLI directly
     try {
         const out = execSync('tailscale ip -4', { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'], timeout: 1000 }).trim();
-        if (out && /^100\.(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\.\d+$/.test(out)) {
+        if (out && /^100\.(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\.\d+\.\d+$/.test(out)) {
             return out;
         }
     } catch (_) {}
@@ -48,7 +48,7 @@ function getTailscaleIp() {
     // 2. Try macOS app binary path if CLI is not in standard PATH
     try {
         const out = execSync('/Applications/Tailscale.app/Contents/MacOS/Tailscale ip -4', { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'], timeout: 1000 }).trim();
-        if (out && /^100\.(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\.\d+$/.test(out)) {
+        if (out && /^100\.(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\.\d+\.\d+$/.test(out)) {
             return out;
         }
     } catch (_) {}

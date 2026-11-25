@@ -13,6 +13,7 @@ const fs = require('fs');
 const indexCss = fs.readFileSync(__dirname + '/../index.css', 'utf-8');
 const kitchenCss = fs.readFileSync(__dirname + '/../kitchen.css', 'utf-8');
 
+assert.doesNotMatch(indexCss, /@import\s+url\(/, 'index.css should not use CSS @import (link Google Fonts in HTML <head>)');
 assert.match(indexCss, /--ink-brush-mask/, 'index.css should define --ink-brush-mask');
 assert.match(indexCss, /@keyframes qalam-stroke-draw/, 'index.css should define @keyframes qalam-stroke-draw');
 
@@ -49,9 +50,7 @@ assert.match(recipeBaseCss, /var\(--color-pop\)/, 'recipe-base.css should use va
 assert.match(recipeBaseCss, /\.recipe-indicators/, 'recipe-base.css should define .recipe-indicators');
 assert.match(recipeBaseCss, /\.nav-item a\.active::after\s*\{[^}]*mask-image:\s*var\(--ink-brush-mask\)/, 'Active back-link should use --ink-brush-mask');
 
-assert.match(recipeSideBySideCss, /var\(--color-urdu/, 'recipe-side-by-side.css should use var(--color-urdu)');
-assert.match(recipeSideBySideCss, /\.urdu-title\s*\{[^}]*color:\s*var\(--color-urdu\)/, '.urdu-title should use var(--color-urdu) in recipe-side-by-side.css');
-assert.match(recipeSideBySideCss, /\.recipe-link::after\s*\{[^}]*mask-image:\s*var\(--ink-brush-mask\)/, 'recipe-side-by-side.css links should use --ink-brush-mask');
+assert.match(recipeSideBySideCss, /#menu \.recipe-section-toggle/, 'recipe-side-by-side.css should style semantic .recipe-section-toggle buttons');
 assert.match(recipeSideBySideCss, /\.steps-scroll-container/, 'recipe-side-by-side.css should define .steps-scroll-container');
 assert.match(recipeSideBySideCss, /\.scroll-down-btn/, 'recipe-side-by-side.css should define .scroll-down-btn');
 

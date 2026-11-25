@@ -189,8 +189,8 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
     assert.ok(header.innerHTML.includes('class="nav-home nav-focal"'), 'Active kitchen tab should have nav-home class');
     assert.ok(header.innerHTML.includes('nav-item-bilal'), 'Bilal tab should have nav-item-bilal class');
     assert.ok(header.innerHTML.includes('>بلال</a>'), 'Should include بلال Urdu text');
-    assert.ok(header.innerHTML.includes('class="nav-text" data-nav-id="abu">abu</span>'), 'Abu tab should render as text');
-    assert.ok(header.innerHTML.includes('class="nav-text" data-nav-id="bhaiya">bhaiya</span>'), 'Bhaiya tab should render as text');
+    assert.ok(header.innerHTML.includes('class="nav-text" data-nav-id="abu" aria-disabled="true"'), 'Abu tab should render as disabled text');
+    assert.ok(header.innerHTML.includes('class="nav-text" data-nav-id="bhaiya" aria-disabled="true"'), 'Bhaiya tab should render as disabled text');
     assert.ok(header.innerHTML.includes('href="../"'), 'From /kitchen/, bilal link should point to "../"');
     assert.ok(header.innerHTML.includes('href="./"'), 'Kitchen tab should have href="./"');
     assert.ok(header.innerHTML.includes('href="customs/"'), 'Customs tab should have href="customs/"');
@@ -220,6 +220,22 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
     assert.ok(header.innerHTML.includes('href="./"'), 'From customs, customs link should be "./"');
     assert.ok(header.innerHTML.includes('href="../ammi/"'), 'From customs, ammi link should be "../ammi/"');
     console.log('PASS: renderNavbar produces correct relative paths on /kitchen/customs/.');
+}
+
+// 4b. Test file:/// protocol appends index.html to all directory links
+{
+    const { context, header, win } = createNavTestEnv('/kitchen/index.html');
+    win.location.protocol = 'file:';
+    navScript.runInContext(context);
+
+    header.setAttribute('data-nav', 'kitchen');
+    header.setAttribute('data-current', 'kitchen');
+    context.window.renderSiteNavbar(header);
+
+    assert.ok(header.innerHTML.includes('href="customs/index.html"'), 'file:// customs link should end with index.html');
+    assert.ok(header.innerHTML.includes('href="ammi/index.html"'), 'file:// ammi link should end with index.html');
+    assert.ok(header.innerHTML.includes('href="../index.html"'), 'file:// bilal home link should end with index.html');
+    console.log('PASS: file:// directory links append index.html across all nav items.');
 }
 
 // 5. Test updateIndicator math
@@ -276,7 +292,7 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
     console.log('PASS: renderSplitHeaders stamps correct title, Urdu script, and configured color from config.js.');
 }
 
-// 7. Test accessible tablist semantics & procedural SVG brush stroke path morph compatibility
+// 7. Test accessible nav semantics & procedural SVG brush stroke path morph compatibility
 {
     const { context, header } = createNavTestEnv('/kitchen/index.html');
     navScript.runInContext(context);
@@ -286,9 +302,9 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
     context.window.renderSiteNavbar(header);
 
     assert.ok(header.innerHTML.includes('<nav class="nav-container"'), 'Should wrap nav links in semantic <nav>');
-    assert.ok(header.innerHTML.includes('role="tablist"'), 'Should mark ul.nav-links with role="tablist"');
-    assert.ok(header.innerHTML.includes('role="tab" aria-selected="true" aria-current="page"'), 'Active tab should have aria-selected="true" and aria-current="page"');
-    assert.ok(header.innerHTML.includes('role="tab" aria-selected="false"'), 'Inactive tabs should have aria-selected="false"');
+    assert.ok(!header.innerHTML.includes('role="tablist"'), 'Navigation links should not misuse role="tablist"');
+    assert.ok(!header.innerHTML.includes('role="tab"'), 'Navigation links should not misuse role="tab"');
+    assert.ok(header.innerHTML.includes('data-nav-id="kitchen" aria-current="page"'), 'Active nav link should have aria-current="page"');
 
     const paths = context.window.INK_BRUSH_PATHS;
     assert.ok(paths && paths.CORE_REST && paths.CORE_STRETCH && paths.CORE_SETTLE, 'INK_BRUSH_PATHS should expose rest, stretch, and settle vector paths');
@@ -460,7 +476,21 @@ function createNavTestEnv(initialPath = '/kitchen/index.html') {
     assert.ok(header.innerHTML.includes('← the kitchen'), 'Contains "← the kitchen" back link');
     assert.ok(header.innerHTML.includes('ammi’s yellow daal'), 'Contains recipe title link');
     assert.ok(header.innerHTML.includes('recipe-top-link active'), 'Recipe title link has recipe-top-link active classes');
-    console.log('PASS: Recipe stationary navbar "← the kitchen | <recipe_name>" verified.');
+
+    // Verify idempotency: repeated calls for the same recipe must not overwrite innerHTML
+    const originalHtml = header.innerHTML;
+    const fakeTab = context.document.createElement('a');
+    fakeTab.id = 'recipe-top-tab';
+    header.querySelector = (sel) => (sel === '#recipe-top-tab' ? fakeTab : null);
+    let innerHtmlWrites = 0;
+    let storedHtml = originalHtml;
+    Object.defineProperty(header, 'innerHTML', {
+        get: () => storedHtml,
+        set: (v) => { innerHtmlWrites++; storedHtml = v; }
+    });
+    context.window.renderRecipeNavbar(header, 'Ammi’s Yellow Daal', '../../');
+    assert.strictEqual(innerHtmlWrites, 0, 'Repeated renderRecipeNavbar calls for same recipe must not rewrite innerHTML');
+    console.log('PASS: Recipe stationary navbar "← the kitchen | <recipe_name>" and idempotency verified.');
 }
 
 console.log('ALL NAV TESTS PASSED!');
