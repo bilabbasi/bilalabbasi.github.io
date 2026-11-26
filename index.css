@@ -1074,7 +1074,6 @@ body {
     right: -32px;
     overflow: hidden;
     pointer-events: auto;
-    perspective: 460px;
     -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
     mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
 }
@@ -1088,7 +1087,6 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    transform-style: preserve-3d;
     pointer-events: none;
     user-select: none;
     will-change: transform;
@@ -1110,7 +1108,6 @@ body {
     white-space: nowrap;
     color: var(--text-muted, #6b7280);
     opacity: 0;
-    backface-visibility: hidden;
     transform-origin: center center;
     transition: color 0.22s ease;
     will-change: transform, opacity, color;
