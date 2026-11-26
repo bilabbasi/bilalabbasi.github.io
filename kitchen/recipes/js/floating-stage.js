@@ -396,8 +396,8 @@
         `;
     }
 
-    function toggleFloatingItemUrdu(item) {
-        const isUrdu = item.classList.toggle('is-urdu');
+    function setFloatingItemUrdu(item, isUrdu) {
+        item.classList.toggle('is-urdu', isUrdu);
         item.setAttribute('aria-pressed', isUrdu ? 'true' : 'false');
         const nameEl = item.querySelector('.floating-item-name');
         const qtyEl = item.querySelector('.floating-item-qty');
@@ -413,12 +413,17 @@
         }
     }
 
+    function toggleFloatingItemUrdu(item) {
+        setFloatingItemUrdu(item, !item.classList.contains('is-urdu'));
+    }
+
     function clearMobileFocus(scope) {
         (scope || document).querySelectorAll('.has-mobile-focus').forEach(el => {
             el.classList.remove('has-mobile-focus');
         });
         (scope || document).querySelectorAll('.floating-item.is-mobile-focused').forEach(el => {
             el.classList.remove('is-mobile-focused');
+            setFloatingItemUrdu(el, false);
         });
     }
 
@@ -428,11 +433,12 @@
             return;
         }
         if (item.classList.contains('is-mobile-focused')) {
-            toggleFloatingItemUrdu(item);
+            clearMobileFocus(document);
         } else {
             clearMobileFocus(document);
             container.classList.add('has-mobile-focus');
             item.classList.add('is-mobile-focused');
+            setFloatingItemUrdu(item, true);
         }
     }
 
