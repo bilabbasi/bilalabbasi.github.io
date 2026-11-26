@@ -30,22 +30,13 @@ const GATEWAY_CONFIG = {
     // - Hovering/clicking "office": smoothly rolls "the scientist" into alignment (indigo slate).
     // - Scrolling (mouse wheel, drag, or touch swipe): lets visitors explore all other descriptors (easter egg).
     reel: {
-        // Initial phrase shown at rest; evaporates (one-way) on first hover or interaction
-        restingLabel: "a bit of everything",
-
-        // Evaporation tuning for restingLabel:
-        // - duration: How long (ms) the phrase takes to dissolve away (higher = slower, e.g. 800, 1400, 2400)
-        // - revealDuration: How long (ms) the horizontal wheel takes to fade in behind it
-        // - blur: Final blur amount in px as it turns to mist
-        // - rise: Upward drift in px while evaporating
-        // - spread: Letter-spacing expansion in em while dispersing
-        evaporation: {
-            duration: 2000,
-            revealDuration: 2000,
-            blur: 10,
-            rise: 14,
-            spread: 0.04
-        },
+        // Auto-advance barrel rotation:
+        // - autoplayInterval: Time (ms) between automatic turns to the next "the ___" (0 to disable)
+        // - turnDuration: Duration (ms) of each cylindrical turn
+        // - bounce: Mechanical detent overshoot on landing (0 = no bounce, 1.35 = subtle bounce, 2.2 = bouncier)
+        autoplayInterval: 2500,
+        turnDuration: 680,
+        bounce: 1.35,
 
         // Descriptors in the circular reel. You can add, edit, or reorder items freely here.
         // - id: unique slug for DOM classes and query parameters (?item=<id>)

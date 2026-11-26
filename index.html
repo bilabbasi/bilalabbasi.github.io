@@ -66,28 +66,6 @@
             const reelEl = document.getElementById("gateway-reel");
             const trackEl = document.getElementById("reel-track");
             const anchorEl = document.querySelector(".reel-baseline-anchor");
-            const restingPhraseEl = document.getElementById("reel-resting-phrase");
-            if (restingPhraseEl && config.reel && config.reel.restingLabel) {
-                restingPhraseEl.textContent = config.reel.restingLabel;
-            }
-            if (reelEl && config.reel && config.reel.evaporation) {
-                const ev = config.reel.evaporation;
-                if (typeof ev.duration === "number") {
-                    reelEl.style.setProperty("--evap-duration", `${ev.duration}ms`);
-                }
-                if (typeof ev.revealDuration === "number") {
-                    reelEl.style.setProperty("--reel-reveal-duration", `${ev.revealDuration}ms`);
-                }
-                if (typeof ev.blur === "number") {
-                    reelEl.style.setProperty("--evap-blur", `${ev.blur}px`);
-                }
-                if (typeof ev.rise === "number") {
-                    reelEl.style.setProperty("--evap-rise", `${-Math.abs(ev.rise)}px`);
-                }
-                if (typeof ev.spread === "number") {
-                    reelEl.style.setProperty("--evap-spread", `${ev.spread}em`);
-                }
-            }
 
             const items = (config.reel && Array.isArray(config.reel.items)) ? config.reel.items : [];
             const itemColors = {};
@@ -103,6 +81,17 @@
             const cookIndex = items.findIndex(it => it.id === "cook" || it.target === "kitchen");
             const scientistIndex = items.findIndex(it => it.id === "scientist" || it.target === "office");
 
+            const autoplayIntervalMs = (config.reel && typeof config.reel.autoplayInterval === "number")
+                ? config.reel.autoplayInterval
+                : 3000;
+            const turnDurationMs = (config.reel && typeof config.reel.turnDuration === "number")
+                ? config.reel.turnDuration
+                : 680;
+            const bounceOvershoot = (config.reel && typeof config.reel.bounce === "number")
+                ? config.reel.bounce
+                : 1.35;
+            const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
             // Build 3 sets of items for seamless circular infinite wrapping
             let trackHtml = "";
             for (let c = 0; c < 3; c++) {
@@ -116,46 +105,25 @@
                 trackEl.innerHTML = trackHtml;
             }
 
-            const viewportEl = reelEl ? reelEl.querySelector(".reel-viewport") : null;
-
-            function getHorizontalMetrics() {
-                const viewportW = (viewportEl && viewportEl.clientWidth) || (reelEl && reelEl.clientWidth) || 720;
-                const viewportCenterX = viewportW / 2;
-                const children = trackEl ? trackEl.children : [];
-                let cycleWidth = 0;
-                if (children.length >= 2 * N && N > 0) {
-                    cycleWidth = children[N].offsetLeft - children[0].offsetLeft;
+            function getItemHeight() {
+                if (anchorEl && anchorEl.offsetHeight > 0) {
+                    return anchorEl.offsetHeight;
                 }
-                if (!cycleWidth || cycleWidth <= 0) {
-                    cycleWidth = Math.max(1, N) * 280;
-                }
-                const avgStep = cycleWidth / Math.max(1, N);
-                const copy1Origin = (children.length > N ? children[N].offsetLeft : cycleWidth) - viewportCenterX;
-                return { viewportW, viewportCenterX, cycleWidth, avgStep, copy1Origin, children };
+                return 68;
             }
 
-            function getItemCenterX(childIdx, metrics) {
-                const { children, avgStep } = metrics;
-                if (children && children[childIdx]) {
-                    const el = children[childIdx];
-                    return el.offsetLeft + el.offsetWidth / 2;
-                }
-                return (childIdx + 0.5) * avgStep;
-            }
-
-            // Target translateX offsets (center of target item aligned to viewportCenterX)
+            // Tight single-row barrel: viewport height is 1 * H, center is 0.5 * H.
+            // Item index K has center (K + 0.5) * H, so T = K * H centers item K.
             function getTargetOffset(state) {
-                const m = getHorizontalMetrics();
-                const cIdx = (cookIndex >= 0 ? cookIndex : 1);
-                const sIdx = (scientistIndex >= 0 ? scientistIndex : 2);
+                const H = getItemHeight();
                 if (state === "kitchen") {
-                    return getItemCenterX(N + cIdx, m) - m.viewportCenterX;
+                    const idx = (cookIndex >= 0 ? cookIndex : 1);
+                    return (N + idx) * H;
                 } else if (state === "office") {
-                    return getItemCenterX(N + sIdx, m) - m.viewportCenterX;
+                    const idx = (scientistIndex >= 0 ? scientistIndex : 2);
+                    return (N + idx) * H;
                 } else {
-                    // Resting: midpoint between cook and scientist
-                    const midCenter = (getItemCenterX(N + cIdx, m) + getItemCenterX(N + sIdx, m)) / 2;
-                    return midCenter - m.viewportCenterX;
+                    return (N + activeIndex) * H;
                 }
             }
 
@@ -164,9 +132,12 @@
             const previewState = urlParams.get("state");
             const previewItem = urlParams.get("item");
 
+            let activeIndex = 0;
             let initialTarget = "resting";
             if (previewState && (previewState === "office" || previewState === "kitchen" || previewState === "resting")) {
                 initialTarget = previewState;
+                if (previewState === "kitchen" && cookIndex >= 0) activeIndex = cookIndex;
+                if (previewState === "office" && scientistIndex >= 0) activeIndex = scientistIndex;
             }
 
             let currentState = initialTarget;
@@ -179,28 +150,21 @@
             if (previewItem) {
                 const itemIdx = items.findIndex(it => it.id === previewItem);
                 if (itemIdx >= 0) {
-                    const m = getHorizontalMetrics();
-                    currentT = getItemCenterX(N + itemIdx, m) - m.viewportCenterX;
+                    activeIndex = itemIdx;
+                    currentT = (N + itemIdx) * getItemHeight();
                     currentState = "scrolling";
-                }
-            }
-
-            function evaporateRestingPhrase() {
-                if (reelEl && !reelEl.classList.contains("has-evaporated")) {
-                    reelEl.classList.add("has-evaporated");
                 }
             }
 
             if (reelEl) {
                 reelEl.setAttribute("data-state", currentState);
-                if (currentState !== "resting") {
-                    evaporateRestingPhrase();
-                }
             }
 
             let leaveTimer = null;
             let animRafId = null;
             let momentumRafId = null;
+            let autoplayTimer = null;
+            let isLinkHovered = false;
 
             function cancelAnimation() {
                 if (animRafId) {
@@ -216,67 +180,103 @@
                 }
             }
 
+            function stopAutoplay() {
+                if (autoplayTimer) {
+                    clearInterval(autoplayTimer);
+                    autoplayTimer = null;
+                }
+            }
+
+            function startAutoplay() {
+                stopAutoplay();
+                if (prefersReducedMotion || autoplayIntervalMs <= 0 || N <= 1) return;
+                if (previewState || previewItem) return;
+                autoplayTimer = setInterval(() => {
+                    if (isNavigating || isDragging || isLinkHovered || document.hidden) return;
+                    const H = getItemHeight();
+                    activeIndex = (activeIndex + 1) % N;
+                    currentState = "resting";
+                    if (reelEl) reelEl.setAttribute("data-state", "resting");
+                    if (cardEl) cardEl.setAttribute("data-state", "resting");
+                    // Advance forward by exactly one slot with cylindrical bounce
+                    const nextT = Math.round(currentT / H) * H + H;
+                    animateTo(nextT, turnDurationMs, null, true, false);
+                }, autoplayIntervalMs);
+            }
+
             function renderTrack() {
                 if (!trackEl) return;
-                const m = getHorizontalMetrics();
-                const C = m.cycleWidth;
-                const minWrap = m.copy1Origin;
-                const maxWrap = m.copy1Origin + C;
+                const H = getItemHeight();
+                const C = N * H;
 
-                // Circular wrap currentT into Copy 1 range [copy1Origin, copy1Origin + C)
-                while (currentT < minWrap) currentT += C;
-                while (currentT >= maxWrap) currentT -= C;
+                // Circular wrap currentT into Copy 1 range [0.5 * C, 1.5 * C)
+                while (currentT < 0.5 * C) currentT += C;
+                while (currentT >= 1.5 * C) currentT -= C;
 
-                trackEl.style.transform = `translateX(${-currentT}px)`;
+                trackEl.style.transform = `translateY(${-currentT}px)`;
 
-                const children = m.children;
+                const viewportCenterY = 0.5 * H;
+                const children = trackEl.children;
                 const totalChildren = children.length;
 
                 for (let i = 0; i < totalChildren; i++) {
                     const el = children[i];
-                    const itemCenterX = el.offsetLeft + el.offsetWidth / 2;
-                    const screenDist = itemCenterX - currentT - m.viewportCenterX;
-                    const d = Math.abs(screenDist) / m.avgStep;
+                    const itemCenterY = (i + 0.5) * H;
+                    const screenDist = itemCenterY - currentT - viewportCenterY;
+                    const d = screenDist / H; // signed slot offset from center
+                    const absD = Math.abs(d);
 
-                    if (d < 0.28) {
-                        el.style.opacity = "1";
+                    if (absD < 1.15) {
+                        // Cylindrical barrel 3D tilt + subtle perspective compression
+                        const angleDeg = Math.max(-72, Math.min(72, -d * 62));
+                        const scale = Math.max(0.84, 1 - absD * 0.14);
+                        const opacity = Math.max(0, 1 - absD * 1.12);
+                        el.style.opacity = opacity.toFixed(3);
+                        el.style.transform = `rotateX(${angleDeg.toFixed(1)}deg) scale(${scale.toFixed(3)})`;
+
                         const itemId = el.getAttribute("data-item-id");
-                        if (itemId === "cook" && currentState === "kitchen") {
+                        if (absD < 0.35 && itemId === "cook" && currentState === "kitchen") {
                             el.style.color = kitchenColor;
-                        } else if (itemId === "scientist" && currentState === "office") {
+                        } else if (absD < 0.35 && itemId === "scientist" && currentState === "office") {
                             el.style.color = officeColor;
-                        } else {
+                        } else if (absD < 0.45) {
                             el.style.color = "var(--text-title, #1e293b)";
+                        } else {
+                            el.style.color = "var(--text-muted, #6b7280)";
                         }
-                    } else if (d < 0.92) {
-                        el.style.opacity = "0.40";
-                        el.style.color = "var(--text-muted, #6b7280)";
-                    } else if (d < 1.95) {
-                        el.style.opacity = "0.18";
-                        el.style.color = "var(--text-muted, #6b7280)";
                     } else {
                         el.style.opacity = "0";
-                        el.style.color = "var(--text-muted, #6b7280)";
+                        el.style.transform = "none";
                     }
                 }
             }
 
-            function animateTo(targetT, duration = 460, onComplete = null) {
+            // Back-out spring easing for subtle mechanical barrel detent bounce
+            function easeOutBack(x, s) {
+                if (s <= 0) return 1 - Math.pow(1 - x, 3);
+                const c3 = s + 1;
+                return 1 + c3 * Math.pow(x - 1, 3) + s * Math.pow(x - 1, 2);
+            }
+
+            function animateTo(targetT, duration = turnDurationMs, onComplete = null, withBounce = true, shortestPath = true) {
                 cancelAnimation();
                 cancelMomentum();
-                const C = getHorizontalMetrics().cycleWidth;
+                const H = getItemHeight();
+                const C = N * H;
 
-                // Pick shortest direction around circle
-                let delta = ((targetT - currentT) % C + C * 1.5) % C - 0.5 * C;
+                let endT = targetT;
+                if (shortestPath) {
+                    const delta = ((targetT - currentT) % C + C * 1.5) % C - 0.5 * C;
+                    endT = currentT + delta;
+                }
                 const startT = currentT;
-                const endT = currentT + delta;
                 const startTime = performance.now();
+                const overshoot = withBounce && !prefersReducedMotion ? bounceOvershoot : 0;
 
                 function step(now) {
                     const elapsed = now - startTime;
                     const progress = Math.min(1, elapsed / duration);
-                    // Quintic smooth cubic bezier easing (0.22, 1, 0.36, 1)
-                    const t = 1 - Math.pow(1 - progress, 3);
+                    const t = easeOutBack(progress, overshoot);
                     currentT = startT + (endT - startT) * t;
                     renderTrack();
 
@@ -285,6 +285,7 @@
                     } else {
                         animRafId = null;
                         currentT = endT;
+                        activeIndex = ((Math.round(currentT / H) % N) + N) % N;
                         renderTrack();
                         if (onComplete) onComplete();
                     }
@@ -298,9 +299,6 @@
                     newState = "resting";
                 }
                 currentState = newState;
-                if (newState !== "resting") {
-                    evaporateRestingPhrase();
-                }
 
                 if (leaveTimer) {
                     clearTimeout(leaveTimer);
@@ -314,8 +312,12 @@
                     cardEl.setAttribute("data-state", newState);
                 }
 
-                const targetT = getTargetOffset(newState);
-                animateTo(targetT, 460);
+                if (newState === "office" || newState === "kitchen") {
+                    const targetT = getTargetOffset(newState);
+                    animateTo(targetT, 560, null, true, true);
+                } else {
+                    renderTrack();
+                }
             }
 
             // Expose globally for tests and inspectability
@@ -323,40 +325,21 @@
             window.setDoorState = setReelState; // Backward compatibility alias
 
             // =====================================================================
-            // Free-Scroll & Magnetic Snap Physics (Easter Egg)
+            // Free-Scroll & Magnetic Snap Physics (Vertical Cylindrical Barrel)
             // =====================================================================
             let velocity = 0;
             let isDragging = false;
-            let touchStartX = 0;
-            let lastTouchX = 0;
+            let touchStartY = 0;
+            let lastTouchY = 0;
             let lastTouchTime = 0;
 
             function snapToNearest() {
-                const m = getHorizontalMetrics();
-                const C = m.cycleWidth;
-                const cIdx = (cookIndex >= 0 ? cookIndex : 1);
-                const sIdx = (scientistIndex >= 0 ? scientistIndex : 2);
-                const midTarget = (getItemCenterX(N + cIdx, m) + getItemCenterX(N + sIdx, m)) / 2 - m.viewportCenterX;
-
-                const candidateTargets = [midTarget];
-                for (let k = 0; k < N; k++) {
-                    candidateTargets.push(getItemCenterX(N + k, m) - m.viewportCenterX);
-                }
-
-                let bestTarget = null;
-                let minDelta = Infinity;
-
-                candidateTargets.forEach(candTarget => {
-                    let delta = ((candTarget - currentT) % C + C * 1.5) % C - 0.5 * C;
-                    if (Math.abs(delta) < Math.abs(minDelta)) {
-                        minDelta = delta;
-                        bestTarget = currentT + delta;
-                    }
-                });
-
-                if (bestTarget !== null) {
-                    animateTo(bestTarget, 240);
-                }
+                const H = getItemHeight();
+                const nearestSlot = Math.round(currentT / H);
+                activeIndex = ((nearestSlot % N) + N) % N;
+                animateTo(nearestSlot * H, 320, () => {
+                    startAutoplay();
+                }, true, false);
             }
 
             const wheelSensitivity = (config.reel && typeof config.reel.wheelSensitivity === "number")
@@ -387,44 +370,37 @@
             }
 
             if (reelEl) {
-                // Start one-way evaporation as soon as the cursor touches the resting phrase
-                reelEl.addEventListener("mouseenter", () => {
-                    if (isNavigating) return;
-                    evaporateRestingPhrase();
-                });
-
-                // Wheel / Trackpad listener (supports both horizontal swipe and vertical mouse wheel)
+                // Wheel / Trackpad listener (vertical barrel scroll)
                 reelEl.addEventListener("wheel", (e) => {
                     if (isNavigating) return;
                     e.preventDefault();
-                    evaporateRestingPhrase();
+                    stopAutoplay();
                     cancelAnimation();
                     cancelMomentum();
                     currentState = "scrolling";
                     reelEl.setAttribute("data-state", "scrolling");
                     if (cardEl) cardEl.setAttribute("data-state", "scrolling");
 
-                    const primaryDelta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-                    velocity += primaryDelta * wheelSensitivity * 2.2;
-                    const maxVel = getHorizontalMetrics().avgStep * 0.9;
+                    velocity += e.deltaY * wheelSensitivity;
+                    const maxVel = getItemHeight() * 1.4;
                     if (velocity > maxVel) velocity = maxVel;
                     if (velocity < -maxVel) velocity = -maxVel;
 
                     startMomentum();
                 }, { passive: false });
 
-                // Touch listeners (Mobile horizontal swipe)
+                // Touch listeners (Mobile vertical swipe)
                 reelEl.addEventListener("touchstart", (e) => {
                     if (isNavigating || e.touches.length !== 1) return;
-                    evaporateRestingPhrase();
+                    stopAutoplay();
                     cancelAnimation();
                     cancelMomentum();
                     currentState = "scrolling";
                     reelEl.setAttribute("data-state", "scrolling");
                     if (cardEl) cardEl.setAttribute("data-state", "scrolling");
 
-                    touchStartX = e.touches[0].clientX;
-                    lastTouchX = touchStartX;
+                    touchStartY = e.touches[0].clientY;
+                    lastTouchY = touchStartY;
                     lastTouchTime = performance.now();
                     isDragging = true;
                     velocity = 0;
@@ -432,15 +408,15 @@
 
                 reelEl.addEventListener("touchmove", (e) => {
                     if (!isDragging || e.touches.length !== 1) return;
-                    const touchX = e.touches[0].clientX;
-                    const deltaX = lastTouchX - touchX;
+                    const touchY = e.touches[0].clientY;
+                    const deltaY = lastTouchY - touchY;
                     const now = performance.now();
                     const dt = Math.max(1, now - lastTouchTime);
-                    velocity = (deltaX / dt) * 16;
-                    lastTouchX = touchX;
+                    velocity = (deltaY / dt) * 16;
+                    lastTouchY = touchY;
                     lastTouchTime = now;
 
-                    currentT += deltaX;
+                    currentT += deltaY;
                     renderTrack();
                 }, { passive: true });
 
@@ -456,18 +432,18 @@
                     startMomentum();
                 });
 
-                // Mouse drag listeners (Desktop horizontal drag)
+                // Mouse drag listeners (Desktop vertical drag)
                 reelEl.addEventListener("mousedown", (e) => {
                     if (isNavigating || e.button !== 0) return;
-                    evaporateRestingPhrase();
+                    stopAutoplay();
                     cancelAnimation();
                     cancelMomentum();
                     currentState = "scrolling";
                     reelEl.setAttribute("data-state", "scrolling");
                     if (cardEl) cardEl.setAttribute("data-state", "scrolling");
 
-                    touchStartX = e.clientX;
-                    lastTouchX = touchStartX;
+                    touchStartY = e.clientY;
+                    lastTouchY = touchStartY;
                     lastTouchTime = performance.now();
                     isDragging = true;
                     velocity = 0;
@@ -476,15 +452,15 @@
 
                 window.addEventListener("mousemove", (e) => {
                     if (!isDragging) return;
-                    const touchX = e.clientX;
-                    const deltaX = lastTouchX - touchX;
+                    const touchY = e.clientY;
+                    const deltaY = lastTouchY - touchY;
                     const now = performance.now();
                     const dt = Math.max(1, now - lastTouchTime);
-                    velocity = (deltaX / dt) * 16;
-                    lastTouchX = touchX;
+                    velocity = (deltaY / dt) * 16;
+                    lastTouchY = touchY;
                     lastTouchTime = now;
 
-                    currentT += deltaX;
+                    currentT += deltaY;
                     renderTrack();
                 });
 
@@ -508,8 +484,9 @@
                 document.fonts.ready.then(syncStaticPosition);
             }
 
-            // Initial render
+            // Initial render & start 3-second cylindrical barrel cadence
             renderTrack();
+            startAutoplay();
 
             // Wire click listeners: provide choreographed transition (revolver roll -> hold highlight -> smooth exit fade -> navigation)
             let isNavigating = false;
@@ -563,6 +540,7 @@
                     if (isNavigating) return;
                     const link = event.target.closest("a[data-reel], a[data-door]");
                     if (link) {
+                        isLinkHovered = true;
                         const targetKey = link.getAttribute("data-reel") || link.getAttribute("data-door");
                         setReelState(targetKey);
                     }
@@ -570,6 +548,7 @@
 
                 linksContainer.addEventListener("mouseleave", () => {
                     if (isNavigating) return;
+                    isLinkHovered = false;
                     leaveTimer = setTimeout(() => {
                         setReelState("resting");
                     }, 100);
@@ -580,6 +559,7 @@
                     if (isNavigating) return;
                     const link = event.target.closest("a[data-reel], a[data-door]");
                     if (link) {
+                        isLinkHovered = true;
                         const targetKey = link.getAttribute("data-reel") || link.getAttribute("data-door");
                         setReelState(targetKey);
                     }
@@ -589,6 +569,7 @@
                     if (isNavigating) return;
                     leaveTimer = setTimeout(() => {
                         if (!linksContainer.contains(document.activeElement)) {
+                            isLinkHovered = false;
                             setReelState("resting");
                         }
                     }, 100);
@@ -633,7 +614,6 @@
                 </span>
                 <span class="gateway-reel" id="gateway-reel" data-state="resting" aria-hidden="true">
                     <span class="reel-baseline-anchor">the scientist</span>
-                    <span class="reel-resting-phrase" id="reel-resting-phrase">a bit of everything</span>
                     <span class="reel-viewport" id="reel-viewport">
                         <span class="reel-track" id="reel-track">
                             <span class="reel-item reel-runner" id="reel-item-runner">the runner</span>
