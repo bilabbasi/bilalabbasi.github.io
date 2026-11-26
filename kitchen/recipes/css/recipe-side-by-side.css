@@ -218,6 +218,7 @@
 }
 
 #ingredients-list-container .menu-item .recipe-description {
+    line-height: 1.8;
     transition: color 0.24s ease, opacity 0.24s ease;
 }
 
@@ -522,7 +523,7 @@
     #ingredients-list-container .menu-item .recipe-description {
         margin-bottom: 0;
         font-size: 0.96rem;
-        line-height: 1.55;
+        line-height: 1.8;
         color: var(--text-body);
     }
 

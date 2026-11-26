@@ -89,18 +89,33 @@
 
 /* Override card styles inside the full-screen list for clean aesthetics */
 .ingredients-centered-list .menu-item {
+    position: relative;
     border: none;
     background: none;
     box-shadow: none;
     padding: 4px 0;
     margin: 0;
     width: auto;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
     transform: none !important;
 }
 
 .ingredients-centered-list .recipe-description {
     margin-bottom: 0;
     font-size: 1rem;
+    line-height: 1.85;
+    transition: color 0.24s ease, opacity 0.24s ease;
+}
+
+.ingredients-centered-list .ingredient-text {
+    display: inline;
+}
+
+.ingredients-centered-list .menu-item.is-checked .recipe-description {
+    color: var(--text-muted);
+    opacity: 0.52;
 }
 
 .ingredients-centered-list .recipe-section-title {
@@ -223,22 +238,6 @@
     min-height: 0;
 }
 
-.floating-stage-hint {
-    margin-top: 6px;
-    font-family: var(--font-sans);
-    font-size: 0.78rem;
-    color: var(--text-muted);
-    text-align: center;
-    letter-spacing: 0.01em;
-    flex-shrink: 0;
-}
-
-.floating-stage-hint [lang="ur"] {
-    font-family: var(--font-urdu);
-    font-size: 0.92rem;
-    color: var(--color-urdu, #b83b14);
-}
-
 .floating-item {
     position: absolute;
     /* Rasterize at 2x and scale down (0.5x -> 0.875x) so GPU never upscales a 1x bitmap during hover */
@@ -256,9 +255,9 @@
     font-family: var(--font-sans);
     cursor: pointer;
     width: calc(var(--item-size, 74px) * 2);
-    height: calc((var(--item-size, 74px) + 46px) * 2);
+    height: calc((var(--item-size, 74px) + 56px) * 2);
     min-height: 0;
-    max-height: calc((var(--item-size, 74px) + 46px) * 2);
+    max-height: calc((var(--item-size, 74px) + 56px) * 2);
     overflow: visible;
     contain: layout size;
     justify-content: flex-start;
@@ -323,40 +322,83 @@
 }
 
 .floating-item-name {
+    display: inline-grid;
+    place-items: center;
     font-size: 1.52rem;
     font-weight: 500;
     color: var(--text-title, #1e293b);
-    line-height: 1.2;
-    margin-top: 4px;
+    line-height: 1.25;
+    margin-top: 6px;
     white-space: nowrap;
     opacity: var(--dock-text-opacity, 1);
-    text-shadow: 0 0 14px var(--bg-main, #fafaf9), 0 0 26px var(--bg-main, #fafaf9), 0 1px 6px var(--bg-main, #fafaf9);
+    text-shadow: 0 0 8px var(--bg-main, #fafaf9);
 }
 
 .floating-item-qty {
+    display: inline-grid;
+    place-items: center;
     font-size: 1.38rem;
     font-weight: 500;
     color: var(--link-color, #7c2d12);
-    line-height: 1.2;
+    line-height: 1.25;
+    margin-top: 4px;
     white-space: nowrap;
     opacity: var(--dock-text-opacity, 1);
-    text-shadow: 0 0 14px var(--bg-main, #fafaf9), 0 0 26px var(--bg-main, #fafaf9), 0 1px 6px var(--bg-main, #fafaf9);
+    text-shadow: 0 0 8px var(--bg-main, #fafaf9);
 }
 
-.floating-item.is-urdu .floating-item-name,
-.floating-item.is-urdu .floating-item-qty {
+/* Stacked bilingual layers with pixel-locked feathered R→L erase/reveal masks */
+.floating-text-en,
+.floating-text-ur {
+    grid-area: 1 / 1;
+    display: block;
+    width: 100%;
+    text-align: center;
+    pointer-events: none;
+    /* Generous border-box expansion so mask-clip never trims Nastaliq ascenders or descender nuqtas */
+    padding: 0.7em 0.3em;
+    margin: -0.7em -0.3em;
+    box-sizing: content-box;
+    -webkit-mask-size: 300% 100%;
+    mask-size: 300% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: 0% 0;
+    mask-position: 0% 0;
+    transition: -webkit-mask-position 720ms cubic-bezier(0.4, 0, 0.2, 1), mask-position 720ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.floating-text-en {
+    -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 44%, transparent 50%, transparent 100%);
+    mask-image: linear-gradient(90deg, #000 0%, #000 44%, transparent 50%, transparent 100%);
+}
+
+.floating-text-ur {
     font-family: var(--font-urdu);
     color: var(--color-urdu, #b45309);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, transparent 50%, #000 56%, #000 100%);
+    mask-image: linear-gradient(90deg, transparent 0%, transparent 50%, #000 56%, #000 100%);
 }
 
-.floating-item.is-urdu .floating-item-name {
-    font-size: 1.76rem;
-    line-height: 1.45;
+.floating-item-qty .floating-text-en,
+.floating-item-qty .floating-text-ur {
+    transition-delay: 80ms;
 }
 
-.floating-item.is-urdu .floating-item-qty {
-    font-size: 1.56rem;
-    line-height: 1.4;
+.floating-item.is-urdu .floating-text-en,
+.floating-item.is-urdu .floating-text-ur {
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
+}
+
+.floating-item-name .floating-text-ur {
+    font-size: 1.72rem;
+    line-height: 1.85;
+}
+
+.floating-item-qty .floating-text-ur {
+    font-size: 1.52rem;
+    line-height: 1.8;
 }
 
 /* Scrolling Right Steps Column */
@@ -479,6 +521,10 @@
         text-align: center;
     }
 
+    .ingredients-centered-list .menu-item {
+        padding: 6px 4px;
+    }
+
     .visual-sticky-column {
         position: sticky;
         top: 48px;
@@ -513,11 +559,14 @@
     }
 
     .sketch-container.has-floating-stage {
-        height: auto;
-        min-height: 200px;
+        height: 100%;
+        min-height: 0;
         width: 100%;
         max-width: 100%;
-        overflow: visible;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        overflow: hidden;
     }
 
     /* Reset structured desktop column swap back to stacked mobile layout */
@@ -578,29 +627,30 @@
         overflow-anchor: none;
     }
 
-    .floating-stage {
+    .floating-stage,
+    .sketch-container.has-floating-stage .floating-stage {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
         align-items: flex-start;
-        gap: 6px 8px;
+        align-content: flex-start;
+        gap: 6px 6px;
         width: 100%;
         max-width: 100%;
-        height: auto;
-        max-height: none;
-        overflow: visible;
-        padding: 6px 0 10px;
+        flex: 0 1 auto;
+        min-height: 0;
+        max-height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+        overscroll-behavior-y: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 8px 4px 10px;
         box-sizing: border-box;
     }
 
-    .floating-stage-hint {
-        margin-top: 2px;
-        margin-bottom: 4px;
-    }
-
-    .hero-section .recipe-indicators {
-        padding-top: 8px;
-        margin-top: 8px;
+    .floating-stage::-webkit-scrollbar {
+        display: none;
     }
 
     .floating-item,
@@ -623,6 +673,41 @@
         transition: transform var(--mobile-focus-duration, 280ms) cubic-bezier(0.22, 1, 0.36, 1), opacity var(--mobile-focus-duration, 280ms) ease, filter var(--mobile-focus-duration, 280ms) ease;
     }
 
+    /* Compact hero item footprint so 4 rows (14 items) fit above the fold on a ~664px phone viewport */
+    .floating-stage.is-hero-stage .floating-item,
+    .floating-stage.is-hero-stage .floating-item.is-active {
+        --item-size: 35px;
+        width: 78px;
+        height: 82px;
+        flex: 0 0 78px;
+        min-width: 78px;
+        max-width: 78px;
+        min-height: 82px;
+        max-height: 82px;
+    }
+
+    .floating-stage.is-hero-stage .floating-item-name {
+        font-size: 0.72rem;
+        line-height: 1.15;
+    }
+
+    .floating-stage.is-hero-stage .floating-item-qty {
+        font-size: 0.66rem;
+        line-height: 1.15;
+        margin-top: 2px;
+    }
+
+    .floating-stage.is-hero-stage .floating-item-name .floating-text-ur {
+        font-size: 0.80rem;
+        line-height: 1.8;
+    }
+
+    .floating-stage.is-hero-stage .floating-item-qty .floating-text-ur {
+        font-size: 0.70rem;
+        line-height: 1.75;
+        white-space: nowrap;
+    }
+
     .has-mobile-focus .floating-item:not(.is-mobile-focused) {
         filter: blur(var(--mobile-bg-blur, 3.5px));
         opacity: var(--mobile-bg-opacity, 0.38);
@@ -643,7 +728,7 @@
 
     .floating-item.is-mobile-focused .floating-item-name,
     .floating-item.is-mobile-focused .floating-item-qty {
-        text-shadow: 0 0 12px var(--bg-main, #fafaf9), 0 0 22px var(--bg-main, #fafaf9);
+        text-shadow: 0 0 6px var(--bg-main, #fafaf9);
     }
 
     .floating-item.is-inactive {
@@ -656,23 +741,31 @@
     }
 
     .floating-item-name {
+        width: 100%;
         font-size: 0.76rem;
         margin-top: 2px;
         white-space: normal;
         word-break: normal;
         overflow-wrap: normal;
+        text-shadow: none;
     }
 
     .floating-item-qty {
+        width: 100%;
         font-size: 0.69rem;
+        margin-top: 2px;
+        text-shadow: none;
     }
 
-    .floating-item.is-urdu .floating-item-name {
-        font-size: 0.88rem;
+    .floating-item-name .floating-text-ur {
+        font-size: 0.86rem;
+        line-height: 1.8;
     }
 
-    .floating-item.is-urdu .floating-item-qty {
-        font-size: 0.78rem;
+    .floating-item-qty .floating-text-ur {
+        font-size: 0.75rem;
+        line-height: 1.75;
+        white-space: nowrap;
     }
 
     .steps-scrolling-column {
@@ -702,6 +795,45 @@
     }
 }
 
+@media (min-width: 601px) and (max-width: 900px) {
+    .sketch-container.has-floating-stage .floating-stage.is-hero-stage {
+        gap: 14px 12px;
+        padding: 16px 8px;
+    }
+
+    .floating-stage.is-hero-stage .floating-item,
+    .floating-stage.is-hero-stage .floating-item.is-active {
+        --item-size: 46px;
+        width: 94px;
+        height: 98px;
+        flex: 0 0 94px;
+        min-width: 94px;
+        max-width: 94px;
+        min-height: 98px;
+        max-height: 98px;
+    }
+
+    .floating-stage.is-hero-stage .floating-item-name {
+        font-size: 0.78rem;
+        line-height: 1.18;
+    }
+
+    .floating-stage.is-hero-stage .floating-item-qty {
+        font-size: 0.71rem;
+        line-height: 1.18;
+    }
+
+    .floating-stage.is-hero-stage .floating-item-name .floating-text-ur {
+        font-size: 0.88rem;
+        line-height: 1.85;
+    }
+
+    .floating-stage.is-hero-stage .floating-item-qty .floating-text-ur {
+        font-size: 0.78rem;
+        line-height: 1.8;
+    }
+}
+
 @media (max-width: 600px) {
     .ingredients-centered-title {
         font-size: 2.2rem;
@@ -725,5 +857,13 @@
     .step-slide .step-section-list {
         font-size: 0.95rem;
         gap: 12px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .floating-text-en,
+    .floating-text-ur {
+        transition-duration: 0.01ms !important;
+        transition-delay: 0ms !important;
     }
 }

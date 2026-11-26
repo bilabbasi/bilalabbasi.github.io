@@ -475,31 +475,112 @@ body {
         padding-top: 0 !important;
     }
 
-    .hero-section {
-        min-height: auto;
-    }
-
     header.navbar {
         position: sticky;
         top: 0;
         height: 48px;
         min-height: 48px;
-        margin: 0 0 16px 0;
+        margin: 0;
         display: flex;
         align-items: center;
         background-color: var(--bg-main, #fafaf9);
         z-index: 100;
         border-bottom: 1px solid var(--border-color);
     }
+
+    /* Strict single-screen cover so mode buttons are always visible above the fold */
+    .hero-section {
+        height: calc(100vh - 48px);
+        height: calc(100dvh - 48px);
+        min-height: 0;
+        padding: 10px 0 calc(10px + env(safe-area-inset-bottom, 0px)) 0;
+        scroll-margin-top: 48px;
+        overflow: hidden;
+    }
+
+    .hero-section .main-content {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-height: 0;
+        gap: 6px;
+        margin: 0;
+        overflow: hidden;
+    }
+
+    .hero-section .info-column {
+        flex: 0 0 auto;
+        gap: 4px;
+    }
+
+    .hero-section .heading-group {
+        gap: 2px;
+    }
+
+    .hero-section .main-title {
+        font-size: clamp(2.15rem, 7.6vw, 2.75rem);
+        line-height: 1.08;
+        min-height: 0;
+    }
+
+    .hero-section .main-subtitle {
+        font-size: clamp(1.4rem, 5.2vw, 1.85rem);
+        line-height: 1.35;
+        margin-top: 2px;
+        min-height: 0;
+    }
+
+    .hero-section .bio-paragraph {
+        font-size: 0.92rem;
+        line-height: 1.42;
+        text-align: left;
+    }
+
+    .hero-section .visual-column {
+        flex: 1 1 auto;
+        min-height: 0;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .hero-section .sketch-container {
+        height: 100%;
+        width: 100%;
+        max-width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .hero-section .sketch-img {
+        max-height: 100%;
+        max-width: 100%;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        object-position: center;
+    }
+
+    .hero-section .recipe-indicators {
+        flex-shrink: 0;
+        margin-top: 4px;
+        padding-top: 8px;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        gap: 36px;
+    }
+
+    .hero-section .scroll-indicator {
+        padding: 4px 8px 0 8px;
+        margin-bottom: 0;
+        gap: 4px;
+    }
 }
 
 @media (max-width: 600px) {
-    .recipe-indicators {
-        gap: 24px;
-    }
-
-    .scroll-indicator {
-        padding-top: 10px;
-        margin-bottom: 20px;
+    .hero-section .recipe-indicators {
+        gap: 28px;
     }
 }

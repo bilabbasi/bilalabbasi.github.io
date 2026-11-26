@@ -5,6 +5,7 @@
 
 (function () {
     let currentRecipeTitle = "";
+    const checkedIngredientIndices = new Set();
 
     // Helper function to dynamically load nav.js if not already present
     function ensureNavComponent() {
@@ -302,8 +303,10 @@
         }
 
         // 2. Render Ingredients Column (Side-by-Side View)
+        checkedIngredientIndices.clear();
         const ingredientsContainer = document.getElementById("ingredients-list-container");
         if (recipe.ingredients && recipe.ingredients.length > 0) {
+            let ingIdx = 0;
             ingredientsContainer.innerHTML = recipe.ingredients.map(sec => `
                 <div class="recipe-section">
                     <h4 class="recipe-section-title">
@@ -316,7 +319,7 @@
                     </h4>
                     <div class="recipe-section-content">
                         ${(sec.items || []).map(item => `
-                            <div class="menu-item">
+                            <div class="menu-item" data-ingredient-idx="${ingIdx++}">
                                 <p class="recipe-description"><span class="ingredient-text">${item}</span></p>
                             </div>
                         `).join("")}
@@ -511,10 +514,13 @@
             if (shouldScroll) {
                 sideBySideSection.scrollIntoView({ behavior: 'smooth' });
             }
+            syncIngredientCheckedState(document.getElementById('ingredients-list-container'));
             syncMobileMenuTabs();
+            requestAnimationFrame(() => syncCheckedIngredientStrikes());
             setTimeout(() => {
                 updateScrollButtonVisibility();
                 syncMobileMenuTabs();
+                syncCheckedIngredientStrikes();
             }, 300);
             updateQalamProgress();
         } else if (mode === 'step-by-step') {
@@ -541,6 +547,7 @@
             } catch (e) {}
 
             populateCenteredIngredients();
+            requestAnimationFrame(() => syncCheckedIngredientStrikes());
             if (shouldScroll) {
                 stepByStepSection.scrollIntoView({ behavior: 'smooth' });
             }
@@ -548,20 +555,34 @@
         }
     };
 
+    function syncIngredientCheckedState(containerEl) {
+        if (!containerEl) return;
+        containerEl.querySelectorAll('.menu-item[data-ingredient-idx]').forEach(item => {
+            const idx = item.getAttribute('data-ingredient-idx');
+            const shouldBeChecked = checkedIngredientIndices.has(idx);
+            item.classList.toggle('is-checked', shouldBeChecked);
+            if (!shouldBeChecked) {
+                item.querySelectorAll('.ingredient-qalam-strike').forEach(s => s.remove());
+            }
+        });
+    }
+
     function populateCenteredIngredients() {
         const sourceIngredients = document.getElementById('ingredients-list-container');
         const destIngredients = document.getElementById('ingredients-centered-list');
-        if (sourceIngredients && destIngredients && destIngredients.children.length === 0) {
-            destIngredients.innerHTML = sourceIngredients.innerHTML;
-            destIngredients.querySelectorAll('.recipe-section').forEach(sec => sec.classList.remove('collapsed'));
-            destIngredients.querySelectorAll('.menu-item.is-checked').forEach(item => item.classList.remove('is-checked'));
-            destIngredients.querySelectorAll('.ingredient-qalam-strike').forEach(el => el.remove());
-            destIngredients.querySelectorAll('.recipe-section-toggle').forEach(btn => {
-                const label = btn.querySelector('span');
-                const staticSpan = document.createElement('span');
-                staticSpan.textContent = label ? label.textContent : btn.textContent.trim();
-                btn.replaceWith(staticSpan);
-            });
+        if (sourceIngredients && destIngredients) {
+            if (destIngredients.children.length === 0) {
+                destIngredients.innerHTML = sourceIngredients.innerHTML;
+                destIngredients.querySelectorAll('.recipe-section').forEach(sec => sec.classList.remove('collapsed'));
+                destIngredients.querySelectorAll('.ingredient-qalam-strike').forEach(el => el.remove());
+                destIngredients.querySelectorAll('.recipe-section-toggle').forEach(btn => {
+                    const label = btn.querySelector('span');
+                    const staticSpan = document.createElement('span');
+                    staticSpan.textContent = label ? label.textContent : btn.textContent.trim();
+                    btn.replaceWith(staticSpan);
+                });
+            }
+            syncIngredientCheckedState(destIngredients);
         }
     }
 
@@ -619,7 +640,11 @@
     }
 
     function syncCheckedIngredientStrikes() {
-        document.querySelectorAll('#ingredients-list-container .menu-item.is-checked, #steps-scroll-container .step-card.is-checked').forEach(item => {
+        document.querySelectorAll(
+            '#ingredients-list-container .menu-item.is-checked, ' +
+            '#ingredients-centered-list .menu-item.is-checked, ' +
+            '#steps-scroll-container .step-card.is-checked'
+        ).forEach(item => {
             buildQalamStrikeLines(item, false);
         });
     }
@@ -780,7 +805,7 @@
             });
         }
 
-        // Click/tap-to-cross-off ingredients and steps with qalam brush stroke
+        // Click/tap-to-cross-off ingredients (side-by-side + mise en place) and steps with qalam brush stroke
         const bindQalamStrikeContainer = (containerEl) => {
             if (!containerEl || containerEl.dataset.strikeBound) return;
             containerEl.dataset.strikeBound = "true";
@@ -790,6 +815,26 @@
                 if (!menuItem) return;
 
                 const isChecked = menuItem.classList.toggle('is-checked');
+                const ingIdx = menuItem.getAttribute('data-ingredient-idx');
+                if (ingIdx !== null) {
+                    if (isChecked) checkedIngredientIndices.add(ingIdx);
+                    else checkedIngredientIndices.delete(ingIdx);
+
+                    const twinId = containerEl.id === 'ingredients-centered-list'
+                        ? 'ingredients-list-container'
+                        : 'ingredients-centered-list';
+                    const twinContainer = document.getElementById(twinId);
+                    const twinItem = twinContainer
+                        ? twinContainer.querySelector(`.menu-item[data-ingredient-idx="${ingIdx}"]`)
+                        : null;
+                    if (twinItem) {
+                        twinItem.classList.toggle('is-checked', isChecked);
+                        if (!isChecked) {
+                            twinItem.querySelectorAll('.ingredient-qalam-strike').forEach(s => s.remove());
+                        }
+                    }
+                }
+
                 if (isChecked) {
                     buildQalamStrikeLines(menuItem, true);
                 } else {
@@ -807,6 +852,7 @@
             });
         };
         bindQalamStrikeContainer(document.getElementById('ingredients-list-container'));
+        bindQalamStrikeContainer(document.getElementById('ingredients-centered-list'));
         bindQalamStrikeContainer(document.getElementById('steps-scroll-container'));
 
         // Urdu Qalam Progress Bar

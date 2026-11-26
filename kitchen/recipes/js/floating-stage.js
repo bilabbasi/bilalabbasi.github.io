@@ -25,7 +25,12 @@
             mobileBgBlurPx: cfg.mobileBgBlurPx ?? 3.5,
             mobileBgOpacity: cfg.mobileBgOpacity ?? 0.38,
             mobileFocusDurationMs: cfg.mobileFocusDurationMs ?? 280,
-            mobileSwipeFadeFactor: cfg.mobileSwipeFadeFactor ?? 1.15
+            mobileSwipeFadeFactor: cfg.mobileSwipeFadeFactor ?? 1.15,
+            ambientUrduEnabled: cfg.ambientUrduEnabled ?? true,
+            ambientInitialDelayMs: cfg.ambientInitialDelayMs ?? 1500,
+            ambientHoldMs: cfg.ambientHoldMs ?? 2600,
+            ambientMinGapMs: cfg.ambientMinGapMs ?? 1800,
+            ambientMaxGapMs: cfg.ambientMaxGapMs ?? 3000
         };
     }
 
@@ -266,7 +271,7 @@
             const qtyEl = el.querySelector('.floating-item-qty');
             const captionW = Math.max(nameEl ? nameEl.scrollWidth * 0.5 : 0, qtyEl ? qtyEl.scrollWidth * 0.5 : 0);
             const w = Math.max(sizePx, captionW, 84);
-            const h = sizePx + 46;
+            const h = sizePx + 56;
             const slot = slots[idx % slots.length];
             return { el, w, h, x: slot.x, y: slot.y };
         });
@@ -327,6 +332,10 @@
                 <div class="floating-item-placeholder" style="display:none"><span>${item.form}</span></div>`;
     }
 
+    function renderBilingualTextHtml(enText, urText) {
+        return `<span class="floating-text-en" aria-hidden="false">${enText}</span><span class="floating-text-ur" dir="rtl" lang="ur" aria-hidden="true">${urText}</span>`;
+    }
+
     function renderFloatingStageHtml(items, { isStepStage, seedKey }) {
         const itemsHtml = items.map(item => {
             const mediaHtml = buildFloatingMediaHtml(item);
@@ -346,21 +355,16 @@
                     aria-pressed="false"
                     ${stepDataAttr}>
                     <div class="floating-item-media">${mediaHtml}</div>
-                    <span class="floating-item-name">${enLabel}</span>
-                    <span class="floating-item-qty">${item.totalQtyEn}</span>
+                    <span class="floating-item-name">${renderBilingualTextHtml(enLabel, item.ur)}</span>
+                    <span class="floating-item-qty">${renderBilingualTextHtml(item.totalQtyEn, item.totalQtyUr)}</span>
                 </button>
             `;
         }).join("");
-
-        const hintHtml = !isStepStage
-            ? `<p class="floating-stage-hint">select any ingredient for <span dir="rtl" lang="ur">اردو</span></p>`
-            : "";
 
         return `
             <div class="floating-stage ${isStepStage ? 'is-step-stage' : 'is-hero-stage'}" data-seed="${seedKey}">
                 ${itemsHtml}
             </div>
-            ${hintHtml}
         `;
     }
 
@@ -382,8 +386,8 @@
                         data-current-qty-ur="${stepEntry.qtyUr}"
                         aria-pressed="false">
                         <div class="floating-item-media">${mediaHtml}</div>
-                        <span class="floating-item-name">${enLabel}</span>
-                        <span class="floating-item-qty">${stepEntry.qtyEn}</span>
+                        <span class="floating-item-name">${renderBilingualTextHtml(enLabel, item.ur)}</span>
+                        <span class="floating-item-qty">${renderBilingualTextHtml(stepEntry.qtyEn, stepEntry.qtyUr)}</span>
                     </button>
                 `;
             }).join("");
@@ -399,22 +403,32 @@
     function setFloatingItemUrdu(item, isUrdu) {
         item.classList.toggle('is-urdu', isUrdu);
         item.setAttribute('aria-pressed', isUrdu ? 'true' : 'false');
-        const nameEl = item.querySelector('.floating-item-name');
-        const qtyEl = item.querySelector('.floating-item-qty');
-        if (nameEl) {
-            nameEl.textContent = isUrdu ? (item.getAttribute('data-ur-name') || '') : (item.getAttribute('data-en-name') || '');
-            if (isUrdu) { nameEl.setAttribute('dir', 'rtl'); nameEl.setAttribute('lang', 'ur'); }
-            else { nameEl.removeAttribute('dir'); nameEl.removeAttribute('lang'); }
-        }
-        if (qtyEl) {
-            qtyEl.textContent = isUrdu ? (item.getAttribute('data-current-qty-ur') || '') : (item.getAttribute('data-current-qty-en') || '');
-            if (isUrdu) { qtyEl.setAttribute('dir', 'rtl'); qtyEl.setAttribute('lang', 'ur'); }
-            else { qtyEl.removeAttribute('dir'); qtyEl.removeAttribute('lang'); }
-        }
+        item.querySelectorAll('.floating-text-en').forEach(el => {
+            el.setAttribute('aria-hidden', isUrdu ? 'true' : 'false');
+        });
+        item.querySelectorAll('.floating-text-ur').forEach(el => {
+            el.setAttribute('aria-hidden', isUrdu ? 'false' : 'true');
+        });
+    }
+
+    const ambientControllers = new WeakMap();
+
+    function clearStageAmbientUrdu(stage, { keepItem = null } = {}) {
+        const ctrl = stage ? ambientControllers.get(stage) : null;
+        if (ctrl) ctrl.clearActive(keepItem);
     }
 
     function toggleFloatingItemUrdu(item) {
-        setFloatingItemUrdu(item, !item.classList.contains('is-urdu'));
+        const stage = item.closest('.floating-stage');
+        const wasAmbient = item.dataset.ambientUrdu === 'true';
+        if (wasAmbient) {
+            clearStageAmbientUrdu(stage, { keepItem: item });
+            delete item.dataset.ambientUrdu;
+        }
+        const nextUrdu = !item.classList.contains('is-urdu');
+        if (nextUrdu) item.dataset.manualUrdu = 'true';
+        else delete item.dataset.manualUrdu;
+        setFloatingItemUrdu(item, nextUrdu);
     }
 
     function clearMobileFocus(scope) {
@@ -423,11 +437,15 @@
         });
         (scope || document).querySelectorAll('.floating-item.is-mobile-focused').forEach(el => {
             el.classList.remove('is-mobile-focused');
+            delete el.dataset.manualUrdu;
             setFloatingItemUrdu(el, false);
         });
     }
 
     function handleMobileItemTap(container, item) {
+        const stage = container && container.classList && container.classList.contains('floating-stage')
+            ? container
+            : (item ? item.closest('.floating-stage') : null);
         if (!item) {
             clearMobileFocus(container);
             return;
@@ -435,11 +453,113 @@
         if (item.classList.contains('is-mobile-focused')) {
             clearMobileFocus(document);
         } else {
+            clearStageAmbientUrdu(stage, { keepItem: item });
             clearMobileFocus(document);
             container.classList.add('has-mobile-focus');
             item.classList.add('is-mobile-focused');
+            delete item.dataset.ambientUrdu;
+            item.dataset.manualUrdu = 'true';
             setFloatingItemUrdu(item, true);
         }
+    }
+
+    function initAmbientHeroUrdu(stage, isPointerHovering) {
+        if (!stage || !stage.classList.contains('is-hero-stage')) return;
+        const cfg = getFloatingLensConfig();
+        if (!cfg.ambientUrduEnabled) return;
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        let nextTimer = null;
+        let revertTimer = null;
+        let activeItem = null;
+        let lastPickedItem = null;
+        let isVisible = true;
+
+        function clearActive(keepItem = null) {
+            if (revertTimer) {
+                clearTimeout(revertTimer);
+                revertTimer = null;
+            }
+            if (activeItem) {
+                const prev = activeItem;
+                activeItem = null;
+                delete prev.dataset.ambientUrdu;
+                if (prev !== keepItem && prev.dataset.manualUrdu !== 'true' && !prev.classList.contains('is-mobile-focused')) {
+                    setFloatingItemUrdu(prev, false);
+                }
+            }
+        }
+
+        function canRun() {
+            if (!isVisible) return false;
+            if (typeof document !== 'undefined' && document.hidden) return false;
+            if (stage.classList.contains('has-mobile-focus')) return false;
+            if (typeof isPointerHovering === 'function' && isPointerHovering()) return false;
+            return true;
+        }
+
+        function scheduleNext(delayMs) {
+            if (nextTimer) clearTimeout(nextTimer);
+            const gap = typeof delayMs === 'number'
+                ? delayMs
+                : cfg.ambientMinGapMs + Math.random() * Math.max(0, cfg.ambientMaxGapMs - cfg.ambientMinGapMs);
+            nextTimer = setTimeout(runStep, gap);
+        }
+
+        function runStep() {
+            nextTimer = null;
+            if (!canRun()) {
+                scheduleNext(1200);
+                return;
+            }
+            const candidates = Array.from(stage.querySelectorAll('.floating-item.is-active')).filter(el => {
+                if (el.dataset.manualUrdu === 'true') return false;
+                if (el.classList.contains('is-mobile-focused')) return false;
+                const en = (el.getAttribute('data-en-name') || '').trim();
+                const ur = (el.getAttribute('data-ur-name') || '').trim();
+                return Boolean(ur) && ur !== en;
+            });
+            if (candidates.length === 0) {
+                scheduleNext();
+                return;
+            }
+            const pool = candidates.length > 1 ? candidates.filter(el => el !== lastPickedItem) : candidates;
+            const pick = pool[Math.floor(Math.random() * pool.length)];
+            lastPickedItem = pick;
+            activeItem = pick;
+            pick.dataset.ambientUrdu = 'true';
+            setFloatingItemUrdu(pick, true);
+
+            revertTimer = setTimeout(() => {
+                revertTimer = null;
+                clearActive();
+                scheduleNext();
+            }, cfg.ambientHoldMs);
+        }
+
+        if (typeof IntersectionObserver !== 'undefined') {
+            const observer = new IntersectionObserver((entries) => {
+                const entry = entries[0];
+                isVisible = Boolean(entry && entry.isIntersecting);
+                if (!isVisible) {
+                    clearActive();
+                } else if (!activeItem && !nextTimer) {
+                    scheduleNext(1000);
+                }
+            }, { threshold: 0.2 });
+            observer.observe(stage);
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                clearActive();
+            } else if (isVisible && !activeItem && !nextTimer) {
+                scheduleNext(1000);
+            }
+        });
+
+        ambientControllers.set(stage, { clearActive });
+        scheduleNext(cfg.ambientInitialDelayMs);
     }
 
     if (!document.documentElement.dataset.mobileFocusOutsideBound) {
@@ -479,13 +599,15 @@
             toggleFloatingItemUrdu(item);
         });
 
-        const finePointer = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-        if (!finePointer) return;
-
         let pointerX = null;
         let pointerY = null;
         let rafId = null;
         const animState = new WeakMap();
+
+        initAmbientHeroUrdu(stage, () => pointerX !== null && window.innerWidth > 900);
+
+        const finePointer = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+        if (!finePointer) return;
 
         function stepAppleWatchLens() {
             const lensCfg = getFloatingLensConfig();
@@ -661,7 +783,13 @@
                 const qUr = stepMap[effectiveStep].qtyUr || '';
                 item.setAttribute('data-current-qty-en', qEn);
                 item.setAttribute('data-current-qty-ur', qUr);
-                if (qtyEl) qtyEl.textContent = isUrdu ? qUr : qEn;
+                if (qtyEl) {
+                    const enSpan = qtyEl.querySelector('.floating-text-en');
+                    const urSpan = qtyEl.querySelector('.floating-text-ur');
+                    if (enSpan) enSpan.textContent = qEn;
+                    if (urSpan) urSpan.textContent = qUr;
+                    if (!enSpan && !urSpan) qtyEl.textContent = isUrdu ? qUr : qEn;
+                }
             } else {
                 item.classList.remove('is-active');
                 item.classList.add('is-inactive');

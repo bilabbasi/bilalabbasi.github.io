@@ -57,6 +57,9 @@ assert.match(recipeSideBySideCss, /\.mobile-menu-tab-indicator[\s\S]*?mask-image
 assert.match(recipeSideBySideCss, /\.ingredient-qalam-strike[\s\S]*?mask-image:\s*var\(--ink-brush-mask\)/, 'mobile/tablet ingredient cross-out should use --ink-brush-mask');
 
 assert.match(recipeStepByStepCss, /\.ingredients-centered-page/, 'recipe-step-by-step.css should define .ingredients-centered-page');
+assert.match(recipeStepByStepCss, /\.ingredients-centered-list \.menu-item\.is-checked/, 'recipe-step-by-step.css should style crossed-off mise en place items');
+assert.match(recipeStepByStepCss, /\.floating-text-en[\s\S]*?mask-image:\s*linear-gradient/, 'recipe-step-by-step.css should define feathered mask wipe on .floating-text-en');
+assert.match(recipeStepByStepCss, /\.floating-text-ur[\s\S]*?mask-image:\s*linear-gradient/, 'recipe-step-by-step.css should define feathered mask wipe on .floating-text-ur');
 assert.match(recipeStepByStepCss, /\.visual-sticky-column/, 'recipe-step-by-step.css should define .visual-sticky-column');
 assert.match(recipeStepByStepCss, /@media\s*\(max-width:\s*900px\)[\s\S]*?\.floating-item(?:,\s*\.floating-item\.is-active)?\s*\{[^}]*width:\s*\d+px;[^}]*height:\s*\d+px;[^}]*contain:\s*layout\s+size;/, 'mobile .floating-item should lock fixed width, height, and contain: layout size to prevent background reflow on Urdu toggle');
 

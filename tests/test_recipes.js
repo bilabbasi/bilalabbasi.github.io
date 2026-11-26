@@ -122,4 +122,8 @@ const completeById = Object.fromEntries(completeCollected.map(it => [it.id, it])
 assert.strictEqual(completeById['ing:coriander_powder:powder'].totalQtyEn, '2 tsp', 'Decimal amounts 1.5 + 0.5 must sum to 2 tsp');
 assert.strictEqual(Floating.hasCompleteAssets(completeCollected, completeRecipe), true, 'Recipe with all existing PNGs and per-step items must enable floating stage');
 
+const heroStageHtml = Floating.renderFloatingStageHtml(completeCollected, { isStepStage: false, seedKey: 'test' });
+assert.ok(!heroStageHtml.includes('floating-stage-hint'), 'Hero floating stage should not render the removed Urdu hint line');
+assert.ok(heroStageHtml.includes('floating-text-en') && heroStageHtml.includes('floating-text-ur'), 'Floating stage items should render stacked EN/UR bilingual spans');
+
 console.log('PASS: test_recipes.js passed all checks.');
