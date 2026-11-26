@@ -580,6 +580,7 @@
         }
 
         stage.addEventListener('mousemove', (e) => {
+            if (window.innerWidth <= 900) return;
             pointerX = e.clientX;
             pointerY = e.clientY;
             if (!rafId) {
@@ -588,6 +589,7 @@
         });
 
         stage.addEventListener('mouseleave', () => {
+            if (window.innerWidth <= 900) return;
             pointerX = null;
             pointerY = null;
             if (!rafId) {
