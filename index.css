@@ -910,14 +910,16 @@ body {
 
     html,
     body {
-        overflow-y: auto;
-        /* Enable page scrolling on mobile screens */
+        overflow-x: clip;
+        overflow-y: visible;
+        /* Avoid nested html/body scroll containers on iOS WebKit so 100dvh tracks the dynamic viewport */
         height: auto;
     }
 
     .app-wrapper {
         height: auto;
         min-height: 100vh;
+        min-height: 100dvh;
         padding: 24px 20px;
     }
 
