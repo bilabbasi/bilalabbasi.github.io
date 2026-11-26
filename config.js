@@ -112,6 +112,9 @@ const OFFICE_CONFIG = {
     // Tab title
     tab: "office",
 
+    // Icon size (in px) for the LinkedIn / Google Scholar / GitHub icons below the bio
+    iconSize: 30,
+
     // Links to your profiles (LinkedIn, Google Scholar, GitHub, etc.)
     links: [
         {

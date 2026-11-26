@@ -27,6 +27,9 @@
     --font-serif: 'Lora', Georgia, 'Noto Nastaliq Urdu', 'Geeza Pro', serif;
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
+    /* Office social icon size (overridden dynamically by OFFICE_CONFIG.iconSize in config.js) */
+    --office-icon-size: 30px;
+
     /* Animation speed for links and transitions */
     --transition-smooth: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
@@ -683,10 +686,9 @@ body {
 .external-links {
     display: flex;
     flex-wrap: wrap;
-    /* Wraps links to a new line if screen is narrow */
-    gap: 24px;
-    /* Spacing between links */
-    margin-top: 16px;
+    align-items: center;
+    gap: 22px;
+    margin-top: 18px;
 }
 
 /* Hide empty link wrappers to reclaim vertical viewport space */
@@ -694,58 +696,189 @@ body {
     display: none;
 }
 
-/* Individual link button styling */
+/* Icon-only link at rest; expands smoothly on hover/focus to reveal the platform name */
 .external-link {
     text-decoration: none;
-    font-size: 0.95rem;
+    font-size: 0.98rem;
     font-weight: 500;
-    color: var(--link-color);
+    color: var(--text-title);
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    /* Spacing between link label and arrow icon */
+    gap: 0;
     position: relative;
-    padding-bottom: 2px;
-    transition: var(--transition-smooth);
+    padding: 4px 0;
+    border-radius: 4px;
+    transition: color 0.25s ease;
 }
 
-/* Creates a custom line under links that vanishes on hover */
-.external-link::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background-color: var(--text-title);
-    transform: scaleX(1);
-    transform-origin: bottom left;
-    transition: transform var(--transition-smooth);
+.external-link:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--bg-main, #ffffff), 0 0 0 3.5px var(--scientist-color, var(--text-title));
 }
 
-.external-link:hover {
-    color: var(--link-hover);
+/* Collapsible label wrapper animated to exact intrinsic width via CSS Grid */
+.external-link-label {
+    display: inline-grid;
+    grid-template-columns: 0fr;
+    max-width: 0;
+    overflow: hidden;
+    margin-left: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+        grid-template-columns 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+        max-width 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+        margin-left 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.22s ease;
 }
 
-/* Animate the underline to slide away on hover */
-.external-link:hover::after {
-    transform: scaleX(0);
-    transform-origin: bottom right;
+.external-link-label > span {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
-/* Arrow SVG icon styling next to links */
+.external-link:hover .external-link-label,
+.external-link:focus-visible .external-link-label {
+    grid-template-columns: 1fr;
+    max-width: 14rem;
+    margin-left: 9px;
+    opacity: 1;
+    transition:
+        grid-template-columns 0.36s cubic-bezier(0.22, 1, 0.36, 1),
+        max-width 0.36s cubic-bezier(0.22, 1, 0.36, 1),
+        margin-left 0.36s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.28s ease 0.06s;
+}
+
+/* Platform SVG icon styling (controlled via --office-icon-size / OFFICE_CONFIG.iconSize) */
 .external-link svg {
-    width: 14px;
-    height: 14px;
-    stroke-width: 2.5px;
-    color: var(--text-muted);
-    transition: var(--transition-smooth);
+    width: var(--office-icon-size, 30px);
+    height: var(--office-icon-size, 30px);
+    flex-shrink: 0;
+    stroke-width: 1.6px;
+    color: var(--text-body);
+    overflow: visible;
+    transition: color 0.25s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Animate the arrow icon to point further top-right on hover */
-.external-link:hover svg {
-    color: var(--link-hover);
+.external-link:hover,
+.external-link:focus-visible {
+    color: var(--scientist-color, var(--text-title));
+}
+
+.external-link:hover svg,
+.external-link:focus-visible svg {
+    color: var(--scientist-color, var(--text-title));
+}
+
+/* Fallback external arrow motion */
+.external-link:hover .icon-arrow,
+.external-link:focus-visible .icon-arrow {
     transform: translate(2px, -2px);
+}
+
+/* LinkedIn: dot spring hop + smooth arch draw */
+.icon-li-dot {
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
+.icon-li-arch {
+    stroke-dasharray: 22;
+    stroke-dashoffset: 0;
+}
+
+.external-link:hover .icon-li-dot,
+.external-link:focus-visible .icon-li-dot {
+    animation: icon-li-hop 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.external-link:hover .icon-li-arch,
+.external-link:focus-visible .icon-li-arch {
+    animation: icon-li-draw 0.46s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes icon-li-hop {
+    0% { transform: translateY(0); }
+    42% { transform: translateY(-2.4px); }
+    72% { transform: translateY(0.4px); }
+    100% { transform: translateY(0); }
+}
+
+@keyframes icon-li-draw {
+    0% { stroke-dashoffset: 22; }
+    100% { stroke-dashoffset: 0; }
+}
+
+/* Google Scholar: subtle mortarboard lift + swinging tassel */
+.icon-sch-cap-group {
+    transform-origin: 12px 9.5px;
+    transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.icon-sch-tassel {
+    transform-origin: 20px 10.2px;
+}
+
+.external-link:hover .icon-sch-cap-group,
+.external-link:focus-visible .icon-sch-cap-group {
+    transform: translateY(-1.4px) rotate(-6deg);
+}
+
+.external-link:hover .icon-sch-tassel,
+.external-link:focus-visible .icon-sch-tassel {
+    animation: icon-sch-swing 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes icon-sch-swing {
+    0% { transform: rotate(0deg); }
+    24% { transform: rotate(15deg); }
+    52% { transform: rotate(-10deg); }
+    78% { transform: rotate(5deg); }
+    100% { transform: rotate(0deg); }
+}
+
+/* GitHub: gentle body lift + playful tail wag */
+.icon-gh-body {
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.icon-gh-tail {
+    transform-origin: 9px 18.2px;
+}
+
+.external-link:hover .icon-gh-body,
+.external-link:focus-visible .icon-gh-body {
+    transform: translateY(-0.8px);
+}
+
+.external-link:hover .icon-gh-tail,
+.external-link:focus-visible .icon-gh-tail {
+    animation: icon-gh-wag 0.56s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes icon-gh-wag {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(18deg); }
+    55% { transform: rotate(-13deg); }
+    80% { transform: rotate(7deg); }
+    100% { transform: rotate(0deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .external-link svg,
+    .external-link-label,
+    .icon-sch-cap-group,
+    .icon-gh-body,
+    .icon-li-dot,
+    .icon-li-arch,
+    .icon-sch-tassel,
+    .icon-gh-tail {
+        animation: none !important;
+        transition-duration: 0.01ms !important;
+        transform: none !important;
+    }
 }
 
 /* --- Right Column: Image artwork --- */
@@ -896,12 +1029,14 @@ body {
         text-align: left;
     }
 
-    .external-link {
-        min-height: 44px;
+    .external-links {
+        gap: 18px;
     }
 
-    .external-link::after {
-        bottom: 9px;
+    .external-link {
+        min-width: 44px;
+        min-height: 44px;
+        justify-content: flex-start;
     }
 
     .sketch-container {
