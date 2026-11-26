@@ -101,15 +101,25 @@
             <section class="menu-section" id="menu" style="${isStepMode ? 'display: none;' : ''}">
                 <h2 class="menu-title">the recipe</h2>
 
-                <div class="menu-grid">
+                <div class="mobile-menu-tabs" id="mobile-menu-tabs" role="tablist" aria-label="Recipe sections">
+                    <button type="button" class="mobile-menu-tab is-active" id="mobile-tab-ingredients" role="tab" aria-selected="true" aria-controls="menu-col-ingredients" data-pane="0">
+                        <span class="mobile-menu-tab-label">ingredients</span>
+                    </button>
+                    <button type="button" class="mobile-menu-tab" id="mobile-tab-steps" role="tab" aria-selected="false" aria-controls="menu-col-steps" data-pane="1">
+                        <span class="mobile-menu-tab-label">steps</span>
+                    </button>
+                    <span class="mobile-menu-tab-indicator" id="mobile-menu-tab-indicator" aria-hidden="true"></span>
+                </div>
+
+                <div class="menu-grid" id="menu-grid">
                     <!-- INGREDIENTS COLUMN -->
-                    <div class="menu-column">
+                    <div class="menu-column" id="menu-col-ingredients" role="tabpanel" aria-labelledby="mobile-tab-ingredients">
                         <h3 class="column-title">ingredients</h3>
                         <div class="menu-items" id="ingredients-list-container"></div>
                     </div>
 
                     <!-- STEPS COLUMN -->
-                    <div class="menu-column steps-column">
+                    <div class="menu-column steps-column" id="menu-col-steps" role="tabpanel" aria-labelledby="mobile-tab-steps">
                         <h3 class="column-title">steps</h3>
                         <div class="steps-scroll-wrapper">
                             <div class="menu-items steps-scroll-container" id="steps-scroll-container"></div>
@@ -307,7 +317,7 @@
                     <div class="recipe-section-content">
                         ${(sec.items || []).map(item => `
                             <div class="menu-item">
-                                <p class="recipe-description">${item}</p>
+                                <p class="recipe-description"><span class="ingredient-text">${item}</span></p>
                             </div>
                         `).join("")}
                     </div>
@@ -387,7 +397,7 @@
                     stepsSideBySideHtml += `
                         <div class="menu-item step-card" data-step="${globalStepCounter}">
                             <span class="step-card-num">${formattedStepNum}</span>
-                            <p class="recipe-description">${stepText}</p>
+                            <p class="recipe-description"><span class="step-card-text">${stepText}</span></p>
                         </div>
                     `;
                 });
@@ -501,7 +511,11 @@
             if (shouldScroll) {
                 sideBySideSection.scrollIntoView({ behavior: 'smooth' });
             }
-            setTimeout(updateScrollButtonVisibility, 300);
+            syncMobileMenuTabs();
+            setTimeout(() => {
+                updateScrollButtonVisibility();
+                syncMobileMenuTabs();
+            }, 300);
             updateQalamProgress();
         } else if (mode === 'step-by-step') {
             sideBySideSection.style.display = 'none';
@@ -540,6 +554,8 @@
         if (sourceIngredients && destIngredients && destIngredients.children.length === 0) {
             destIngredients.innerHTML = sourceIngredients.innerHTML;
             destIngredients.querySelectorAll('.recipe-section').forEach(sec => sec.classList.remove('collapsed'));
+            destIngredients.querySelectorAll('.menu-item.is-checked').forEach(item => item.classList.remove('is-checked'));
+            destIngredients.querySelectorAll('.ingredient-qalam-strike').forEach(el => el.remove());
             destIngredients.querySelectorAll('.recipe-section-toggle').forEach(btn => {
                 const label = btn.querySelector('span');
                 const staticSpan = document.createElement('span');
@@ -547,6 +563,107 @@
                 btn.replaceWith(staticSpan);
             });
         }
+    }
+
+    function buildQalamStrikeLines(menuItem, animate = true) {
+        const textEl = menuItem.querySelector('.ingredient-text, .step-card-text');
+        if (!textEl) return;
+        menuItem.querySelectorAll('.ingredient-qalam-strike').forEach(el => el.remove());
+
+        const itemRect = menuItem.getBoundingClientRect();
+        const rawRects = Array.from(textEl.getClientRects()).filter(r => r.width > 1 && r.height > 1);
+        if (rawRects.length === 0) return;
+
+        // Merge client rects on the same visual line (e.g. mixed English + Urdu RTL runs)
+        const lines = [];
+        rawRects.forEach(r => {
+            const midY = r.top + r.height / 2;
+            const existing = lines.find(l => Math.abs(l.midY - midY) < Math.max(8, r.height * 0.45));
+            if (existing) {
+                existing.left = Math.min(existing.left, r.left);
+                existing.right = Math.max(existing.right, r.right);
+                existing.top = Math.min(existing.top, r.top);
+                existing.bottom = Math.max(existing.bottom, r.bottom);
+                existing.midY = (existing.top + existing.bottom) / 2;
+            } else {
+                lines.push({ left: r.left, right: r.right, top: r.top, bottom: r.bottom, midY });
+            }
+        });
+
+        const strokes = lines.map((line, idx) => {
+            const strike = document.createElement('span');
+            strike.className = 'ingredient-qalam-strike';
+            strike.setAttribute('aria-hidden', 'true');
+            const leftPx = Math.max(0, line.left - itemRect.left - 3);
+            const widthPx = Math.max(8, (line.right - line.left) + 6);
+            const topPx = line.midY - itemRect.top;
+            strike.style.left = `${leftPx.toFixed(1)}px`;
+            strike.style.top = `${topPx.toFixed(1)}px`;
+            strike.style.width = `${widthPx.toFixed(1)}px`;
+            if (animate) {
+                strike.style.transitionDelay = `${idx * 75}ms`;
+            } else {
+                strike.classList.add('is-drawn');
+            }
+            menuItem.appendChild(strike);
+            return strike;
+        });
+
+        if (animate) {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    strokes.forEach(s => s.classList.add('is-drawn'));
+                });
+            });
+        }
+    }
+
+    function syncCheckedIngredientStrikes() {
+        if (window.innerWidth > 900) return;
+        document.querySelectorAll('#ingredients-list-container .menu-item.is-checked, #steps-scroll-container .step-card.is-checked').forEach(item => {
+            buildQalamStrikeLines(item, false);
+        });
+    }
+
+    function syncMobileMenuTabs() {
+        if (window.innerWidth > 900) return;
+        const tabsBar = document.getElementById('mobile-menu-tabs');
+        const indicator = document.getElementById('mobile-menu-tab-indicator');
+        const menuGrid = document.getElementById('menu-grid');
+        if (!tabsBar || !indicator || !menuGrid) return;
+
+        const tabs = Array.from(tabsBar.querySelectorAll('.mobile-menu-tab'));
+        if (tabs.length < 2) return;
+
+        const barRect = tabsBar.getBoundingClientRect();
+        if (barRect.width === 0) return;
+
+        const labelRects = tabs.map(tab => {
+            const lbl = tab.querySelector('.mobile-menu-tab-label') || tab;
+            return lbl.getBoundingClientRect();
+        });
+
+        const maxScroll = Math.max(1, menuGrid.scrollWidth - menuGrid.clientWidth);
+        const progress = Math.max(0, Math.min(1, menuGrid.scrollLeft / maxScroll));
+
+        const x0 = labelRects[0].left - barRect.left;
+        const w0 = labelRects[0].width;
+        const x1 = labelRects[1].left - barRect.left;
+        const w1 = labelRects[1].width;
+
+        const curX = x0 + (x1 - x0) * progress;
+        const curW = w0 + (w1 - w0) * progress;
+
+        indicator.style.transform = `translate3d(${curX.toFixed(1)}px, 0, 0)`;
+        indicator.style.width = `${curW.toFixed(1)}px`;
+        indicator.style.opacity = '0.92';
+
+        const activeIdx = progress >= 0.5 ? 1 : 0;
+        tabs.forEach((tab, idx) => {
+            const isActive = idx === activeIdx;
+            tab.classList.toggle('is-active', isActive);
+            tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
     }
 
     function updateScrollButtonVisibility() {
@@ -631,6 +748,68 @@
                 }
             });
         });
+
+        // Mobile & tablet stationary 2-pane tabs + horizontal swipe sync
+        const tabsBar = document.getElementById('mobile-menu-tabs');
+        const menuGrid = document.getElementById('menu-grid');
+        if (tabsBar && menuGrid && !tabsBar.dataset.listenerAdded) {
+            tabsBar.dataset.listenerAdded = "true";
+            tabsBar.addEventListener('click', (e) => {
+                const tab = e.target.closest('.mobile-menu-tab');
+                if (!tab) return;
+                const paneIdx = parseInt(tab.getAttribute('data-pane'), 10) || 0;
+                menuGrid.scrollTo({
+                    left: paneIdx * menuGrid.clientWidth,
+                    behavior: 'smooth'
+                });
+            });
+
+            let tabScrollRaf = null;
+            menuGrid.addEventListener('scroll', () => {
+                if (tabScrollRaf) return;
+                tabScrollRaf = requestAnimationFrame(() => {
+                    tabScrollRaf = null;
+                    syncMobileMenuTabs();
+                });
+            }, { passive: true });
+        }
+        syncMobileMenuTabs();
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(() => {
+                syncMobileMenuTabs();
+                syncCheckedIngredientStrikes();
+            });
+        }
+
+        // Mobile & tablet tap-to-cross-off ingredients and steps with qalam brush stroke
+        const bindQalamStrikeContainer = (containerEl) => {
+            if (!containerEl || containerEl.dataset.strikeBound) return;
+            containerEl.dataset.strikeBound = "true";
+            containerEl.addEventListener('click', (e) => {
+                if (window.innerWidth > 900) return;
+                if (e.target.closest('a, button')) return;
+                const menuItem = e.target.closest('.menu-item');
+                if (!menuItem) return;
+
+                const isChecked = menuItem.classList.toggle('is-checked');
+                if (isChecked) {
+                    buildQalamStrikeLines(menuItem, true);
+                } else {
+                    const existingStrikes = menuItem.querySelectorAll('.ingredient-qalam-strike');
+                    existingStrikes.forEach(s => {
+                        s.style.transitionDelay = '0ms';
+                        s.classList.remove('is-drawn');
+                    });
+                    setTimeout(() => {
+                        if (!menuItem.classList.contains('is-checked')) {
+                            menuItem.querySelectorAll('.ingredient-qalam-strike').forEach(s => s.remove());
+                        }
+                    }, 380);
+                }
+            });
+        };
+        bindQalamStrikeContainer(document.getElementById('ingredients-list-container'));
+        bindQalamStrikeContainer(document.getElementById('steps-scroll-container'));
 
         // Urdu Qalam Progress Bar
         setupQalamProgressBar();
@@ -745,6 +924,8 @@
     window.addEventListener('resize', () => {
         updateScrollButtonVisibility();
         updateQalamProgress();
+        syncMobileMenuTabs();
+        syncCheckedIngredientStrikes();
         if (window.RecipeFloatingStage) {
             document.querySelectorAll('.floating-stage').forEach(stage => {
                 window.RecipeFloatingStage.layoutFloatingStage(stage, { activeOnly: Boolean(stage.querySelector('.floating-item.is-inactive')) });

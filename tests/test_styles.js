@@ -53,9 +53,12 @@ assert.match(recipeBaseCss, /\.nav-item a\.active::after\s*\{[^}]*mask-image:\s*
 assert.match(recipeSideBySideCss, /#menu \.recipe-section-toggle/, 'recipe-side-by-side.css should style semantic .recipe-section-toggle buttons');
 assert.match(recipeSideBySideCss, /\.steps-scroll-container/, 'recipe-side-by-side.css should define .steps-scroll-container');
 assert.match(recipeSideBySideCss, /\.scroll-down-btn/, 'recipe-side-by-side.css should define .scroll-down-btn');
+assert.match(recipeSideBySideCss, /\.mobile-menu-tab-indicator[\s\S]*?mask-image:\s*var\(--ink-brush-mask\)/, 'mobile/tablet tab indicator should use --ink-brush-mask');
+assert.match(recipeSideBySideCss, /\.ingredient-qalam-strike[\s\S]*?mask-image:\s*var\(--ink-brush-mask\)/, 'mobile/tablet ingredient cross-out should use --ink-brush-mask');
 
 assert.match(recipeStepByStepCss, /\.ingredients-centered-page/, 'recipe-step-by-step.css should define .ingredients-centered-page');
 assert.match(recipeStepByStepCss, /\.visual-sticky-column/, 'recipe-step-by-step.css should define .visual-sticky-column');
+assert.match(recipeStepByStepCss, /@media\s*\(max-width:\s*900px\)[\s\S]*?\.floating-item(?:,\s*\.floating-item\.is-active)?\s*\{[^}]*width:\s*\d+px;[^}]*height:\s*\d+px;[^}]*contain:\s*layout\s+size;/, 'mobile .floating-item should lock fixed width, height, and contain: layout size to prevent background reflow on Urdu toggle');
 
 assert.match(recipeProgressBarCss, /\.qalam-progress-container/, 'recipe-progress-bar.css should define .qalam-progress-container');
 assert.match(recipeProgressBarCss, /\.qalam-step-marker/, 'recipe-progress-bar.css should define .qalam-step-marker');

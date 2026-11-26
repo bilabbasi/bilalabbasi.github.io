@@ -271,6 +271,12 @@
     color: var(--link-hover);
 }
 
+/* Mobile/tablet stationary tab bar and qalam strike overlays stay hidden on desktop */
+.mobile-menu-tabs,
+.ingredient-qalam-strike {
+    display: none;
+}
+
 /* -------------------------------------------------------------------------
    7. SIDE-BY-SIDE RESPONSIVENESS OVERRIDES
    ------------------------------------------------------------------------- */
@@ -287,40 +293,252 @@
 }
 
 @media (max-width: 900px) {
+    /* Stationary single-viewport recipe board under the 48px sticky navbar */
+    .menu-section {
+        height: calc(100vh - 48px);
+        height: calc(100dvh - 48px);
+        min-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        scroll-margin-top: 48px;
+        scroll-snap-align: start;
+        justify-content: flex-start;
+        overflow: hidden;
+    }
 
-    /* Reset Side-by-Side vertical card scroll for mobile/tablet */
+    .menu-title,
+    .menu-section .column-title,
+    .menu-section .footer {
+        display: none;
+    }
+
+    /* Stationary Ingredients | Steps switcher with live qalam ink underline */
+    .mobile-menu-tabs {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+        flex-shrink: 0;
+        border-bottom: 1px solid var(--border-color);
+        background-color: var(--bg-main);
+        z-index: 4;
+    }
+
+    .mobile-menu-tab {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 46px;
+        padding: 10px 8px;
+        background: none;
+        border: none;
+        font-family: var(--font-serif);
+        font-size: 1.2rem;
+        font-weight: 400;
+        letter-spacing: -0.3px;
+        text-transform: lowercase;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: color 0.22s ease;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .mobile-menu-tab.is-active {
+        color: var(--text-subtitle);
+        font-weight: 500;
+    }
+
+    .mobile-menu-tab:focus-visible {
+        outline: 2px solid var(--link-hover);
+        outline-offset: -3px;
+        border-radius: 4px;
+    }
+
+    .mobile-menu-tab-label {
+        display: inline-block;
+        padding: 0 2px;
+    }
+
+    .mobile-menu-tab-indicator {
+        position: absolute;
+        bottom: 2px;
+        left: 0;
+        height: 7px;
+        width: 0;
+        background: linear-gradient(90deg, var(--link-color) 0%, var(--link-color) 65%, var(--link-hover) 100%);
+        -webkit-mask-image: var(--ink-brush-mask);
+        mask-image: var(--ink-brush-mask);
+        -webkit-mask-size: 100% 100%;
+        mask-size: 100% 100%;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        opacity: 0;
+        pointer-events: none;
+        will-change: transform, width;
+        transition: opacity 0.2s ease;
+    }
+
+    /* Horizontal 2-pane carousel: swipe left/right between Ingredients & Steps */
+    .menu-grid {
+        display: flex;
+        flex-direction: row;
+        flex: 1 1 auto;
+        min-height: 0;
+        width: 100%;
+        gap: 0;
+        margin-bottom: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        overscroll-behavior-x: contain;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .menu-grid::-webkit-scrollbar {
+        display: none;
+    }
+
+    .menu-column {
+        flex: 0 0 100%;
+        width: 100%;
+        min-width: 100%;
+        height: 100%;
+        min-height: 0;
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .steps-scroll-wrapper {
+        flex: 1 1 auto;
+        min-height: 0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Independent vertical scroll inside each mini-page */
     .steps-scroll-container,
     #ingredients-list-container {
-        height: auto;
-        overflow-y: visible;
+        flex: 1 1 auto;
+        min-height: 0;
+        height: 100%;
+        max-height: none;
+        overflow-y: auto;
+        overflow-x: hidden;
         scroll-snap-type: none;
-        padding-bottom: 0;
+        overscroll-behavior-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 18px 2px calc(32px + env(safe-area-inset-bottom, 0px)) 2px;
+        scrollbar-width: none;
     }
 
     .scroll-down-btn {
         display: none !important;
-        /* Hide vertical scroll button on mobile */
+        /* Hide desktop vertical scroll button on mobile/tablet */
+    }
+
+    /* Tap-to-cross-off ingredients with navbar qalam ink brush stroke */
+    #ingredients-list-container .recipe-section {
+        margin-bottom: 24px;
+    }
+
+    #ingredients-list-container .menu-item {
+        position: relative;
+        cursor: pointer;
+        padding: 7px 2px;
+        margin-bottom: 4px;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+    }
+
+    #ingredients-list-container .menu-item .recipe-description {
+        margin-bottom: 0;
+        font-size: 0.96rem;
+        line-height: 1.55;
+        color: var(--text-body);
+        transition: color 0.24s ease, opacity 0.24s ease;
+    }
+
+    #ingredients-list-container .menu-item .ingredient-text {
+        display: inline;
+    }
+
+    #ingredients-list-container .menu-item.is-checked .recipe-description {
+        color: var(--text-muted);
+        opacity: 0.52;
+    }
+
+    .ingredient-qalam-strike {
+        display: block;
+        position: absolute;
+        height: 7px;
+        background: linear-gradient(90deg, var(--link-color) 0%, var(--link-color) 65%, var(--link-hover) 100%);
+        -webkit-mask-image: var(--ink-brush-mask);
+        mask-image: var(--ink-brush-mask);
+        -webkit-mask-size: 100% 100%;
+        mask-size: 100% 100%;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        transform: translateY(-50%) scaleX(0) scaleY(0.75);
+        transform-origin: left center;
+        opacity: 0;
+        pointer-events: none;
+        will-change: transform, opacity;
+        transition: transform var(--ink-duration, 420ms) var(--ink-easing, cubic-bezier(0.22, 1, 0.36, 1)), opacity 0.2s ease;
+    }
+
+    .ingredient-qalam-strike.is-drawn {
+        transform: translateY(-50%) scaleX(1) scaleY(1);
+        opacity: 0.88;
     }
 
     .step-card {
+        position: relative;
         width: 100% !important;
         flex: none !important;
         max-width: 100%;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+    }
+
+    .step-card .step-card-text {
+        display: inline;
+    }
+
+    .step-card .step-card-num,
+    .step-card .recipe-description {
+        transition: color 0.24s ease, opacity 0.24s ease;
+    }
+
+    .step-card.is-checked {
+        background: rgba(0, 0, 0, 0.01);
+    }
+
+    .step-card.is-checked .step-card-num {
+        opacity: 0.45;
+    }
+
+    .step-card.is-checked .recipe-description {
+        color: var(--text-muted);
+        opacity: 0.52;
     }
 }
 
 @media (max-width: 600px) {
-    .menu-grid {
-        grid-template-columns: 1fr;
-        gap: 24px;
-    }
-
-    .menu-title {
-        font-size: 2.5rem;
-        margin-bottom: 32px;
-    }
-
     .step-card {
         padding: 16px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ingredient-qalam-strike,
+    .mobile-menu-tab-indicator {
+        transition-duration: 0.01ms !important;
     }
 }
