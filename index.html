@@ -18,9 +18,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap">
 
-    <!-- Stylesheets: Base tokens/typography + gateway cover layout -->
+    <!-- Stylesheet: Base tokens/typography and gateway cover layout -->
     <link rel="stylesheet" href="index.css">
-    <link rel="stylesheet" href="gateway.css">
 
     <!-- Configuration Data -->
     <script src="config.js"></script>
@@ -106,8 +105,10 @@
             }
 
             function getItemHeight() {
-                if (anchorEl && anchorEl.offsetHeight > 0) {
-                    return anchorEl.offsetHeight;
+                if (anchorEl) {
+                    const rectH = anchorEl.getBoundingClientRect().height;
+                    if (rectH > 0) return rectH;
+                    if (anchorEl.offsetHeight > 0) return anchorEl.offsetHeight;
                 }
                 return 68;
             }
@@ -213,7 +214,7 @@
                 while (currentT < 0.5 * C) currentT += C;
                 while (currentT >= 1.5 * C) currentT -= C;
 
-                trackEl.style.transform = `translateY(${-currentT}px)`;
+                trackEl.style.transform = `translate3d(0, ${-currentT}px, 0)`;
 
                 const viewportCenterY = 0.5 * H;
                 const children = trackEl.children;
@@ -227,12 +228,14 @@
                     const absD = Math.abs(d);
 
                     if (absD < 1.15) {
-                        // Cylindrical barrel 3D tilt + subtle perspective compression
+                        // Inline perspective avoids iOS Safari's overflow+mask+preserve-3d clipping bug
                         const angleDeg = Math.max(-72, Math.min(72, -d * 62));
                         const scale = Math.max(0.84, 1 - absD * 0.14);
                         const opacity = Math.max(0, 1 - absD * 1.12);
                         el.style.opacity = opacity.toFixed(3);
-                        el.style.transform = `rotateX(${angleDeg.toFixed(1)}deg) scale(${scale.toFixed(3)})`;
+                        el.style.transform = absD < 0.01
+                            ? "none"
+                            : `perspective(460px) rotateX(${angleDeg.toFixed(1)}deg) scale(${scale.toFixed(3)})`;
 
                         const itemId = el.getAttribute("data-item-id");
                         if (absD < 0.35 && itemId === "cook" && currentState === "kitchen") {
