@@ -619,7 +619,6 @@
     }
 
     function syncCheckedIngredientStrikes() {
-        if (window.innerWidth > 900) return;
         document.querySelectorAll('#ingredients-list-container .menu-item.is-checked, #steps-scroll-container .step-card.is-checked').forEach(item => {
             buildQalamStrikeLines(item, false);
         });
@@ -781,12 +780,11 @@
             });
         }
 
-        // Mobile & tablet tap-to-cross-off ingredients and steps with qalam brush stroke
+        // Click/tap-to-cross-off ingredients and steps with qalam brush stroke
         const bindQalamStrikeContainer = (containerEl) => {
             if (!containerEl || containerEl.dataset.strikeBound) return;
             containerEl.dataset.strikeBound = "true";
             containerEl.addEventListener('click', (e) => {
-                if (window.innerWidth > 900) return;
                 if (e.target.closest('a, button')) return;
                 const menuItem = e.target.closest('.menu-item');
                 if (!menuItem) return;

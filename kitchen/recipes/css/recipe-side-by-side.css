@@ -152,6 +152,7 @@
    ------------------------------------------------------------------------- */
 
 .step-card {
+    position: relative;
     width: 100%;
     background: rgba(0, 0, 0, 0.02);
     border: 1px solid var(--border-color);
@@ -161,7 +162,10 @@
     flex-direction: column;
     /* Stacks step number and text description vertically */
     gap: 16px;
-    transition: transform var(--transition-smooth), border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    transition: transform var(--transition-smooth), border-color var(--transition-smooth), box-shadow var(--transition-smooth), background-color 0.24s ease;
     box-sizing: border-box;
     scroll-snap-align: start;
     /* Snaps the card to the top of the scroll viewport */
@@ -180,10 +184,74 @@
     font-weight: 600;
     color: var(--text-subtitle);
     letter-spacing: 1px;
+    transition: color 0.24s ease, opacity 0.24s ease;
 }
 
 .step-card .recipe-description {
     margin-bottom: 0;
+    transition: color 0.24s ease, opacity 0.24s ease;
+}
+
+.step-card .step-card-text {
+    display: inline;
+}
+
+.step-card.is-checked {
+    background: rgba(0, 0, 0, 0.01);
+}
+
+.step-card.is-checked .step-card-num {
+    opacity: 0.45;
+}
+
+.step-card.is-checked .recipe-description {
+    color: var(--text-muted);
+    opacity: 0.52;
+}
+
+/* Click/tap-to-cross-off ingredients & steps with navbar qalam ink brush stroke */
+#ingredients-list-container .menu-item {
+    position: relative;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+#ingredients-list-container .menu-item .recipe-description {
+    transition: color 0.24s ease, opacity 0.24s ease;
+}
+
+#ingredients-list-container .menu-item .ingredient-text {
+    display: inline;
+}
+
+#ingredients-list-container .menu-item.is-checked .recipe-description {
+    color: var(--text-muted);
+    opacity: 0.52;
+}
+
+.ingredient-qalam-strike {
+    display: block;
+    position: absolute;
+    height: 7px;
+    background: linear-gradient(90deg, var(--link-color) 0%, var(--link-color) 65%, var(--link-hover) 100%);
+    -webkit-mask-image: var(--ink-brush-mask);
+    mask-image: var(--ink-brush-mask);
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    transform: translateY(-50%) scaleX(0) scaleY(0.75);
+    transform-origin: left center;
+    opacity: 0;
+    pointer-events: none;
+    will-change: transform, opacity;
+    transition: transform var(--ink-duration, 420ms) var(--ink-easing, cubic-bezier(0.22, 1, 0.36, 1)), opacity 0.2s ease;
+}
+
+.ingredient-qalam-strike.is-drawn {
+    transform: translateY(-50%) scaleX(1) scaleY(1);
+    opacity: 0.88;
 }
 
 /* -------------------------------------------------------------------------
@@ -271,9 +339,8 @@
     color: var(--link-hover);
 }
 
-/* Mobile/tablet stationary tab bar and qalam strike overlays stay hidden on desktop */
-.mobile-menu-tabs,
-.ingredient-qalam-strike {
+/* Mobile/tablet stationary tab bar stays hidden on desktop */
+.mobile-menu-tabs {
     display: none;
 }
 
@@ -442,18 +509,14 @@
         /* Hide desktop vertical scroll button on mobile/tablet */
     }
 
-    /* Tap-to-cross-off ingredients with navbar qalam ink brush stroke */
+    /* Mobile/tablet ingredient spacing & typography overrides */
     #ingredients-list-container .recipe-section {
         margin-bottom: 24px;
     }
 
     #ingredients-list-container .menu-item {
-        position: relative;
-        cursor: pointer;
         padding: 7px 2px;
         margin-bottom: 4px;
-        -webkit-tap-highlight-color: transparent;
-        user-select: none;
     }
 
     #ingredients-list-container .menu-item .recipe-description {
@@ -461,72 +524,12 @@
         font-size: 0.96rem;
         line-height: 1.55;
         color: var(--text-body);
-        transition: color 0.24s ease, opacity 0.24s ease;
-    }
-
-    #ingredients-list-container .menu-item .ingredient-text {
-        display: inline;
-    }
-
-    #ingredients-list-container .menu-item.is-checked .recipe-description {
-        color: var(--text-muted);
-        opacity: 0.52;
-    }
-
-    .ingredient-qalam-strike {
-        display: block;
-        position: absolute;
-        height: 7px;
-        background: linear-gradient(90deg, var(--link-color) 0%, var(--link-color) 65%, var(--link-hover) 100%);
-        -webkit-mask-image: var(--ink-brush-mask);
-        mask-image: var(--ink-brush-mask);
-        -webkit-mask-size: 100% 100%;
-        mask-size: 100% 100%;
-        -webkit-mask-repeat: no-repeat;
-        mask-repeat: no-repeat;
-        transform: translateY(-50%) scaleX(0) scaleY(0.75);
-        transform-origin: left center;
-        opacity: 0;
-        pointer-events: none;
-        will-change: transform, opacity;
-        transition: transform var(--ink-duration, 420ms) var(--ink-easing, cubic-bezier(0.22, 1, 0.36, 1)), opacity 0.2s ease;
-    }
-
-    .ingredient-qalam-strike.is-drawn {
-        transform: translateY(-50%) scaleX(1) scaleY(1);
-        opacity: 0.88;
     }
 
     .step-card {
-        position: relative;
         width: 100% !important;
         flex: none !important;
         max-width: 100%;
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-        user-select: none;
-    }
-
-    .step-card .step-card-text {
-        display: inline;
-    }
-
-    .step-card .step-card-num,
-    .step-card .recipe-description {
-        transition: color 0.24s ease, opacity 0.24s ease;
-    }
-
-    .step-card.is-checked {
-        background: rgba(0, 0, 0, 0.01);
-    }
-
-    .step-card.is-checked .step-card-num {
-        opacity: 0.45;
-    }
-
-    .step-card.is-checked .recipe-description {
-        color: var(--text-muted);
-        opacity: 0.52;
     }
 }
 
