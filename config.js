@@ -99,8 +99,8 @@ const OFFICE_CONFIG = {
     // Your office subtitle (appears under your name)
     subtitle: "Research Scientist, PhD",
 
-    // Your biography paragraph
-    bio: "I am a research scientist at <a href=\"https://www.interdigital.com\" target=\"_blank\" rel=\"noopener noreferrer\">InterDigital</a>, working on AI-based video compression. Previously, I was a researcher at <a href=\"https://eidosmontreal.com\" target=\"_blank\" rel=\"noopener noreferrer\">Eidos-Montréal</a>, working on deep learning for meshes. And, before that, I was doing a PhD at <a href=\"https://www.mcgill.ca\" target=\"_blank\" rel=\"noopener noreferrer\">McGill University</a> in Applied Mathematics.",
+    // Biography Markdown file (relative to office/index.html)
+    bioFile: "bio.md",
 
     // Contact trigger & obfuscated recipient (XOR-encoded char codes decoded only on form submit)
     contact: {

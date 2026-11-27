@@ -20,6 +20,9 @@
     <!-- Stylesheet: Controls how the website looks (colors, fonts, sizes) -->
     <link rel="stylesheet" href="../index.css">
 
+    <!-- Markdown Parser Library: Vendored locally -->
+    <script src="../assets/marked.min.js"></script>
+
     <!-- Configuration Data: Where your text and links are defined -->
     <script src="../config.js"></script>
 
@@ -47,15 +50,47 @@
             const titleEl = document.getElementById("title-text");
             if (titleEl) titleEl.textContent = OFFICE_CONFIG.subtitle || "Research Scientist, PhD";
 
-            // 3. Set bio text and append contact trigger from config
+            // 3. Load biography from Markdown (office/bio.md) and append contact trigger
             const contactLabel = (OFFICE_CONFIG.contact && OFFICE_CONFIG.contact.label) || "Get in touch.";
             const bioEl = document.getElementById("bio-text");
-            if (bioEl) {
-                bioEl.innerHTML = `${OFFICE_CONFIG.bio}\n\n<button type="button" class="bio-contact-trigger" id="contact-trigger">${contactLabel}</button>`;
-            }
             const modalTitleEl = document.getElementById("contact-modal-title");
             if (modalTitleEl) {
                 modalTitleEl.textContent = contactLabel.replace(/\.$/, "");
+            }
+
+            function renderBioMarkdown(markdown) {
+                if (!bioEl) return;
+                const trimmed = (markdown || "").trim();
+                let html = "";
+                if (trimmed) {
+                    html = (typeof marked !== "undefined" && marked.parse)
+                        ? marked.parse(trimmed)
+                        : trimmed.split(/\n\s*\n/).map(p => `<p>${p.trim().replace(/\n/g, "<br>")}</p>`).join("");
+                }
+                bioEl.innerHTML = `${html}<p class="bio-contact-line"><button type="button" class="bio-contact-trigger" id="contact-trigger">${contactLabel}</button></p>`;
+
+                bioEl.querySelectorAll("a[href]").forEach(link => {
+                    const href = link.getAttribute("href") || "";
+                    if (/^https?:\/\//i.test(href)) {
+                        link.setAttribute("target", "_blank");
+                        link.setAttribute("rel", "noopener noreferrer");
+                    }
+                });
+            }
+
+            if (bioEl) {
+                const bioPath = OFFICE_CONFIG.bioFile || "bio.md";
+                const bioUrl = new URL(bioPath, window.location.href).href;
+                fetch(bioUrl)
+                    .then(res => {
+                        if (!res.ok) throw new Error(`Could not fetch ${bioPath}`);
+                        return res.text();
+                    })
+                    .then(renderBioMarkdown)
+                    .catch(err => {
+                        console.warn("Could not load office bio markdown:", err);
+                        renderBioMarkdown(OFFICE_CONFIG.bio || "");
+                    });
             }
 
             // 4. Generate the social/profile links dynamically with animated platform icons
@@ -108,7 +143,6 @@
             }
 
             // 5. Wire up contact message modal with JS-obfuscated mailto delivery
-            const trigger = document.getElementById("contact-trigger");
             const modal = document.getElementById("contact-modal");
             const closeBtn = document.getElementById("contact-close");
             const form = document.getElementById("contact-form");
@@ -145,11 +179,18 @@
                 if (!modal) return;
                 modal.classList.remove("is-open");
                 modal.setAttribute("aria-hidden", "true");
+                const trigger = document.getElementById("contact-trigger");
                 if (trigger) trigger.focus();
             }
 
-            if (trigger && modal) {
-                trigger.addEventListener("click", openModal);
+            if (modal) {
+                if (bioEl) {
+                    bioEl.addEventListener("click", (e) => {
+                        if (e.target.closest("#contact-trigger")) {
+                            openModal();
+                        }
+                    });
+                }
                 if (closeBtn) closeBtn.addEventListener("click", closeModal);
                 modal.addEventListener("click", (e) => {
                     if (e.target === modal) closeModal();
@@ -241,8 +282,8 @@
                     <h2 class="main-subtitle" id="main-subtitle"><span id="title-text"></span></h2>
                 </div>
 
-                <!-- Main bio paragraph text (populated by JavaScript loader) -->
-                <p class="bio-paragraph" id="bio-text"></p>
+                <!-- Main bio text (loaded from office/bio.md by JavaScript loader) -->
+                <div class="bio-paragraph" id="bio-text"></div>
 
                 <!-- Container where the social/office links will be loaded -->
                 <div class="external-links" id="links-list">
