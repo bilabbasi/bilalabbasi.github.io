@@ -12,11 +12,21 @@ const vm = require('vm');
 
 const rootDir = path.resolve(__dirname, '..');
 
-// 1. Verify all recipes and nav paths in config.js resolve to existing directories/files
+// 1. Verify all recipes, nav paths, and office bioFile in config.js resolve to existing directories/files
 const configCode = fs.readFileSync(path.join(rootDir, 'config.js'), 'utf-8');
 const ctx = {};
 vm.createContext(ctx);
-vm.runInContext(configCode + '\n;globalThis.KITCHEN_CONFIG = KITCHEN_CONFIG;', ctx);
+vm.runInContext(configCode + '\n;globalThis.KITCHEN_CONFIG = KITCHEN_CONFIG; globalThis.OFFICE_CONFIG = OFFICE_CONFIG;', ctx);
+
+if (ctx.OFFICE_CONFIG && ctx.OFFICE_CONFIG.bioFile) {
+    const bioFilePath = path.resolve(rootDir, 'office', ctx.OFFICE_CONFIG.bioFile);
+    assert.ok(fs.existsSync(bioFilePath), `Missing office bioFile: ${ctx.OFFICE_CONFIG.bioFile}`);
+    const bioMd = fs.readFileSync(bioFilePath, 'utf-8').trim();
+    assert.ok(bioMd.length > 0, `Office bioFile is empty: ${ctx.OFFICE_CONFIG.bioFile}`);
+    const marked = require(path.join(rootDir, 'assets', 'marked.min.js'));
+    const parsedHtml = marked.parse(bioMd);
+    assert.ok(parsedHtml.includes('<p>'), 'Parsed office bio.md should render paragraph HTML');
+}
 
 (ctx.KITCHEN_CONFIG.recipes || []).forEach(recipe => {
     const recipeDir = path.join(rootDir, 'kitchen', recipe.url);

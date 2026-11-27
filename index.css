@@ -486,6 +486,33 @@ body {
     /* Justify text to align cleanly with both left and right column boundaries */
 }
 
+/* Office bio renders Markdown from office/bio.md */
+.office-content .bio-paragraph {
+    white-space: normal;
+}
+
+.office-content .bio-paragraph > * + * {
+    margin-top: 1em;
+}
+
+.office-content .bio-paragraph > * + .bio-contact-line {
+    margin-top: 1.55em;
+}
+
+.office-content .bio-paragraph ul,
+.office-content .bio-paragraph ol {
+    padding-left: 1.25em;
+}
+
+.office-content .bio-paragraph li + li {
+    margin-top: 0.35em;
+}
+
+.office-content .bio-paragraph strong {
+    font-weight: 600;
+    color: var(--text-title);
+}
+
 /* Inline links inside bio paragraph: discreet by default, reveals color on hover */
 .bio-paragraph a {
     color: inherit;

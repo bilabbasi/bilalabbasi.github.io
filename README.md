@@ -11,7 +11,8 @@ Built with vanilla HTML5, CSS3, and ES6 JavaScript—no build step, no bundler, 
 ## Repository Map
 
 ### Content (files you edit regularly)
-* `config.js` — All site text, bios, external links, nav tabs, theme colors, and the recipe directory.
+* `config.js` — All site text, kitchen bio, external links, nav tabs, theme colors, and the recipe directory.
+* `office/bio.md` — Markdown biography for the **office** page (`/office/`).
 * `kitchen/customs/this_space.md` — Essay for the **customs** page (`/kitchen/customs/`).
 * `kitchen/ammi/us.md` — Essay for the **ammi** page (`/kitchen/ammi/`).
 * `kitchen/recipes/<slug>/recipe.js` — Individual recipe data (YAML inside a JS template string so `file://` works without CORS).
@@ -63,10 +64,11 @@ node kitchen/recipes/new.js biryani "Ammi’s Biryani" "Fragrant layered basmati
 Then add the printed entry to `KITCHEN_CONFIG.recipes` in `config.js`.
 
 ### 2. Edit a bio, links, or gateway descriptors
-Open `config.js` and edit:
-* `GATEWAY_CONFIG.reel.items` — Descriptors on the cover page.
-* `OFFICE_CONFIG` — Name, subtitle, bio, and external links.
-* `KITCHEN_CONFIG` — Kitchen title, subtitle, bio, theme colors, and recipes.
+* Edit `office/bio.md` directly in Markdown for the office biography.
+* Open `config.js` to edit:
+  * `GATEWAY_CONFIG.reel.items` — Descriptors on the cover page.
+  * `OFFICE_CONFIG` — Name, subtitle, `bioFile`, contact trigger, and external links.
+  * `KITCHEN_CONFIG` — Kitchen title, subtitle, bio, theme colors, and recipes.
 
 ### 3. Edit the Customs or Ammi essays
 Edit the Markdown directly in:
