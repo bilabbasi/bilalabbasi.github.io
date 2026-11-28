@@ -1,1 +1,3 @@
 I am a research scientist at [InterDigital](https://www.interdigital.com), working on AI-based video compression. Previously, I was a researcher at [Eidos-Montréal](https://eidosmontreal.com), working on deep learning for meshes. And, before that, I was doing a PhD at [McGill University](https://www.mcgill.ca) in Applied Mathematics. 
+
+I gravitate towards problems in computer vision and generative modelling, especially with data that occupies at least two dimensions. I'm also keen on well-thought-out interfaces, with a strong belief that many challenges can become far more tractable by having better tools to engage with them.
